@@ -32,10 +32,16 @@ identify -> fetch -> render works end to end.
 
 ## TODO
 
-1. Build the JP-text -> card-id index (~2000 cards): JP passive/leader lines
-   + titles keyed by card id. Sources: fandom wiki card pages (MediaWiki API)
-   or the game's decrypted SQLite DB (grayer area). dokkan.wiki API is
-   English-only; DokkanInfo is client-rendered (no scraping without JS).
+1. Build the JP-text -> card-id index: **scraper built & validated
+   (2026-07-28)** — `prototype/build_index.py` scrapes DokkanInfo's
+   server-embedded JSON (`jpnja.dokkaninfo.com`, JP-server/JP-language;
+   earlier "client-rendered, unscrapable" finding was outdated). Validated
+   on a 20-card stratified sample: titles, passive lines, EZA pre/post kits
+   (`?eza=true` = pre-EZA), transformation following, filler filtering all
+   work; `match.py` voting picks the right card under heavy synthetic OCR
+   noise; ids spot-checked against dokkan.wiki EN API. Details in
+   `prototype/NOTES.md`. **Remaining: run the full ~11k-card scrape
+   (`python build_index.py --all`, ~3.5h at 1 req/s).**
 2. Android app (Kotlin): floating bubble + MediaProjection capture, ML Kit
    Text Recognition v2 (Japanese) instead of Tesseract — retest whether ML Kit
    reads the vertical stylized titles (it likely handles rotation better),

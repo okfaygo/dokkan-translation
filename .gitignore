@@ -1,0 +1,4 @@
+# scrape cache and generated index (rebuild with prototype/build_index.py)
+prototype/cache/
+prototype/index.json
+__pycache__/
