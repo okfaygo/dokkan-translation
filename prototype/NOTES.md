@@ -20,7 +20,17 @@ the community has already translated every JP kit; we identify and look up.
 ## Data findings
 - dokkan.wiki API is English-only; `?lang=ja` is ignored. No public search
   endpoint found at `/api/search`.
-- DokkanInfo is client-rendered (empty HTML shell for scrapers).
+- ~~DokkanInfo is client-rendered (empty HTML shell for scrapers)~~ —
+  **outdated (re-checked 2026-07-28)**: card pages are server-rendered with
+  the full kit embedded as HTML-entity-escaped JSON. Language/server variants
+  live on subdomains: `jpnja.dokkaninfo.com` (JP server, Japanese text — JP
+  title + name + leader + the exact passive-detail lines we OCR),
+  `jpnen.dokkaninfo.com` (JP server, English). The card list
+  `jpnja.dokkaninfo.com/cards?sort=open_at` is a single 12MB page embedding a
+  JSON array of all ~11,176 cards (id, JP name, rarity, eza, open_at) — the
+  enumeration source for the index scrape. Requires a real browser
+  User-Agent (default curl UA -> Cloudflare 403). No XHR involved, plain
+  curl works.
 - JP titles per card are available on the fandom wiki card pages
   (dbz-dokkanbattle.fandom.com, MediaWiki API) -> best source for a one-time
   index scrape. The game's own decrypted SQLite DB also contains all JP
@@ -37,6 +47,37 @@ the community has already translated every JP kit; we identify and look up.
   scraper job; kit JSON fetched live from dokkan.wiki and cached.
 - Reading the screen only — no game modification, no ToS concerns beyond
   normal screen-capture permissions.
+
+## Index scraper (build_index.py, validated 2026-07-28)
+
+- 20-card stratified sample (all rarities, EZAs, oldest/newest, transforming
+  cards) scraped and validated end to end.
+- Card page structure: `datajson` attr -> `card` (id, JP name),
+  `leader_skill.name` **is the card title** (the near-unique matching key),
+  `leader_skill.description`, `passive_skill.itemized_description` = exactly
+  the passive-detail-screen lines we OCR (after stripping `{passiveImg:..}`
+  markup, `*headers*`, `・` bullets, full-width spaces).
+- **EZA**: bare `/cards/<id>` serves the CURRENT max-EZA/SEZA kit;
+  `/cards/<id>?eza=true` (counterintuitively) serves the ORIGINAL pre-EZA
+  kit. Detect EZA via non-empty `eza_medals` in datajson; index both line
+  sets (`lines` + `pre_eza_lines`). Intermediate EZA steps (partially-EZA'd
+  cards) are not covered — acceptable gap, fuzzy voting still overlaps.
+- **Transformations**: `transformations` in datajson lists the other forms'
+  ids (4xxxxxx etc.); scraper follows them recursively. dokkan.wiki API
+  serves those ids too, so transformed forms resolve to EN kits directly.
+- **Filler**: many `9xxxxxx` list entries (World Tournament/event units)
+  have no leader/passive at all — skipped (no title AND no lines). Some
+  9xxxxxx story cards (e.g. giant-form Vegeta) are real and kept.
+- List page rarity can disagree with card page rarity (e.g. 1005701 listed
+  SSR, page says SR) — cosmetic, ids are what matter.
+- Matching (match.py, rewritten for the rich index): per-OCR-line best
+  rapidfuzz ratio >= 70 vs each card's lines/title/name, summed per card.
+  Smoke test with heavy synthetic OCR garbling (気力+2->気力T8 etc.):
+  1032261 wins 741 vs 346 runner-up; pre-EZA Cell lines -> 1017351 at
+  992 vs 526. ID alignment with dokkan.wiki EN API spot-checked on 3 cards
+  including a transformed form.
+- Full run: ~11k SSR+ cards x 2 requests for the ~656 EZA'd ones, 1 req/s
+  -> ~3.5h one-time; cache dir holds gzipped datajson (~80KB/card).
 
 ## Results from first real screenshots (SSJ4 Goku (Mini) DAIMA, card 1032261)
 - Passive-detail screen (dark bg, plain UI font): near-perfect OCR of Japanese
