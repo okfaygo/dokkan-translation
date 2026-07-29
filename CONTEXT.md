@@ -44,10 +44,19 @@ identify -> fetch -> render works end to end.
    Full-index stress test: noisy modern UR wins 741 vs 618 runner-up;
    worst-case 2-line old SSR still ranks #1 (tied only with its own
    awakening sibling, same kit). `rank()` over 5,169 cards: 0.3s.
-2. Android app (Kotlin): floating bubble + MediaProjection capture, ML Kit
-   Text Recognition v2 (Japanese) instead of Tesseract — retest whether ML Kit
-   reads the vertical stylized titles (it likely handles rotation better),
-   bundled SQLite index, live kit fetch + cache, bottom-sheet UI.
+2. Android app (Kotlin): **v0.1 scaffold built (2026-07-29)** in `android/`
+   — share-sheet MVP (screenshot -> Share -> English kit; no special
+   permissions), ML Kit Text Recognition v2 (Japanese, bundled model),
+   bundled `assets/index.json`, Kotlin port of the voting matcher (LCS
+   ratio verified identical to rapidfuzz fuzz.ratio), dokkan.wiki fetch +
+   disk cache, Compose UI with alternative-candidate fallback. **Not yet
+   compiled/run — needs Android Studio + a device; first on-device test of
+   ML Kit OCR quality is the next milestone.** Roadmap after that:
+   v0.2 floating bubble + MediaProjection (manual trigger), v0.3 auto-detect
+   card screens from captured frames (marker text or image-retrieval on
+   card art — retrieval index, NOT a trained classifier). Overlay draws
+   only; MediaProjection is what reads the screen (games have no
+   accessibility tree).
 3. EZA/transformed states: same card id, different passive — API's
    `optimal_awakening_growths` / `transformations` cover this.
 
