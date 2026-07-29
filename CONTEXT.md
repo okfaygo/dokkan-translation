@@ -32,16 +32,18 @@ identify -> fetch -> render works end to end.
 
 ## TODO
 
-1. Build the JP-text -> card-id index: **scraper built & validated
-   (2026-07-28)** — `prototype/build_index.py` scrapes DokkanInfo's
-   server-embedded JSON (`jpnja.dokkaninfo.com`, JP-server/JP-language;
-   earlier "client-rendered, unscrapable" finding was outdated). Validated
-   on a 20-card stratified sample: titles, passive lines, EZA pre/post kits
-   (`?eza=true` = pre-EZA), transformation following, filler filtering all
-   work; `match.py` voting picks the right card under heavy synthetic OCR
-   noise; ids spot-checked against dokkan.wiki EN API. Details in
-   `prototype/NOTES.md`. **Remaining: run the full ~11k-card scrape
-   (`python build_index.py --all`, ~3.5h at 1 req/s).**
+1. ~~Build the JP-text -> card-id index~~ **DONE (2026-07-29)** —
+   `prototype/build_index.py` scraped DokkanInfo's server-embedded JSON
+   (`jpnja.dokkaninfo.com`). Full run complete: **5,169 cards indexed**
+   (767 with pre-EZA kits, 294 with actives; 23.5k passive lines; 3MB
+   `index.json`, gitignored — rebuild from `prototype/cache/` with
+   `--rebuild`). 5,899 kit-less event/filler units skipped; 13 junk ids
+   fail server-side (DokkanInfo 500s/redirect loops) plus 2 real transformed
+   forms (4020341 SSGSS Vegeta Evolution, 4021821 Videl) whose pages are
+   broken on DokkanInfo itself — base forms are indexed, acceptable gap.
+   Full-index stress test: noisy modern UR wins 741 vs 618 runner-up;
+   worst-case 2-line old SSR still ranks #1 (tied only with its own
+   awakening sibling, same kit). `rank()` over 5,169 cards: 0.3s.
 2. Android app (Kotlin): floating bubble + MediaProjection capture, ML Kit
    Text Recognition v2 (Japanese) instead of Tesseract — retest whether ML Kit
    reads the vertical stylized titles (it likely handles rotation better),

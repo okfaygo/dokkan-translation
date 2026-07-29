@@ -79,6 +79,32 @@ the community has already translated every JP kit; we identify and look up.
 - Full run: ~11k SSR+ cards x 2 requests for the ~656 EZA'd ones, 1 req/s
   -> ~3.5h one-time; cache dir holds gzipped datajson (~80KB/card).
 
+## Full scrape results (2026-07-29)
+
+- **5,169 cards indexed** out of 11,073 SSR+ list entries; 5,899 were
+  kit-less event/tournament/filler units (skipped). 767 cards carry
+  pre-EZA line sets, 294 have active skills. 23,538 passive lines total;
+  index.json ~3MB. The run is resumable: a laptop crash mid-run cost only
+  one truncated cache file (delete the corrupt `.json.gz`, rerun `--all`,
+  cached cards replay in seconds).
+- 15 ids fail permanently **server-side** (DokkanInfo 500s / redirect
+  loops / 404s, reproducible in a browser): 13 are junk (Hatchhyack event
+  enemies, Fail-Gotenks A/B, Satan statue, test card 9999990). Two are real
+  transformed forms with broken pages: 4020341 (SSGSS Vegeta (Evolution))
+  and 4021821 (Videl) — their base forms ARE indexed, so identification
+  still works via base kit/title; only a screenshot of specifically those
+  two transformed passive screens would match weakly. No JP-language
+  fallback exists (glbja.dokkaninfo.com just redirects).
+- Full-index stress tests: the synthetic-noise SSJ4 Goku Mini test still
+  ranks 1032261 #1 (741 vs 618 — margin narrows vs the 16-card index but
+  stays clear). Worst case, a 2-line generic old SSR (Krillin 1004530) with
+  exact lines: rank #1, tied only with 1004531 — its own Dokkan-awakening
+  sibling, which shares the identical kit (unresolvable from text alone,
+  and harmless: same character, near-same EN kit; could disambiguate by
+  element/rarity pixels later if it matters).
+- `rank()` over the full index: ~0.3s for 8 candidate lines (pure Python
+  loop; rapidfuzz `process.cdist` can cut this further for the app).
+
 ## Results from first real screenshots (SSJ4 Goku (Mini) DAIMA, card 1032261)
 - Passive-detail screen (dark bg, plain UI font): near-perfect OCR of Japanese
   prose with `jpn` + inverted grayscale + psm 6. Only digits next to icon
