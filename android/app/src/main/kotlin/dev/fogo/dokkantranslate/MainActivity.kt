@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
             AppScreen(
                 state = state,
                 onPickImage = { pickImage.launch("image/*") },
-                onSelectCard = { cardId, _ -> lookUp(cardId) },
+                onSelectCard = ::lookUp,
             )
         }
         handleShareIntent(intent)
