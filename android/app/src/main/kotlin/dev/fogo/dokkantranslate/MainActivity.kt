@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
             AppScreen(
                 state = state,
                 onPickImage = { pickImage.launch("image/*") },
-                onSelectCard = { cardId, altView -> lookUp(cardId, altView) },
+                onSelectCard = { cardId, _ -> lookUp(cardId) },
             )
         }
         handleShareIntent(intent)
@@ -102,7 +102,9 @@ class MainActivity : ComponentActivity() {
     }
 
     /** Look up a card id (alternatives list, transformations). */
-    private fun lookUp(cardId: String, altView: Boolean) {
+    private fun lookUp(cardId: String) {
+        val altView = CardIndex.load(this).firstOrNull { it.id == cardId }
+            ?.altKeys?.isNotEmpty() == true
         val alternatives = (state as? UiState.Result)?.alternatives ?: emptyList()
         lifecycleScope.launch {
             try {
