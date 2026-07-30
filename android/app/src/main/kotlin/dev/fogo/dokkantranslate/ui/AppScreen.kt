@@ -28,7 +28,7 @@ import dev.fogo.dokkantranslate.UiState
 fun AppScreen(
     state: UiState,
     onPickImage: () -> Unit,
-    onSelectCard: (String) -> Unit,
+    onSelectCard: (String, Boolean) -> Unit,
 ) {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Scaffold { padding ->
@@ -96,7 +96,7 @@ private fun SectionHeader(text: String) {
 @Composable
 private fun KitView(
     result: UiState.Result,
-    onSelectCard: (String) -> Unit,
+    onSelectCard: (String, Boolean) -> Unit,
     onPickImage: () -> Unit,
 ) {
     val kit = result.kit
@@ -139,7 +139,7 @@ private fun KitView(
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             for ((id, name) in kit.transformations) {
                 OutlinedButton(
-                    onClick = { onSelectCard(id) },
+                    onClick = { onSelectCard(id, false) },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(name)
@@ -162,10 +162,10 @@ private fun KitView(
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             for (alt in result.alternatives) {
                 OutlinedButton(
-                    onClick = { onSelectCard(alt.record.id) },
+                    onClick = { onSelectCard(alt.record.id, alt.matchedAltView) },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text(alt.record.displayName)
+                    Text(alt.record.displayLabel)
                 }
             }
         }

@@ -86,6 +86,21 @@ identify -> fetch -> render works end to end.
    - Remaining known issue (own work item): card-page identification
      accuracy on transformed forms / busy screens; needs OCR-line dumps
      from failing screenshots (debug screen) before tuning.
+   **Field-test round 3 fixes (2026-07-30, untested on device yet):**
+   - KEY DATA FINDING: DokkanInfo's two per-card views are NOT consistently
+     base/current — bare URL = base kit for EZA'd URs (e.g. Majin Vegeta
+     1023981, both jpnja and global) but SEZA kit for LRs (Cell 1017351);
+     `?eza=true` is the respective other. So "always fetch bare" (round 2)
+     showed base kits for EZA'd URs. Display rule now: fetch whichever view
+     MATCHED the screenshot (the screenshot is ground truth for the
+     player's state). Index stores both views' lines ("lines" = bare view,
+     "pre_eza_lines" = ?eza=true view — historical name, do NOT read it as
+     literally pre-EZA). No pre/post labels or toggles anywhere.
+   - Tie-break regression fix: round 2's id tie-break made transformed
+     forms (4xxxxxxx > 1xxxxxxx) beat their base cards; head-group order is
+     now base-cards-first, then rarity, then id.
+   - Alternatives list shows "[UR Extreme INT] Name" labels (rarity +
+     element from the index) to disambiguate same-name cards.
    Roadmap after that:
    v0.2 floating bubble + MediaProjection (manual trigger), v0.3 auto-detect
    card screens from captured frames (marker text or image-retrieval on

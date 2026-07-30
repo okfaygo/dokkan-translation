@@ -11,21 +11,26 @@ testing from the gallery.
    fully on-device. Keeps recognized lines containing Japanese characters.
 2. `match/CardIndex` — loads `assets/index.json` (built by
    `../prototype/build_index.py`; 5,169 cards incl. English names, ~3MB).
-   Match keys per card: passive lines (current kit AND previous-EZA-step
-   kit — a player's in-game text depends on how far they've awakened the
-   card) + active/leader lines + title + name.
+   Two key groups per card, mirroring DokkanInfo's two per-card views
+   (bare URL vs `?eza=true`): passive lines + active/leader lines + title
+   + name in the main group; the `?eza=true` view's lines in the alt group.
 3. `match/Matcher` — port of `../prototype/match.py`: per OCR line, best
    normalized-indel ratio (identical to rapidfuzz `fuzz.ratio`, verified to
    float precision) against each card's keys; scores >= 70, weighted by
    line length (full sentences outvote category chips / UI labels), summed
-   per card. Candidates within 2% of the top score are re-ranked by rarity
-   then id, so awakening siblings resolve to the awakened stage.
+   per card. The two views are scored separately, and the winner remembers
+   WHICH view matched. Candidates within 2% of the top score are re-ranked
+   base-cards-first, then rarity, then id — awakened beats unawakened, and
+   a base card beats its own transformed form.
 4. `api/DokkanInfo` — fetches the GLOBAL `dokkaninfo.com/cards/<id>` page
    (embedded `datajson`), permanent disk cache under `cache/dokkaninfo/`
    (the v0.1 `cache/kits/` dir is purged on first use — its dokkan.wiki
-   payloads read as blank kits under this parser). Always the current kit:
-   EZA steps aren't binary (EZA -> Super EZA), so per-step views were
-   removed after field testing. Replaced dokkan.wiki, which went stale.
+   payloads read as blank kits under this parser). Fetches whichever view
+   MATCHED the screenshot: the bare/?eza=true views aren't consistently
+   base/EZA (bare = base kit for EZA'd URs but SEZA kit for LRs), so the
+   screenshot itself decides which kit the player is looking at. No
+   pre/post-EZA labels anywhere, deliberately. Replaced dokkan.wiki,
+   which went stale.
 5. `ui/AppScreen` — Compose UI. Kit sections incl. Active Skill and a
    Transformations section (buttons jump between a card's forms), plus a
    "not the right card?" list of the next 3 candidates (English names).

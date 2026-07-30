@@ -61,10 +61,12 @@ def rank(candidates, index, threshold=70):
     if not ranked:
         return ranked
     # Awakening siblings share (nearly) identical text; within the head
-    # group prefer the later stage (higher rarity, then higher id)
+    # group prefer base summonable cards over transformed/story forms
+    # (4xxxxxxx/9xxxxxxx), then the later stage (higher rarity, higher id)
     cutoff = ranked[0][1] * TIE_MARGIN
     head = [r for r in ranked if r[1] >= cutoff]
-    head.sort(key=lambda kv: (-index[kv[0]].get("rarity", 0), -int(kv[0])))
+    head.sort(key=lambda kv: (int(kv[0]) >= 4_000_000,
+                              -index[kv[0]].get("rarity", 0), -int(kv[0])))
     return head + ranked[len(head):]
 
 

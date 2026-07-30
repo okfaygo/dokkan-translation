@@ -11,9 +11,14 @@ import org.json.JSONObject
  * English kit source: the GLOBAL dokkaninfo.com card page, which embeds the
  * full kit as HTML-entity-escaped JSON in a `datajson="..."` attribute.
  * Always up to date (JP/GLB release simultaneously), same card ids as the
- * bundled index. Always the CURRENT kit (max EZA step) — per-step EZA views
- * were removed after field testing showed EZA steps aren't binary and the
- * pre/post toggle mislabeled kits.
+ * bundled index.
+ *
+ * DokkanInfo serves two views per card and which one is the player's
+ * current kit varies by card (bare URL = base kit for EZA'd URs but SEZA
+ * kit for LRs; ?eza=true is the other one). `altView` picks the ?eza=true
+ * view; the caller passes whichever view MATCHED the screenshot, so the
+ * displayed kit is the one on the player's screen. No pre/post-EZA
+ * labeling exists on purpose — the views aren't consistently either.
  */
 class Kit(
     val cardId: String,
@@ -49,15 +54,17 @@ object DokkanInfo {
     private var legacyCachePurged = false
 
     /** Fetch a card's English kit, using a permanent on-disk cache. */
-    fun fetch(context: Context, cardId: String): Kit {
+    fun fetch(context: Context, cardId: String, altView: Boolean = false): Kit {
         purgeLegacyCache(context)
         val dir = File(context.cacheDir, "dokkaninfo").apply { mkdirs() }
-        val cacheFile = File(dir, "$cardId.json")
+        val cacheFile = File(dir, if (altView) "$cardId-alt.json" else "$cardId.json")
         val text = if (cacheFile.exists()) {
             cacheFile.readText(Charsets.UTF_8)
         } else {
+            val url = "https://dokkaninfo.com/cards/$cardId" +
+                if (altView) "?eza=true" else ""
             val body = try {
-                httpGet("https://dokkaninfo.com/cards/$cardId")
+                httpGet(url)
             } catch (e: FileNotFoundException) {
                 throw CardNotOnGlobalException(cardId)
             }

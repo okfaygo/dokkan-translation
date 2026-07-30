@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
             AppScreen(
                 state = state,
                 onPickImage = { pickImage.launch("image/*") },
-                onSelectCard = ::lookUp,
+                onSelectCard = { cardId, altView -> lookUp(cardId, altView) },
             )
         }
         handleShareIntent(intent)
@@ -93,19 +93,20 @@ class MainActivity : ComponentActivity() {
                     return@launch
                 }
 
-                fetchAndShow(ranked.first().record.id, ranked.drop(1).take(3))
+                val top = ranked.first()
+                fetchAndShow(top.record.id, top.matchedAltView, ranked.drop(1).take(3))
             } catch (e: Exception) {
                 state = UiState.Failed(e.message ?: e.toString())
             }
         }
     }
 
-    /** Look up a card id (top match, alternatives list, transformations). */
-    private fun lookUp(cardId: String) {
+    /** Look up a card id (alternatives list, transformations). */
+    private fun lookUp(cardId: String, altView: Boolean) {
         val alternatives = (state as? UiState.Result)?.alternatives ?: emptyList()
         lifecycleScope.launch {
             try {
-                fetchAndShow(cardId, alternatives)
+                fetchAndShow(cardId, altView, alternatives)
             } catch (e: Exception) {
                 state = UiState.Failed(e.message ?: e.toString())
             }
@@ -114,11 +115,12 @@ class MainActivity : ComponentActivity() {
 
     private suspend fun fetchAndShow(
         cardId: String,
+        altView: Boolean,
         alternatives: List<Matcher.Candidate>,
     ) {
         state = UiState.Working("Fetching English kit…")
         val kit = withContext(Dispatchers.IO) {
-            DokkanInfo.fetch(this@MainActivity, cardId)
+            DokkanInfo.fetch(this@MainActivity, cardId, altView)
         }
         state = UiState.Result(kit = kit, alternatives = alternatives)
     }
