@@ -67,6 +67,25 @@ identify -> fetch -> render works end to end.
      page into index.json as `name_en`, 5,141/5,169 covered).
    - Itemized-passive renderer rewritten: *headers* spanning wrapped lines
      and "- "/"・" items with continuations now render as clean rows.
+   **Field-test round 2 fixes (2026-07-30, untested on device yet)** — from
+   the user's 10-slide field report:
+   - Blank kits root-caused: v0.1's dokkan.wiki cache files collided with
+     v0.2's cache filenames (same `cache/kits/<id>.json` path, different
+     schema -> blank leader/passive, Categories-but-no-Links fingerprint).
+     New cache dir `cache/dokkaninfo/`, legacy dir purged on first use.
+   - EZA toggle SCRAPPED (user decision + mislabels): EZA is multi-step
+     (EZA -> SEZA), `?eza=true` = previous step not "original", and the
+     binary label was wrong whenever a card sat mid-chain. Always show the
+     current max kit now; previous-step lines kept in the index for
+     matching only (they correctly identified a mid-EZA card in the field).
+   - Transformations section: buttons in the kit view jump between forms
+     (ids+names from the payload's `transformations` list).
+   - Awakening-sibling tie-break: candidates within 2% of top score
+     re-ranked by rarity then id (field report slide 10: awakened card
+     matched its unawakened sibling on shared text).
+   - Remaining known issue (own work item): card-page identification
+     accuracy on transformed forms / busy screens; needs OCR-line dumps
+     from failing screenshots (debug screen) before tuning.
    Roadmap after that:
    v0.2 floating bubble + MediaProjection (manual trigger), v0.3 auto-detect
    card screens from captured frames (marker text or image-retrieval on

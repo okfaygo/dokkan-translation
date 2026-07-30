@@ -11,10 +11,9 @@ import org.json.JSONObject
  * English kit source: the GLOBAL dokkaninfo.com card page, which embeds the
  * full kit as HTML-entity-escaped JSON in a `datajson="..."` attribute.
  * Always up to date (JP/GLB release simultaneously), same card ids as the
- * bundled index. `?eza=true` serves the ORIGINAL pre-EZA kit; the bare URL
- * serves the current max-EZA state.
- *
- * (Replaces dokkan.wiki, which had gone stale and 404s on recent cards.)
+ * bundled index. Always the CURRENT kit (max EZA step) — per-step EZA views
+ * were removed after field testing showed EZA steps aren't binary and the
+ * pre/post toggle mislabeled kits.
  */
 class Kit(
     val cardId: String,
@@ -31,7 +30,8 @@ class Kit(
     val activeDesc: String,
     val links: List<String>,
     val categories: List<String>,
-    val isPreEza: Boolean,
+    /** other forms of this card: (card id, name) */
+    val transformations: List<Pair<String, String>>,
 )
 
 class CardNotOnGlobalException(cardId: String) :
@@ -40,22 +40,24 @@ class CardNotOnGlobalException(cardId: String) :
 object DokkanInfo {
 
     private const val UA =
-        "Mozilla/5.0 (Linux; Android 14) DokkanTranslate/0.1 (identify-and-lookup helper)"
+        "Mozilla/5.0 (Linux; Android 14) DokkanTranslate/0.2 (identify-and-lookup helper)"
     private val RARITIES = mapOf(2 to "SR", 3 to "SSR", 4 to "UR", 5 to "LR")
     private val ELEMENTS = mapOf(0 to "AGL", 1 to "TEQ", 2 to "INT", 3 to "STR", 4 to "PHY")
     private val PASSIVE_IMG = Regex("\\{passiveImg:[^}]+\\}")
 
+    @Volatile
+    private var legacyCachePurged = false
+
     /** Fetch a card's English kit, using a permanent on-disk cache. */
-    fun fetch(context: Context, cardId: String, preEza: Boolean = false): Kit {
-        val dir = File(context.cacheDir, "kits").apply { mkdirs() }
-        val cacheFile = File(dir, if (preEza) "$cardId-pre.json" else "$cardId.json")
+    fun fetch(context: Context, cardId: String): Kit {
+        purgeLegacyCache(context)
+        val dir = File(context.cacheDir, "dokkaninfo").apply { mkdirs() }
+        val cacheFile = File(dir, "$cardId.json")
         val text = if (cacheFile.exists()) {
             cacheFile.readText(Charsets.UTF_8)
         } else {
-            val url = "https://dokkaninfo.com/cards/$cardId" +
-                if (preEza) "?eza=true" else ""
             val body = try {
-                httpGet(url)
+                httpGet("https://dokkaninfo.com/cards/$cardId")
             } catch (e: FileNotFoundException) {
                 throw CardNotOnGlobalException(cardId)
             }
@@ -63,7 +65,18 @@ object DokkanInfo {
             cacheFile.writeText(json, Charsets.UTF_8)
             json
         }
-        return parse(cardId, JSONObject(text), preEza)
+        return parse(cardId, JSONObject(text))
+    }
+
+    /**
+     * v0.1 cached dokkan.wiki payloads under cacheDir/kits/<id>.json — the
+     * same filenames this source uses. Reading those with this parser gave
+     * blank kits (field report slide 1), so nuke the old dir once.
+     */
+    private fun purgeLegacyCache(context: Context) {
+        if (legacyCachePurged) return
+        legacyCachePurged = true
+        File(context.cacheDir, "kits").deleteRecursively()
     }
 
     private fun httpGet(url: String): String {
@@ -147,7 +160,7 @@ object DokkanInfo {
         rows.add(last.first to (last.second + " " + text))
     }
 
-    private fun parse(cardId: String, data: JSONObject, preEza: Boolean): Kit {
+    private fun parse(cardId: String, data: JSONObject): Kit {
         val card = data.getJSONObject("card")
         val leader = data.optJSONObject("leader_skill")
         val passive = data.optJSONObject("passive_skill")
@@ -171,6 +184,17 @@ object DokkanInfo {
             return (0 until arr.length()).map { arr.getJSONObject(it).optString("name") }
         }
 
+        val transformations = ArrayList<Pair<String, String>>()
+        data.optJSONArray("transformations")?.let { arr ->
+            for (i in 0 until arr.length()) {
+                val form = arr.getJSONObject(i)
+                val id = form.optLong("id").toString()
+                if (id == cardId) continue
+                val name = form.optString("name").replace("\n", " ")
+                if (name.isNotEmpty()) transformations.add(id to name)
+            }
+        }
+
         val activeDesc = listOfNotNull(
             active?.optString("effect_description")?.ifEmpty { null },
             active?.optString("condition_description")?.ifEmpty { null },
@@ -190,7 +214,7 @@ object DokkanInfo {
             activeDesc = activeDesc,
             links = names("links"),
             categories = names("categories"),
-            isPreEza = preEza,
+            transformations = transformations,
         )
     }
 }

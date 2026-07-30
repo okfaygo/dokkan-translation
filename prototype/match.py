@@ -42,6 +42,9 @@ def _weight(text):
     return min(len(text), 24) / 24
 
 
+TIE_MARGIN = 0.98
+
+
 def rank(candidates, index, threshold=70):
     """candidates: [(text, ocr_conf)]; returns [(card_id, total_score)]."""
     scores = {}
@@ -54,7 +57,15 @@ def rank(candidates, index, threshold=70):
             best = max((fuzz.ratio(text, k) for k in _keys(rec)), default=0)
             if best >= threshold:
                 scores[cid] = scores.get(cid, 0) + best * w
-    return sorted(scores.items(), key=lambda kv: -kv[1])
+    ranked = sorted(scores.items(), key=lambda kv: -kv[1])
+    if not ranked:
+        return ranked
+    # Awakening siblings share (nearly) identical text; within the head
+    # group prefer the later stage (higher rarity, then higher id)
+    cutoff = ranked[0][1] * TIE_MARGIN
+    head = [r for r in ranked if r[1] >= cutoff]
+    head.sort(key=lambda kv: (-index[kv[0]].get("rarity", 0), -int(kv[0])))
+    return head + ranked[len(head):]
 
 
 def best_match(candidates, index, threshold=70):

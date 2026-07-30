@@ -7,23 +7,23 @@ import org.json.JSONObject
 /**
  * The bundled JP-text -> card-id index built by prototype/build_index.py.
  *
- * Keys are split into two groups so the matcher can tell WHICH state of an
- * EZA'd card the screenshot shows:
- *  - postKeys: current kit (post-EZA if the card is EZA'd) + title + name
- *              + leader lines (leader text is the one plain-font element on
- *              the card page itself, not just the passive popup)
- *  - preKeys:  the original pre-EZA kit lines, empty for non-EZA'd cards
+ * `keys` is everything an OCR line can match against: passive lines (current
+ * kit AND previous-EZA-step kit — in-game text depends on how far the player
+ * has awakened the card, so both stay in the match pool), active skill lines,
+ * leader lines (the one plain-font element on the card page itself), title
+ * and name. Display always shows the current kit; the pre-EZA lines exist
+ * for matching only.
  */
 class CardRecord(
     val id: String,
     val name: String,
     val nameEn: String?,
     val title: String,
-    val postKeys: List<String>,
-    val preKeys: List<String>,
+    val rarity: Int,
+    val keys: List<String>,
 ) {
-    val hasPreEza get() = preKeys.isNotEmpty()
     val displayName get() = (nameEn ?: name).replace("\n", " ")
+    val idNumber get() = id.toLongOrNull() ?: 0L
 }
 
 object CardIndex {
@@ -43,26 +43,24 @@ object CardIndex {
                 val title = rec.optString("title", "")
                 val name = rec.optString("name", "")
 
-                val post = ArrayList<String>()
-                post.addAll(strings(rec.optJSONArray("lines")))
-                post.addAll(strings(rec.optJSONArray("active_lines")))
-                post.addAll(leaderLines(rec.optString("leader", "")))
-                if (title.isNotEmpty()) post.add(title)
-                if (name.isNotEmpty()) post.add(name)
+                val keys = ArrayList<String>()
+                keys.addAll(strings(rec.optJSONArray("lines")))
+                keys.addAll(strings(rec.optJSONArray("pre_eza_lines")))
+                keys.addAll(strings(rec.optJSONArray("active_lines")))
+                keys.addAll(leaderLines(rec.optString("leader", "")))
+                keys.addAll(leaderLines(rec.optString("pre_eza_leader", "")))
+                if (title.isNotEmpty()) keys.add(title)
+                if (name.isNotEmpty()) keys.add(name)
+                if (keys.isEmpty()) continue
 
-                val pre = ArrayList<String>()
-                pre.addAll(strings(rec.optJSONArray("pre_eza_lines")))
-                pre.addAll(leaderLines(rec.optString("pre_eza_leader", "")))
-
-                if (post.isEmpty() && pre.isEmpty()) continue
                 records.add(
                     CardRecord(
                         id = id,
                         name = name,
                         nameEn = rec.optString("name_en", "").ifEmpty { null },
                         title = title,
-                        postKeys = post,
-                        preKeys = pre,
+                        rarity = rec.optInt("rarity"),
+                        keys = keys,
                     )
                 )
             }
@@ -70,6 +68,9 @@ object CardIndex {
             return records
         }
     }
+
+    fun findById(context: Context, id: String): CardRecord? =
+        load(context).firstOrNull { it.id == id }
 
     private fun strings(arr: JSONArray?): List<String> {
         arr ?: return emptyList()

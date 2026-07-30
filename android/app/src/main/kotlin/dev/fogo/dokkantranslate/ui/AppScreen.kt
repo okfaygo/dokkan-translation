@@ -23,15 +23,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.fogo.dokkantranslate.UiState
-import dev.fogo.dokkantranslate.match.CardRecord
-import dev.fogo.dokkantranslate.match.Matcher
 
 @Composable
 fun AppScreen(
     state: UiState,
     onPickImage: () -> Unit,
-    onSelectAlternative: (Matcher.Candidate) -> Unit,
-    onToggleEza: (CardRecord, Boolean) -> Unit,
+    onSelectCard: (String) -> Unit,
 ) {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Scaffold { padding ->
@@ -46,8 +43,7 @@ fun AppScreen(
                     is UiState.Idle -> Idle(onPickImage)
                     is UiState.Working -> Working(state.step)
                     is UiState.Failed -> Failed(state.message, onPickImage)
-                    is UiState.Result ->
-                        KitView(state, onSelectAlternative, onToggleEza, onPickImage)
+                    is UiState.Result -> KitView(state, onSelectCard, onPickImage)
                 }
             }
         }
@@ -100,8 +96,7 @@ private fun SectionHeader(text: String) {
 @Composable
 private fun KitView(
     result: UiState.Result,
-    onSelectAlternative: (Matcher.Candidate) -> Unit,
-    onToggleEza: (CardRecord, Boolean) -> Unit,
+    onSelectCard: (String) -> Unit,
     onPickImage: () -> Unit,
 ) {
     val kit = result.kit
@@ -111,18 +106,6 @@ private fun KitView(
         style = MaterialTheme.typography.titleMedium,
     )
     Text(kit.name, style = MaterialTheme.typography.headlineSmall)
-
-    if (result.record.hasPreEza) {
-        Spacer(Modifier.height(8.dp))
-        val showingPre = kit.isPreEza
-        Text(
-            if (showingPre) "Showing the pre-EZA kit" else "Showing the current (EZA) kit",
-            style = MaterialTheme.typography.labelMedium,
-        )
-        OutlinedButton(onClick = { onToggleEza(result.record, !showingPre) }) {
-            Text(if (showingPre) "Show EZA kit" else "Show pre-EZA kit")
-        }
-    }
 
     SectionHeader("Leader Skill")
     Text(kit.leader)
@@ -151,6 +134,20 @@ private fun KitView(
         }
     }
 
+    if (kit.transformations.isNotEmpty()) {
+        SectionHeader("Transformations")
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            for ((id, name) in kit.transformations) {
+                OutlinedButton(
+                    onClick = { onSelectCard(id) },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(name)
+                }
+            }
+        }
+    }
+
     if (kit.links.isNotEmpty()) {
         SectionHeader("Links")
         Text(kit.links.joinToString(", "))
@@ -165,7 +162,7 @@ private fun KitView(
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             for (alt in result.alternatives) {
                 OutlinedButton(
-                    onClick = { onSelectAlternative(alt) },
+                    onClick = { onSelectCard(alt.record.id) },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(alt.record.displayName)

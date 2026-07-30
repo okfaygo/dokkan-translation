@@ -15,7 +15,6 @@ import androidx.lifecycle.lifecycleScope
 import dev.fogo.dokkantranslate.api.DokkanInfo
 import dev.fogo.dokkantranslate.api.Kit
 import dev.fogo.dokkantranslate.match.CardIndex
-import dev.fogo.dokkantranslate.match.CardRecord
 import dev.fogo.dokkantranslate.match.Matcher
 import dev.fogo.dokkantranslate.ocr.OcrEngine
 import dev.fogo.dokkantranslate.ui.AppScreen
@@ -29,7 +28,6 @@ sealed interface UiState {
     data class Failed(val message: String) : UiState
     data class Result(
         val kit: Kit,
-        val record: CardRecord,
         val alternatives: List<Matcher.Candidate>,
     ) : UiState
 }
@@ -49,10 +47,7 @@ class MainActivity : ComponentActivity() {
             AppScreen(
                 state = state,
                 onPickImage = { pickImage.launch("image/*") },
-                onSelectAlternative = { alt ->
-                    lookUp(alt.record, alt.matchedPreEza && alt.record.hasPreEza)
-                },
-                onToggleEza = { record, preEza -> lookUp(record, preEza) },
+                onSelectCard = ::lookUp,
             )
         }
         handleShareIntent(intent)
@@ -98,24 +93,19 @@ class MainActivity : ComponentActivity() {
                     return@launch
                 }
 
-                val top = ranked.first()
-                fetchAndShow(
-                    record = top.record,
-                    preEza = top.matchedPreEza && top.record.hasPreEza,
-                    alternatives = ranked.drop(1).take(3),
-                )
+                fetchAndShow(ranked.first().record.id, ranked.drop(1).take(3))
             } catch (e: Exception) {
                 state = UiState.Failed(e.message ?: e.toString())
             }
         }
     }
 
-    /** Look up a specific card (alternatives list, EZA toggle). */
-    private fun lookUp(record: CardRecord, preEza: Boolean) {
+    /** Look up a card id (top match, alternatives list, transformations). */
+    private fun lookUp(cardId: String) {
         val alternatives = (state as? UiState.Result)?.alternatives ?: emptyList()
         lifecycleScope.launch {
             try {
-                fetchAndShow(record, preEza, alternatives)
+                fetchAndShow(cardId, alternatives)
             } catch (e: Exception) {
                 state = UiState.Failed(e.message ?: e.toString())
             }
@@ -123,15 +113,14 @@ class MainActivity : ComponentActivity() {
     }
 
     private suspend fun fetchAndShow(
-        record: CardRecord,
-        preEza: Boolean,
+        cardId: String,
         alternatives: List<Matcher.Candidate>,
     ) {
         state = UiState.Working("Fetching English kit…")
         val kit = withContext(Dispatchers.IO) {
-            DokkanInfo.fetch(this@MainActivity, record.id, preEza)
+            DokkanInfo.fetch(this@MainActivity, cardId)
         }
-        state = UiState.Result(kit = kit, record = record, alternatives = alternatives)
+        state = UiState.Result(kit = kit, alternatives = alternatives)
     }
 
     private fun decode(uri: Uri): Bitmap =

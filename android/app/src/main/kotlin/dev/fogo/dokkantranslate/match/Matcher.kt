@@ -5,52 +5,52 @@ package dev.fogo.dokkantranslate.match
  * (>= threshold) into each card it resembles; highest total wins.
  *
  * Votes are weighted by line length so a full passive sentence outvotes
- * short fragments (category chips, UI labels, OCR shrapnel). Pre- and
- * post-EZA key groups are scored separately, so the winner also tells us
- * which EZA state the screenshot shows.
+ * short fragments (category chips, UI labels, OCR shrapnel).
+ *
+ * Awakening siblings share (nearly) identical text, so candidates within a
+ * small margin of the top score are re-ranked by rarity then id — the later
+ * awakening stage wins the tie, matching what a player looking at an
+ * awakened card expects.
  *
  * `ratio` is rapidfuzz's fuzz.ratio: normalized indel similarity
  * 2*LCS(a,b)/(len(a)+len(b))*100 — verified identical to float precision.
  */
 object Matcher {
 
-    data class Candidate(
-        val record: CardRecord,
-        val score: Double,
-        /** true when the pre-EZA kit lines matched better than the current kit */
-        val matchedPreEza: Boolean,
-    )
+    private const val TIE_MARGIN = 0.98
+
+    data class Candidate(val record: CardRecord, val score: Double)
 
     fun rank(
         ocrLines: List<String>,
         index: List<CardRecord>,
         threshold: Double = 70.0,
     ): List<Candidate> {
-        val post = HashMap<CardRecord, Double>()
-        val pre = HashMap<CardRecord, Double>()
+        val scores = HashMap<CardRecord, Double>()
         for (raw in ocrLines) {
             val line = raw.trim()
             if (line.length < 4) continue
             val weight = minOf(line.length, 24) / 24.0
             for (rec in index) {
-                val bestPost = bestRatio(line, rec.postKeys, threshold)
-                if (bestPost >= threshold) {
-                    post[rec] = (post[rec] ?: 0.0) + bestPost * weight
-                }
-                if (rec.preKeys.isNotEmpty()) {
-                    val bestPre = bestRatio(line, rec.preKeys, threshold)
-                    if (bestPre >= threshold) {
-                        pre[rec] = (pre[rec] ?: 0.0) + bestPre * weight
-                    }
+                val best = bestRatio(line, rec.keys, threshold)
+                if (best >= threshold) {
+                    scores[rec] = (scores[rec] ?: 0.0) + best * weight
                 }
             }
         }
-        val all = HashSet<CardRecord>(post.keys).apply { addAll(pre.keys) }
-        return all.map { rec ->
-            val p = post[rec] ?: 0.0
-            val q = pre[rec] ?: 0.0
-            Candidate(rec, maxOf(p, q), matchedPreEza = q > p)
-        }.sortedByDescending { it.score }
+        val sorted = scores.entries
+            .map { Candidate(it.key, it.value) }
+            .sortedByDescending { it.score }
+        if (sorted.isEmpty()) return sorted
+
+        // Deterministic tie-break: within the head group, awakened stage first
+        val cutoff = sorted.first().score * TIE_MARGIN
+        val head = sorted.takeWhile { it.score >= cutoff }
+            .sortedWith(
+                compareByDescending<Candidate> { it.record.rarity }
+                    .thenByDescending { it.record.idNumber }
+            )
+        return head + sorted.drop(head.size)
     }
 
     private fun bestRatio(line: String, keys: List<String>, threshold: Double): Double {
