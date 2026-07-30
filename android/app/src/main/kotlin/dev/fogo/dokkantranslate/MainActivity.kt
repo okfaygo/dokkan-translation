@@ -94,7 +94,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 val top = ranked.first()
-                fetchAndShow(top.record.id, top.matchedAltView, ranked.drop(1).take(3))
+                fetchAndShow(top.record.id, top.record.altKeys.isNotEmpty(), ranked.drop(1).take(3))
             } catch (e: Exception) {
                 state = UiState.Failed(e.message ?: e.toString())
             }

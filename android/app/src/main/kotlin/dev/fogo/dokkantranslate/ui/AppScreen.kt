@@ -162,7 +162,7 @@ private fun KitView(
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             for (alt in result.alternatives) {
                 OutlinedButton(
-                    onClick = { onSelectCard(alt.record.id, alt.matchedAltView) },
+                    onClick = { onSelectCard(alt.record.id, alt.record.altKeys.isNotEmpty()) },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(alt.record.displayLabel)
