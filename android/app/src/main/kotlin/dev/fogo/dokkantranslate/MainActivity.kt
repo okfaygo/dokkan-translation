@@ -12,9 +12,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
-import dev.fogo.dokkantranslate.api.DokkanWiki
+import dev.fogo.dokkantranslate.api.DokkanInfo
 import dev.fogo.dokkantranslate.api.Kit
 import dev.fogo.dokkantranslate.match.CardIndex
+import dev.fogo.dokkantranslate.match.CardRecord
 import dev.fogo.dokkantranslate.match.Matcher
 import dev.fogo.dokkantranslate.ocr.OcrEngine
 import dev.fogo.dokkantranslate.ui.AppScreen
@@ -28,9 +29,8 @@ sealed interface UiState {
     data class Failed(val message: String) : UiState
     data class Result(
         val kit: Kit,
+        val record: CardRecord,
         val alternatives: List<Matcher.Candidate>,
-        val ocrLineCount: Int,
-        val score: Double,
     ) : UiState
 }
 
@@ -49,7 +49,10 @@ class MainActivity : ComponentActivity() {
             AppScreen(
                 state = state,
                 onPickImage = { pickImage.launch("image/*") },
-                onSelectAlternative = { candidate -> lookUp(candidate.record.id) },
+                onSelectAlternative = { alt ->
+                    lookUp(alt.record, alt.matchedPreEza && alt.record.hasPreEza)
+                },
+                onToggleEza = { record, preEza -> lookUp(record, preEza) },
             )
         }
         handleShareIntent(intent)
@@ -78,7 +81,8 @@ class MainActivity : ComponentActivity() {
                 if (lines.isEmpty()) {
                     state = UiState.Failed(
                         "No Japanese text found in the image. " +
-                            "Share a screenshot of a card's passive-detail screen."
+                            "Share a screenshot from JP Dokkan — the passive-detail " +
+                            "popup works best, the card page also works."
                     )
                     return@launch
                 }
@@ -94,16 +98,11 @@ class MainActivity : ComponentActivity() {
                     return@launch
                 }
 
-                state = UiState.Working("Fetching English kit…")
                 val top = ranked.first()
-                val kit = withContext(Dispatchers.IO) {
-                    DokkanWiki.fetch(this@MainActivity, top.record.id)
-                }
-                state = UiState.Result(
-                    kit = kit,
+                fetchAndShow(
+                    record = top.record,
+                    preEza = top.matchedPreEza && top.record.hasPreEza,
                     alternatives = ranked.drop(1).take(3),
-                    ocrLineCount = lines.size,
-                    score = top.score,
                 )
             } catch (e: Exception) {
                 state = UiState.Failed(e.message ?: e.toString())
@@ -111,25 +110,28 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    /** Look up a specific card id (used by the "not right?" alternatives). */
-    private fun lookUp(cardId: String) {
-        val prev = state as? UiState.Result
+    /** Look up a specific card (alternatives list, EZA toggle). */
+    private fun lookUp(record: CardRecord, preEza: Boolean) {
+        val alternatives = (state as? UiState.Result)?.alternatives ?: emptyList()
         lifecycleScope.launch {
             try {
-                state = UiState.Working("Fetching English kit…")
-                val kit = withContext(Dispatchers.IO) {
-                    DokkanWiki.fetch(this@MainActivity, cardId)
-                }
-                state = UiState.Result(
-                    kit = kit,
-                    alternatives = prev?.alternatives ?: emptyList(),
-                    ocrLineCount = prev?.ocrLineCount ?: 0,
-                    score = 0.0,
-                )
+                fetchAndShow(record, preEza, alternatives)
             } catch (e: Exception) {
                 state = UiState.Failed(e.message ?: e.toString())
             }
         }
+    }
+
+    private suspend fun fetchAndShow(
+        record: CardRecord,
+        preEza: Boolean,
+        alternatives: List<Matcher.Candidate>,
+    ) {
+        state = UiState.Working("Fetching English kit…")
+        val kit = withContext(Dispatchers.IO) {
+            DokkanInfo.fetch(this@MainActivity, record.id, preEza)
+        }
+        state = UiState.Result(kit = kit, record = record, alternatives = alternatives)
     }
 
     private fun decode(uri: Uri): Bitmap =

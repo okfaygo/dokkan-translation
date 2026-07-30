@@ -10,16 +10,21 @@ testing from the gallery.
 1. `ocr/OcrEngine` — ML Kit Text Recognition v2 (Japanese), bundled model,
    fully on-device. Keeps recognized lines containing Japanese characters.
 2. `match/CardIndex` — loads `assets/index.json` (built by
-   `../prototype/build_index.py`; 5,169 cards, ~3MB).
+   `../prototype/build_index.py`; 5,169 cards incl. English names, ~3MB).
+   Match keys per card: passive/active/leader lines + title + name, split
+   into post-EZA and pre-EZA groups.
 3. `match/Matcher` — port of `../prototype/match.py`: per OCR line, best
    normalized-indel ratio (identical to rapidfuzz `fuzz.ratio`, verified to
-   float precision) against each card's passive/pre-EZA/active lines +
-   title + name; scores >= 70 summed per card; highest total wins.
-4. `api/DokkanWiki` — fetches `https://dokkan.wiki/api/cards/<id>`, caches
-   on disk permanently (kits are immutable in practice), renders leader /
-   passive / super attacks / links / categories.
-5. `ui/AppScreen` — Compose UI. Shows the kit plus a "not the right card?"
-   list of the next 3 candidates.
+   float precision) against each card's keys; scores >= 70, weighted by
+   line length (full sentences outvote category chips / UI labels), summed
+   per card. Pre/post EZA key groups scored separately so the match also
+   tells us which EZA state the screenshot shows.
+4. `api/DokkanInfo` — fetches the GLOBAL `dokkaninfo.com/cards/<id>` page
+   (embedded `datajson`), `?eza=true` for the pre-EZA kit, permanent disk
+   cache. Replaced dokkan.wiki, which went stale (404s on recent cards).
+5. `ui/AppScreen` — Compose UI. Kit sections incl. Active Skill, an EZA
+   pre/post toggle for EZA'd cards, and a "not the right card?" list of the
+   next 3 candidates (English names).
 
 ## Build & run
 

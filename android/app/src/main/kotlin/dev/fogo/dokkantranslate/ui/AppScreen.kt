@@ -23,7 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.fogo.dokkantranslate.UiState
-import dev.fogo.dokkantranslate.api.Kit
+import dev.fogo.dokkantranslate.match.CardRecord
 import dev.fogo.dokkantranslate.match.Matcher
 
 @Composable
@@ -31,6 +31,7 @@ fun AppScreen(
     state: UiState,
     onPickImage: () -> Unit,
     onSelectAlternative: (Matcher.Candidate) -> Unit,
+    onToggleEza: (CardRecord, Boolean) -> Unit,
 ) {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Scaffold { padding ->
@@ -45,7 +46,8 @@ fun AppScreen(
                     is UiState.Idle -> Idle(onPickImage)
                     is UiState.Working -> Working(state.step)
                     is UiState.Failed -> Failed(state.message, onPickImage)
-                    is UiState.Result -> KitView(state, onSelectAlternative, onPickImage)
+                    is UiState.Result ->
+                        KitView(state, onSelectAlternative, onToggleEza, onPickImage)
                 }
             }
         }
@@ -57,8 +59,9 @@ private fun Idle(onPickImage: () -> Unit) {
     Text("Dokkan Translate", style = MaterialTheme.typography.headlineMedium)
     Spacer(Modifier.height(12.dp))
     Text(
-        "Screenshot a card's passive-detail screen in JP Dokkan, " +
-            "then Share it to this app to see the English kit.\n\n" +
+        "Screenshot a card in JP Dokkan (the passive-detail popup works " +
+            "best, the card page also works), then Share it to this app " +
+            "to see the English kit.\n\n" +
             "You can also pick a screenshot from your gallery:"
     )
     Spacer(Modifier.height(16.dp))
@@ -98,9 +101,10 @@ private fun SectionHeader(text: String) {
 private fun KitView(
     result: UiState.Result,
     onSelectAlternative: (Matcher.Candidate) -> Unit,
+    onToggleEza: (CardRecord, Boolean) -> Unit,
     onPickImage: () -> Unit,
 ) {
-    val kit: Kit = result.kit
+    val kit = result.kit
 
     Text(
         "[${kit.rarity} ${kit.element}] ${kit.title}",
@@ -108,16 +112,34 @@ private fun KitView(
     )
     Text(kit.name, style = MaterialTheme.typography.headlineSmall)
 
+    if (result.record.hasPreEza) {
+        Spacer(Modifier.height(8.dp))
+        val showingPre = kit.isPreEza
+        Text(
+            if (showingPre) "Showing the pre-EZA kit" else "Showing the current (EZA) kit",
+            style = MaterialTheme.typography.labelMedium,
+        )
+        OutlinedButton(onClick = { onToggleEza(result.record, !showingPre) }) {
+            Text(if (showingPre) "Show EZA kit" else "Show pre-EZA kit")
+        }
+    }
+
     SectionHeader("Leader Skill")
     Text(kit.leader)
 
     SectionHeader("Passive" + if (kit.passiveName.isNotEmpty()) " — ${kit.passiveName}" else "")
     for ((isHeader, row) in kit.passiveRows) {
         if (isHeader) {
+            Spacer(Modifier.height(6.dp))
             Text(row, fontWeight = FontWeight.Bold)
         } else {
-            Text("• $row", modifier = Modifier.padding(start = 8.dp))
+            Text("•  $row", modifier = Modifier.padding(start = 8.dp))
         }
+    }
+
+    if (kit.activeName.isNotEmpty()) {
+        SectionHeader("Active Skill — ${kit.activeName}")
+        Text(kit.activeDesc)
     }
 
     if (kit.supers.isNotEmpty()) {
@@ -146,7 +168,7 @@ private fun KitView(
                     onClick = { onSelectAlternative(alt) },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("${alt.record.title} / ${alt.record.name}")
+                    Text(alt.record.displayName)
                 }
             }
         }

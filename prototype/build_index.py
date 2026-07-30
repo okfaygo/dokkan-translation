@@ -85,6 +85,26 @@ def fetch_list(session, refresh=False):
     return cards
 
 
+def english_names(session, refresh=False):
+    """id -> English name, from the GLOBAL dokkaninfo list page.
+
+    Covers every card released on Global (nearly everything now that JP/GLB
+    release simultaneously); JP-only stragglers just keep their JP name.
+    """
+    cache_file = CACHE / "list_en.json"
+    if cache_file.exists() and not refresh:
+        cards = json.loads(cache_file.read_text(encoding="utf-8"))
+    else:
+        print("fetching GLOBAL card list for English names (~12MB)...")
+        text = _get(session, "https://dokkaninfo.com/cards?sort=open_at")
+        cards = _embedded_json(text, "cardsjson")
+        cards = [{"id": c["id"], "name": c.get("name")} for c in cards]
+        cache_file.write_text(json.dumps(cards, ensure_ascii=False),
+                              encoding="utf-8")
+        print(f"  {len(cards)} global cards cached")
+    return {c["id"]: c["name"] for c in cards if c.get("name")}
+
+
 def fetch_card(session, card_id, delay=1.0, refresh=False, pre_eza=False):
     """Raw datajson dict for one card, cached gzipped on disk.
 
@@ -253,6 +273,18 @@ def main():
                     queue.append(tid)
         if len(seen) % 50 == 0:
             save_index(index)
+
+    try:
+        en = english_names(session)
+        tagged = 0
+        for cid, rec in index.items():
+            name = en.get(int(cid))
+            if name:
+                rec["name_en"] = name
+                tagged += 1
+        print(f"English names attached: {tagged}/{len(index)}")
+    except Exception as e:
+        print(f"English-name merge skipped: {e}", file=sys.stderr)
 
     save_index(index)
     if failed:

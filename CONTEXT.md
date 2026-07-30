@@ -49,9 +49,25 @@ identify -> fetch -> render works end to end.
    permissions), ML Kit Text Recognition v2 (Japanese, bundled model),
    bundled `assets/index.json`, Kotlin port of the voting matcher (LCS
    ratio verified identical to rapidfuzz fuzz.ratio), dokkan.wiki fetch +
-   disk cache, Compose UI with alternative-candidate fallback. **Not yet
-   compiled/run — needs Android Studio + a device; first on-device test of
-   ML Kit OCR quality is the next milestone.** Roadmap after that:
+   disk cache, Compose UI with alternative-candidate fallback.
+   **Validated on device (2026-07-29): real passive-screen screenshot of
+   SSJ4 Goku (Mini) DAIMA -> correct English kit, end to end.**
+   **Field-test round 1 fixes (2026-07-29, untested on device yet):**
+   - EN kit source switched dokkan.wiki -> GLOBAL dokkaninfo.com datajson
+     (dokkan.wiki went stale, 404s on recent cards like 1034341; dokkandb.com
+     was evaluated but is client-rendered with no visible API). `?eza=true`
+     = pre-EZA kit, same as the JP scrape.
+   - Card-page screenshots now identifiable: leader-skill lines added to
+     match keys (the one plain-font element on the card page); votes are
+     length-weighted so category chips/UI labels can't swamp real passive
+     lines. Simulated card-page test: was 0 matches, now correct card #1.
+   - EZA state: pre/post key groups scored separately; the matched state
+     picks which kit to fetch, plus a manual pre/post toggle in the UI.
+   - Alternatives list shows English names (merged from the GLOBAL list
+     page into index.json as `name_en`, 5,141/5,169 covered).
+   - Itemized-passive renderer rewritten: *headers* spanning wrapped lines
+     and "- "/"・" items with continuations now render as clean rows.
+   Roadmap after that:
    v0.2 floating bubble + MediaProjection (manual trigger), v0.3 auto-detect
    card screens from captured frames (marker text or image-retrieval on
    card art — retrieval index, NOT a trained classifier). Overlay draws
