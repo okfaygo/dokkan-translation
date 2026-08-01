@@ -44,10 +44,69 @@ identify -> fetch -> render works end to end.
    Full-index stress test: noisy modern UR wins 741 vs 618 runner-up;
    worst-case 2-line old SSR still ranks #1 (tied only with its own
    awakening sibling, same kit). `rank()` over 5,169 cards: 0.3s.
-2. Android app (Kotlin): floating bubble + MediaProjection capture, ML Kit
-   Text Recognition v2 (Japanese) instead of Tesseract — retest whether ML Kit
-   reads the vertical stylized titles (it likely handles rotation better),
-   bundled SQLite index, live kit fetch + cache, bottom-sheet UI.
+2. Android app (Kotlin): **v0.1 scaffold built (2026-07-29)** in `android/`
+   — share-sheet MVP (screenshot -> Share -> English kit; no special
+   permissions), ML Kit Text Recognition v2 (Japanese, bundled model),
+   bundled `assets/index.json`, Kotlin port of the voting matcher (LCS
+   ratio verified identical to rapidfuzz fuzz.ratio), dokkan.wiki fetch +
+   disk cache, Compose UI with alternative-candidate fallback.
+   **Validated on device (2026-07-29): real passive-screen screenshot of
+   SSJ4 Goku (Mini) DAIMA -> correct English kit, end to end.**
+   **Field-test round 1 fixes (2026-07-29, untested on device yet):**
+   - EN kit source switched dokkan.wiki -> GLOBAL dokkaninfo.com datajson
+     (dokkan.wiki went stale, 404s on recent cards like 1034341; dokkandb.com
+     was evaluated but is client-rendered with no visible API). `?eza=true`
+     = pre-EZA kit, same as the JP scrape.
+   - Card-page screenshots now identifiable: leader-skill lines added to
+     match keys (the one plain-font element on the card page); votes are
+     length-weighted so category chips/UI labels can't swamp real passive
+     lines. Simulated card-page test: was 0 matches, now correct card #1.
+   - EZA state: pre/post key groups scored separately; the matched state
+     picks which kit to fetch, plus a manual pre/post toggle in the UI.
+   - Alternatives list shows English names (merged from the GLOBAL list
+     page into index.json as `name_en`, 5,141/5,169 covered).
+   - Itemized-passive renderer rewritten: *headers* spanning wrapped lines
+     and "- "/"・" items with continuations now render as clean rows.
+   **Field-test round 2 fixes (2026-07-30, untested on device yet)** — from
+   the user's 10-slide field report:
+   - Blank kits root-caused: v0.1's dokkan.wiki cache files collided with
+     v0.2's cache filenames (same `cache/kits/<id>.json` path, different
+     schema -> blank leader/passive, Categories-but-no-Links fingerprint).
+     New cache dir `cache/dokkaninfo/`, legacy dir purged on first use.
+   - EZA toggle SCRAPPED (user decision + mislabels): EZA is multi-step
+     (EZA -> SEZA), `?eza=true` = previous step not "original", and the
+     binary label was wrong whenever a card sat mid-chain. Always show the
+     current max kit now; previous-step lines kept in the index for
+     matching only (they correctly identified a mid-EZA card in the field).
+   - Transformations section: buttons in the kit view jump between forms
+     (ids+names from the payload's `transformations` list).
+   - Awakening-sibling tie-break: candidates within 2% of top score
+     re-ranked by rarity then id (field report slide 10: awakened card
+     matched its unawakened sibling on shared text).
+   - Remaining known issue (own work item): card-page identification
+     accuracy on transformed forms / busy screens; needs OCR-line dumps
+     from failing screenshots (debug screen) before tuning.
+   **Field-test round 3 fixes (2026-07-30, untested on device yet):**
+   - KEY DATA FINDING: DokkanInfo's two per-card views are NOT consistently
+     base/current — bare URL = base kit for EZA'd URs (e.g. Majin Vegeta
+     1023981, both jpnja and global) but SEZA kit for LRs (Cell 1017351);
+     `?eza=true` is the respective other. So "always fetch bare" (round 2)
+     showed base kits for EZA'd URs. Display rule now: fetch whichever view
+     MATCHED the screenshot (the screenshot is ground truth for the
+     player's state). Index stores both views' lines ("lines" = bare view,
+     "pre_eza_lines" = ?eza=true view — historical name, do NOT read it as
+     literally pre-EZA). No pre/post labels or toggles anywhere.
+   - Tie-break regression fix: round 2's id tie-break made transformed
+     forms (4xxxxxxx > 1xxxxxxx) beat their base cards; head-group order is
+     now base-cards-first, then rarity, then id.
+   - Alternatives list shows "[UR Extreme INT] Name" labels (rarity +
+     element from the index) to disambiguate same-name cards.
+   Roadmap after that:
+   v0.2 floating bubble + MediaProjection (manual trigger), v0.3 auto-detect
+   card screens from captured frames (marker text or image-retrieval on
+   card art — retrieval index, NOT a trained classifier). Overlay draws
+   only; MediaProjection is what reads the screen (games have no
+   accessibility tree).
 3. EZA/transformed states: same card id, different passive — API's
    `optimal_awakening_growths` / `transformations` cover this.
 

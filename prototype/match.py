@@ -24,23 +24,50 @@ def _keys(rec):
     keys = list(rec.get("lines", []))
     keys += rec.get("pre_eza_lines", [])
     keys += rec.get("active_lines", [])
+    # leader-skill text: the one plain-font element on the card page itself,
+    # so it makes card-page screenshots identifiable, not just passive popups
+    for field in ("leader", "pre_eza_leader"):
+        text = rec.get(field)
+        if text:
+            keys += [l.strip("、 　") for l in text.splitlines() if l.strip()]
     for k in (rec.get("title"), rec.get("name")):
         if k:
             keys.append(k)
     return keys
 
 
+def _weight(text):
+    """Longer lines are more card-specific; short fragments (category names,
+    UI labels, OCR shrapnel) shouldn't outvote a full passive sentence."""
+    return min(len(text), 24) / 24
+
+
+TIE_MARGIN = 0.98
+
+
 def rank(candidates, index, threshold=70):
     """candidates: [(text, ocr_conf)]; returns [(card_id, total_score)]."""
     scores = {}
     for text, _conf in candidates:
-        if not text.strip():
+        text = text.strip()
+        if len(text) < 4:
             continue
+        w = _weight(text)
         for cid, rec in index.items():
             best = max((fuzz.ratio(text, k) for k in _keys(rec)), default=0)
             if best >= threshold:
-                scores[cid] = scores.get(cid, 0) + best
-    return sorted(scores.items(), key=lambda kv: -kv[1])
+                scores[cid] = scores.get(cid, 0) + best * w
+    ranked = sorted(scores.items(), key=lambda kv: -kv[1])
+    if not ranked:
+        return ranked
+    # Awakening siblings share (nearly) identical text; within the head
+    # group prefer base summonable cards over transformed/story forms
+    # (4xxxxxxx/9xxxxxxx), then the later stage (higher rarity, higher id)
+    cutoff = ranked[0][1] * TIE_MARGIN
+    head = [r for r in ranked if r[1] >= cutoff]
+    head.sort(key=lambda kv: (int(kv[0]) >= 4_000_000,
+                              -index[kv[0]].get("rarity", 0), -int(kv[0])))
+    return head + ranked[len(head):]
 
 
 def best_match(candidates, index, threshold=70):
