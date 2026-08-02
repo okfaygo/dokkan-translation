@@ -111,12 +111,21 @@ private fun KitView(
     Text(kit.leader)
 
     SectionHeader("Passive" + if (kit.passiveName.isNotEmpty()) " — ${kit.passiveName}" else "")
+    val passiveIcons = rememberPassiveIcons()
     for ((isHeader, row) in kit.passiveRows) {
         if (isHeader) {
             Spacer(Modifier.height(6.dp))
-            Text(row, fontWeight = FontWeight.Bold)
+            Text(
+                PassiveIcons.annotate(row),
+                inlineContent = passiveIcons,
+                fontWeight = FontWeight.Bold,
+            )
         } else {
-            Text("•  $row", modifier = Modifier.padding(start = 8.dp))
+            Text(
+                PassiveIcons.annotate("•  $row"),
+                inlineContent = passiveIcons,
+                modifier = Modifier.padding(start = 8.dp),
+            )
         }
     }
 

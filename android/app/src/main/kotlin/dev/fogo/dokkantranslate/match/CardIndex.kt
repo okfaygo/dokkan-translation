@@ -23,6 +23,10 @@ class CardRecord(
     val title: String,
     val rarity: Int,
     val element: Int,
+    /** max EZA step from the game data; 0 when the card has no EZA.
+     *  Passed as &step= on the alt view — required for some transformed
+     *  EZA'd LR forms, a no-op everywhere else. */
+    val ezaStep: Int,
     val keys: List<String>,
     val altKeys: List<String>,
 ) {
@@ -91,6 +95,7 @@ object CardIndex {
                         title = title,
                         rarity = rec.optInt("rarity"),
                         element = rec.optString("element").toIntOrNull() ?: -1,
+                        ezaStep = rec.optInt("eza_step", 0),
                         keys = keys,
                         altKeys = altKeys,
                     )

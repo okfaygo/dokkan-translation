@@ -56,6 +56,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -83,6 +84,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1",
@@ -131,6 +133,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF178%",
@@ -263,6 +266,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "ターン開始ごとに気力+1(最大+7)",
@@ -330,6 +334,7 @@
    1019401
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF178%",
@@ -3847,6 +3852,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF200%",
@@ -4099,6 +4105,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "会心率/ダメージ軽減率20%",
@@ -4834,6 +4841,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "HP30%以下",
@@ -4944,6 +4952,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -5547,6 +5556,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -5787,6 +5797,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "残りHPが多いほど",
@@ -6230,6 +6241,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "気玉変化：速→技",
@@ -6568,6 +6580,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "高確率でATK200%",
@@ -6881,6 +6894,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ターン開始時にHP14%回復",
@@ -6954,6 +6968,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "HP30%以上",
@@ -6976,6 +6991,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -7570,6 +7586,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -7637,7 +7654,8 @@
   "transformations": [
    4005301
   ],
-  "has_eza": true
+  "has_eza": true,
+  "eza_step": 8
  },
  "1005301": {
   "name": "ビルス",
@@ -7655,6 +7673,7 @@
    4005301
   ],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF160%",
@@ -7692,6 +7711,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+3、ATK/DEF30%",
@@ -7721,6 +7741,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "攻撃した敵のATK/DEF20%、",
@@ -7844,6 +7865,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+4",
@@ -7866,6 +7888,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF70%",
@@ -7931,6 +7954,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+8",
@@ -8093,6 +8117,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "HP77%以下",
@@ -8114,6 +8139,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -8165,6 +8191,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員のDEF77%",
@@ -8309,6 +8336,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -8334,6 +8362,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -8476,6 +8505,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF200%",
@@ -8507,6 +8537,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター10以上で攻撃すると",
@@ -8527,6 +8558,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ランダム気玉変化：属性気玉1種→虹",
@@ -8641,6 +8673,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+2、ATK/DEF25%",
@@ -8960,6 +8993,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "高確率で敵の攻撃を回避",
@@ -9141,6 +9175,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "敵全体のDEF50%",
@@ -9444,7 +9479,8 @@
   "transformations": [
    4006521
   ],
-  "has_eza": true
+  "has_eza": true,
+  "eza_step": 7
  },
  "1006521": {
   "name": "スーパーベビー2(大猿ベビー)",
@@ -9461,6 +9497,7 @@
    4006521
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "HP30%以上",
@@ -9794,6 +9831,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "取得速気玉3個以上",
@@ -9816,6 +9854,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK100%",
@@ -9868,6 +9907,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "気力メーター6以上で攻撃時",
    "HP80%以上",
@@ -9890,6 +9930,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "超系の味方全員のATK/DEF30%、",
@@ -10014,6 +10055,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "必殺技を発動すると",
@@ -10095,6 +10137,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "攻撃した敵のATK/DEF40%",
@@ -10146,6 +10189,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF200%",
@@ -10356,6 +10400,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF160%",
@@ -10385,6 +10430,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "攻撃を受けるたび",
@@ -10409,6 +10455,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF130%",
@@ -10468,6 +10515,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ダメージ軽減率40%",
@@ -10493,6 +10541,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "敵が2体以上いるとき",
@@ -10786,6 +10835,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "HP50%以上",
@@ -10959,6 +11009,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "気力メーター8以上で攻撃すると",
    "気力+4",
@@ -10982,6 +11033,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 4,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+3",
@@ -11014,6 +11066,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+3",
@@ -11137,7 +11190,8 @@
   "transformations": [
    4008341
   ],
-  "has_eza": true
+  "has_eza": true,
+  "eza_step": 7
  },
  "1007681": {
   "name": "ベジータ(大猿)",
@@ -11155,6 +11209,7 @@
    4008341
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ときどき大猿化(最大2回)",
@@ -11266,6 +11321,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -11673,6 +11729,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "極系の味方全員の気力+3、ATK/DEF30%",
@@ -11699,6 +11756,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -11770,6 +11828,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+4、ATK/DEF250%",
@@ -11809,6 +11868,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -11834,6 +11894,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -11858,6 +11919,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "必ず必殺技が追加発動",
@@ -11980,6 +12042,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK100%",
@@ -12176,7 +12239,8 @@
   "transformations": [
    4008291
   ],
-  "has_eza": true
+  "has_eza": true,
+  "eza_step": 7
  },
  "1008291": {
   "name": "超サイヤ人3孫悟空(GT)(黄金大猿)",
@@ -12194,6 +12258,7 @@
    4008291
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員のATK/DEF33%、",
@@ -12440,6 +12505,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員のATK/DEF30%",
@@ -12463,6 +12529,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+3",
@@ -12688,6 +12755,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「未来編」カテゴリの",
@@ -12714,6 +12782,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "気力メーター12以上で攻撃時",
    "バトル中自身が3回必殺技を発動すると",
@@ -12734,6 +12803,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター1につき攻撃時",
@@ -12755,6 +12825,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+3、ATK30%",
@@ -12777,6 +12848,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "HP50%以上",
@@ -12800,6 +12872,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+3、DEF30%",
@@ -12866,6 +12939,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "気力メーター12以上で攻撃時",
    "攻撃参加中の「神次元」",
@@ -12888,6 +12962,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気玉変化：虹→技",
@@ -12909,6 +12984,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF259%",
@@ -13136,6 +13212,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "敵全体のATK40%、",
@@ -13230,6 +13307,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "取得気玉4個以上",
    "気力+2、ATK90%",
@@ -13251,6 +13329,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「ターゲット孫悟空」カテゴリの",
@@ -13358,6 +13437,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "極系の味方全員の気力+4、DEF50%",
@@ -13410,6 +13490,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気玉を6個以上取得",
@@ -13495,6 +13576,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "極系の味方全員の気力+3、DEF30%",
@@ -13556,6 +13638,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -13609,6 +13692,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "高確率でATK180%",
@@ -13696,6 +13780,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "HP30%以上",
    "気力+3"
@@ -13715,6 +13800,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "name_en": "Super Saiyan Gohan (Teen)"
  },
  "1008941": {
@@ -13730,6 +13816,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "name_en": "Super Saiyan Goten (Kid)"
  },
  "1008950": {
@@ -14109,6 +14196,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "必ず追加攻撃し超高確率で必殺技が発動",
@@ -14155,6 +14243,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -14182,6 +14271,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "必ず追加攻撃し中確率で必殺技が発動",
@@ -14406,6 +14496,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -14434,6 +14525,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "必ず追加攻撃し超高確率で必殺技が発動",
@@ -14455,6 +14547,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員のATK/DEF30%",
@@ -14478,6 +14571,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "高確率で全属性に効果抜群で攻撃",
@@ -14662,6 +14756,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF200%",
@@ -14731,6 +14826,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "ダメージ軽減率20%",
@@ -14807,6 +14903,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "1番目か3番目で攻撃時",
@@ -14878,6 +14975,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF200%",
@@ -14925,6 +15023,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "必ず追加攻撃し高確率で必殺技が発動",
@@ -14985,6 +15084,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF77%",
@@ -15007,6 +15107,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -15177,6 +15278,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気玉変化：力→知",
@@ -15202,6 +15304,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "ダメージ軽減率40%",
@@ -15316,6 +15419,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -15343,6 +15447,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "HP30%以上",
@@ -15426,6 +15531,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+2、ATK/DEF30%",
@@ -15447,6 +15553,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF90%",
@@ -15469,6 +15576,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "気力メーター12以上で攻撃時",
    "チームの「体得した進化」カテゴリの",
@@ -15494,6 +15602,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気玉変化：虹→体",
@@ -15517,6 +15626,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "気力メーター12以上で攻撃時",
    "攻撃参加中の「神次元」カテゴリの",
@@ -15600,6 +15710,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+4、ATK/DEF200%",
@@ -15620,6 +15731,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ターン開始ごと",
@@ -15648,6 +15760,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方の超系のATK10%",
@@ -15762,6 +15875,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF200%",
@@ -15818,6 +15932,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "気力メーター12以上で攻撃時",
    "必殺技を発動するたび",
@@ -15882,6 +15997,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "攻撃を受けるたび",
@@ -15902,6 +16018,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "敵全体のATK/DEF20%",
@@ -15925,6 +16042,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -15946,6 +16064,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "HP50%以上",
    "気力+2、ATK/DEF80%",
@@ -15971,6 +16090,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員のATK30%",
@@ -15992,6 +16112,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+1、ATK/DEF25%",
@@ -16018,6 +16139,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "中確率で敵の攻撃を回避",
@@ -16047,6 +16169,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -16072,6 +16195,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -16098,6 +16222,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "敵全体のATK20%",
@@ -16156,6 +16281,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "中確率で敵の攻撃を回避",
@@ -16220,6 +16346,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ランダム気玉変化：知と力を除く属性気玉1種→虹",
@@ -16252,6 +16379,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -16352,6 +16480,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 4,
   "pre_eza_lines": [
    "基本効果",
    "気玉変化：技→知",
@@ -16599,6 +16728,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 4,
   "pre_eza_lines": [
    "基本効果",
    "気力+6、ATK/DEF250%",
@@ -16896,6 +17026,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -16922,6 +17053,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "高確率ランダム気玉変化：技を除く属性気玉1種→虹",
@@ -16945,6 +17077,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「あの世の戦士」カテゴリの",
@@ -17000,6 +17133,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "敵が2体以下のとき",
@@ -17023,6 +17157,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気玉変化：力→技",
@@ -17049,6 +17184,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+2、ATK/DEF30%",
@@ -17073,6 +17209,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -17103,6 +17240,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+4、ATK/DEF100%",
@@ -17161,6 +17299,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -17243,6 +17382,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 4,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF180%",
@@ -17343,6 +17483,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "会心率17%",
@@ -17366,6 +17507,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ダメージ軽減率18%",
@@ -17519,6 +17661,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+2、ATK/DEF25%",
@@ -17543,6 +17686,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "お菓子で回復",
@@ -17571,6 +17715,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "お菓子で回復",
@@ -17755,6 +17900,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+4、ATK/DEF200%",
@@ -17898,6 +18044,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "速属性と技属性と知属性の",
@@ -17939,6 +18086,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "HP50%以上",
@@ -17982,6 +18130,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "必ず追加攻撃し超高確率で必殺技が発動",
@@ -18030,7 +18179,8 @@
   "transformations": [
    4008331
   ],
-  "has_eza": true
+  "has_eza": true,
+  "eza_step": 7
  },
  "1010781": {
   "name": "ラディッツ(大猿)",
@@ -18048,6 +18198,7 @@
    4008331
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ときどき大猿化(最大2回)",
@@ -18070,6 +18221,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気玉変化：技→虹",
@@ -18092,6 +18244,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "気力メーター8以上で攻撃すると",
    "気力+4、ATK/DEF80%",
@@ -18114,7 +18267,8 @@
   "transformations": [
    4008321
   ],
-  "has_eza": true
+  "has_eza": true,
+  "eza_step": 7
  },
  "1010811": {
   "name": "孫悟空(少年期)(大猿)",
@@ -18131,6 +18285,7 @@
    4008321
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ときどき大猿化(最大2回)",
@@ -18184,6 +18339,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "中確率で敵の攻撃を回避",
@@ -18236,6 +18392,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "全属性に効果抜群で攻撃",
@@ -18294,6 +18451,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "全ての攻撃をガード",
@@ -18362,6 +18520,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "超高確率で自身の気力+7、ATK77%",
@@ -18497,6 +18656,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「あの世の戦士」カテゴリの",
@@ -18522,6 +18682,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "力属性の味方全員の気力+2、ATK/DEF30%",
@@ -18549,6 +18710,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "体属性の味方全員の気力+2、ATK/DEF30%",
@@ -18576,6 +18738,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "技属性の味方全員の気力+2、ATK/DEF30%",
@@ -18603,6 +18766,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "知属性の味方全員の気力+2、ATK/DEF30%",
@@ -18630,6 +18794,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "速属性の味方全員の気力+2、ATK/DEF30%",
@@ -18784,6 +18949,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "敵全体のDEF50%",
@@ -18849,6 +19015,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "登場から7ターンの間",
@@ -18869,6 +19036,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「急激な成長」カテゴリの",
@@ -18898,6 +19066,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -18924,6 +19093,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+2、ATK/DEF25%",
@@ -18953,7 +19123,8 @@
   "transformations": [
    4011111
   ],
-  "has_eza": true
+  "has_eza": true,
+  "eza_step": 7
  },
  "1011111": {
   "name": "孫悟空(少年期)(大猿)",
@@ -18970,6 +19141,7 @@
    4011111
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "低確率で大猿化",
@@ -19049,6 +19221,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "ターン開始時にHP15%回復",
@@ -19077,6 +19250,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "速属性と力属性の",
@@ -19132,6 +19306,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "取得気玉1個につき",
@@ -19168,6 +19343,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "敵が2体以下のとき",
@@ -19223,6 +19399,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF100%",
@@ -19415,6 +19592,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "極系の敵全体のATK/DEF20%",
@@ -19473,6 +19651,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "敵全体のATK/DEF20%",
@@ -19529,6 +19708,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "攻撃を受けると",
@@ -19618,6 +19798,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+2、ATK/DEF35%",
@@ -19642,6 +19823,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -19670,6 +19852,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "速属性と技属性と体属性の",
@@ -19795,6 +19978,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ランダム気玉変化：属性気玉1種→虹",
@@ -19834,6 +20018,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気玉変化：技→体",
@@ -19866,6 +20051,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気玉変化：体→速",
@@ -19896,6 +20082,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF250%",
@@ -20123,6 +20310,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 4,
   "pre_eza_lines": [
    "基本効果",
    "ランダムで気力+5〜10",
@@ -20225,6 +20413,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "中確率で気力+5",
@@ -20300,6 +20489,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 4,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF250%",
@@ -20481,6 +20671,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -20521,6 +20712,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "超系の味方全員のDEF50%",
@@ -20640,6 +20832,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ランダム気玉変化：力を除く属性気玉1種→力",
@@ -20897,6 +21090,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "超系の敵のATK30%、DEF60%",
@@ -20974,6 +21168,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "敵全体のATK15%",
@@ -21223,6 +21418,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF100%",
@@ -21313,6 +21509,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "残りHPが多いほど",
@@ -21682,6 +21879,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -21754,6 +21952,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 4,
   "pre_eza_lines": [
    "基本効果",
    "気力+7、ATK/DEF177%",
@@ -21827,6 +22026,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "中確率で会心が発動",
@@ -21873,6 +22073,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF77%",
@@ -21942,6 +22143,7 @@
    4012421
   ],
   "has_eza": true,
+  "eza_step": 7,
   "name_en": "Tapion (Hirudegarn)"
  },
  "1012450": {
@@ -21990,6 +22192,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "中確率で会心が発動",
@@ -22399,6 +22602,7 @@
    4012651
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1",
@@ -22457,6 +22661,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "気力メーター12以上で攻撃時",
    "攻撃するたび",
@@ -22521,6 +22726,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "敵が2体以上いるとき",
@@ -22573,6 +22779,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -22641,6 +22848,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "必ず2回追加攻撃し中確率で必殺技が発動",
@@ -22699,6 +22907,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "極系の味方全員の気力+3、DEF50%",
@@ -22723,6 +22932,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "攻撃参加中の「GT HERO」カテゴリの",
@@ -22896,6 +23106,7 @@
    4012901
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "中確率で会心が発動",
@@ -22970,6 +23181,7 @@
    4012931
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "中確率で会心が発動",
@@ -23045,6 +23257,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ダメージ軽減率40%",
@@ -23123,6 +23336,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ダメージ軽減率40%",
@@ -23183,6 +23397,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "攻撃を受けるたび",
@@ -23224,6 +23439,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "極系の味方全員の気力+3、ATK30%",
@@ -23284,6 +23500,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "取得気玉1個につき",
@@ -23341,6 +23558,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "攻撃した敵のATK/DEFを2ターン20%",
@@ -23402,6 +23620,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "敵が1体のとき",
@@ -23429,6 +23648,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -23454,6 +23674,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF120%",
@@ -23485,6 +23706,7 @@
    4013121
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF150%",
@@ -23583,6 +23805,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "虹気玉取得時の気力上昇量+2",
@@ -23737,6 +23960,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "残りHPが少ないほど",
@@ -23873,6 +24097,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF150%",
@@ -23915,6 +24140,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -23978,6 +24204,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF100%",
@@ -24086,6 +24313,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "超系の味方全員の気力+4、DEF50%",
@@ -24123,6 +24351,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "高確率で敵の攻撃を回避",
@@ -24148,6 +24377,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "必ず追加攻撃し超高確率で必殺技が発動",
@@ -24175,6 +24405,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気玉変化：知→体",
@@ -24296,6 +24527,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "気力メーター12以上で攻撃時",
    "チームの「宇宙サバイバル編」カテゴリの",
@@ -24323,6 +24555,7 @@
    4013551
   ],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF200%",
@@ -24403,6 +24636,7 @@
    4013581
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+3、ATK40%",
@@ -24427,6 +24661,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -24453,6 +24688,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -24580,6 +24816,7 @@
    4013681
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ときどき大猿化(最大2回)",
@@ -24692,6 +24929,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "HP77%以下",
@@ -24796,6 +25034,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 4,
   "pre_eza_lines": [
    "基本効果",
    "気力+7、ATK/DEF250%",
@@ -24851,6 +25090,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気玉変化：知→体",
@@ -24912,6 +25152,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "中確率で敵の攻撃を回避",
@@ -24983,6 +25224,7 @@
    4013841
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "必ず2回追加攻撃し低確率で必殺技が発動",
@@ -25046,6 +25288,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ダメージ軽減率30%",
@@ -25075,6 +25318,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気玉変化：体+力→技",
@@ -25107,6 +25351,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+1、ATK/DEF40%",
@@ -25194,6 +25439,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "ターン開始ごと",
    "回避率20%(最大60%)",
@@ -25281,6 +25527,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF200%",
@@ -25317,6 +25564,7 @@
    4013951
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気玉取得時の気力上昇量+1",
@@ -25423,6 +25671,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "ターン開始ごと",
@@ -25502,6 +25751,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -25529,6 +25779,7 @@
    4014071
   ],
   "has_eza": true,
+  "eza_step": 7,
   "name_en": "Brianne de Chateau"
  },
  "1014081": {
@@ -25548,6 +25799,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "超系の味方全員のATK/DEF30%",
@@ -25642,6 +25894,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ターン経過ごと",
@@ -25708,6 +25961,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "残りHPが多いほど",
@@ -25739,6 +25993,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "攻撃した敵のATK/DEFを2ターン20%",
@@ -25763,6 +26018,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ターン開始ごと",
@@ -25788,6 +26044,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+3",
@@ -25814,6 +26071,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "チームの「ピチピチギャル」カテゴリの",
    "味方1体につき",
@@ -25841,6 +26099,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「ピチピチギャル」カテゴリの",
@@ -25870,6 +26129,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "気力メーター12以上で攻撃時",
    "攻撃を受けると",
@@ -25945,6 +26205,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "虹気玉か速気玉取得時の気力上昇量+2",
@@ -25986,6 +26247,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "虹気玉か力気玉取得時の気力上昇量+2",
@@ -26279,6 +26541,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF150%",
@@ -26342,6 +26605,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF150%",
@@ -26530,6 +26794,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+3、ATK40%",
@@ -26563,6 +26828,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "ターン開始時にHP8%回復",
@@ -26622,6 +26888,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "高確率で会心が発動",
@@ -26653,6 +26920,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "超系の味方全員の気力+2、ATK/DEF30%",
@@ -26683,6 +26951,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ターン開始ごと",
@@ -26773,6 +27042,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「人造人間」または「力の吸収」カテゴリの",
@@ -26842,6 +27112,7 @@
    4014751
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF120%",
@@ -26904,6 +27175,7 @@
    4014691
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "取得虹気玉1個につき",
@@ -26961,6 +27233,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF150%",
@@ -26988,6 +27261,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF150%",
@@ -27050,6 +27324,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "高確率で全ての攻撃をガード",
@@ -27082,6 +27357,7 @@
    4014801
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ダメージ軽減率21%",
@@ -27143,6 +27419,7 @@
    4014861
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ターン開始時にHP11%回復",
@@ -27206,6 +27483,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+3、DEF60%",
@@ -27282,6 +27560,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -27374,6 +27653,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "知属性の味方全員の気力+3、ATK/DEF10%",
@@ -27408,6 +27688,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "知属性の味方全員の気力+3、ATK/DEF10%",
@@ -27488,6 +27769,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "HP50%以上",
@@ -27548,6 +27830,7 @@
    4015081
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1",
@@ -27612,6 +27895,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "高確率で敵の攻撃を回避",
@@ -27641,6 +27925,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気玉変化：知→力",
@@ -27673,6 +27958,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "技属性の味方全員の気力+3、ATK/DEF10%",
@@ -27707,6 +27993,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "技属性の味方全員の気力+3、ATK/DEF10%",
@@ -27818,6 +28105,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+5",
@@ -27881,6 +28169,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "超系の味方全員の気力+1、ATK/DEF20%",
@@ -27911,6 +28200,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "力属性の味方全員の気力+3、ATK/DEF10%",
@@ -27945,6 +28235,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "力属性の味方全員の気力+3、ATK/DEF10%",
@@ -27979,6 +28270,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "速属性の味方全員の気力+3、ATK/DEF10%",
@@ -28013,6 +28305,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "速属性の味方全員の気力+3、ATK/DEF10%",
@@ -28047,6 +28340,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "体属性の味方全員の気力+3、ATK/DEF10%",
@@ -28081,6 +28375,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "体属性の味方全員の気力+3、ATK/DEF10%",
@@ -28181,6 +28476,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ランダム気玉変化：力を除く属性気玉1種→力",
@@ -28243,6 +28539,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "会心率20%",
@@ -28385,6 +28682,7 @@
    4015371
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -28435,6 +28733,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "チームの「ピチピチギャル」カテゴリの",
    "味方1体につき",
@@ -28567,6 +28866,7 @@
    4015481
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -28858,6 +29158,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+4",
@@ -28928,6 +29229,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "必ず追加攻撃し超高確率で必殺技が発動",
@@ -29117,6 +29419,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF150%",
@@ -29188,6 +29491,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "攻撃した敵のATKを2ターン20%",
@@ -29559,6 +29863,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "登場から6ターンの間",
    "気力+3",
@@ -29620,6 +29925,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF160%",
@@ -29718,6 +30024,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「第6宇宙」カテゴリの",
@@ -29840,6 +30147,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気玉変化：力→速",
@@ -29867,6 +30175,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気玉変化：速→力",
@@ -29898,6 +30207,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "高確率で気力+3",
@@ -30007,6 +30317,7 @@
    4015981
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -30066,6 +30377,7 @@
    4016011
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+6",
@@ -30128,6 +30440,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -30189,6 +30502,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -30288,6 +30602,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「純粋サイヤ人」または「コンビネーション」",
@@ -30350,6 +30665,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「劇場版BOSS」カテゴリの敵がいるとき",
@@ -30404,6 +30720,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「劇場版BOSS」カテゴリの敵がいるとき",
@@ -30621,6 +30938,7 @@
    4017601
   ],
   "has_eza": true,
+  "eza_step": 7,
   "name_en": "Launch"
  },
  "1016260": {
@@ -30791,6 +31109,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「ドラゴンボールを求めし者」カテゴリの",
@@ -30821,6 +31140,7 @@
    4016321
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+2、ATK/DEF20%",
@@ -30936,6 +31256,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -31032,6 +31353,7 @@
    4016401
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+6、ATK/DEF150%",
@@ -31114,6 +31436,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "「ベジータの系譜」カテゴリの敵がいるとき",
    "ターン開始ごとに気力+1",
@@ -31142,6 +31465,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "「孫悟空の系譜」カテゴリの敵がいるとき",
    "ターン開始ごとに気力+1",
@@ -31204,6 +31528,7 @@
    4016551
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "超高確率で気玉変化：力→体",
@@ -31282,6 +31607,7 @@
    "HP59%以下のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "残りHPが多いほど",
@@ -31316,6 +31642,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "虹気玉取得時の気力上昇量+2",
@@ -31343,6 +31670,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF150%",
@@ -31578,6 +31906,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ターン開始時にHP12%回復",
@@ -31604,6 +31933,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "高確率で全ての攻撃をガード",
@@ -31635,6 +31965,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF120%",
@@ -31663,6 +31994,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "極系の味方全員の気力+3、ATK/DEF40%",
@@ -31688,6 +32020,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF120%",
@@ -31718,6 +32051,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "HP81%以上",
@@ -31803,6 +32137,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "必ず追加攻撃し高確率で必殺技が発動",
@@ -31909,6 +32244,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -31988,6 +32324,7 @@
    4016881
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -32415,6 +32752,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+3、DEF70%",
@@ -32538,6 +32876,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「時空を超えし者」カテゴリの",
@@ -32599,6 +32938,7 @@
    4017101
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "超系の味方全員の気力+2",
@@ -32665,6 +33005,7 @@
    4017141
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "極系の味方全員の気力+2",
@@ -32730,6 +33071,7 @@
    "&敵が3体以上いるとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "敵が2体以上いるとき",
@@ -32790,6 +33132,7 @@
    4017201
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -32903,6 +33246,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "name_en": "Gogeta"
  },
  "1017250": {
@@ -32949,6 +33293,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "超系の味方全員の気力+2、DEF30%",
@@ -33016,6 +33361,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -33090,6 +33436,7 @@
    4017311
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1",
@@ -33121,6 +33468,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF120%",
@@ -33232,6 +33580,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "極系の味方全員の気力+2、DEF30%",
@@ -33263,6 +33612,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "チームの「ドラゴンボールを求めし者」",
@@ -33371,6 +33721,7 @@
    4018761
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF150%",
@@ -33419,6 +33770,7 @@
    4018781
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF150%",
@@ -33458,6 +33810,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "中確率で敵の攻撃を回避",
@@ -33490,6 +33843,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "必ず2回追加攻撃し超高確率で必殺技が発動",
@@ -33588,6 +33942,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "必ず追加攻撃し超高確率で必殺技が発動",
@@ -33663,6 +34018,7 @@
    "味方がいれば発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -33796,6 +34152,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "高確率で敵の攻撃を回避",
@@ -33864,6 +34221,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「人工生命体」カテゴリの",
@@ -33926,6 +34284,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF160%",
@@ -34021,6 +34380,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "ターン開始ごと",
@@ -34083,6 +34443,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF90%"
@@ -34106,6 +34467,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+2、ATK/DEF18%",
@@ -34179,6 +34541,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF150%",
@@ -34240,6 +34603,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -34303,6 +34667,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「孫悟空の系譜」カテゴリの",
@@ -34387,6 +34752,7 @@
    4017791
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "ランダム気玉変化：技を除く属性気玉1種→技",
@@ -34427,6 +34793,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "気力メーター12以上で攻撃時",
    "攻撃が必中する",
@@ -34695,6 +35062,7 @@
    4017911
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "高確率で必殺技が追加発動",
@@ -34755,6 +35123,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "取得属性気玉1個につき",
@@ -34814,6 +35183,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "取得虹気玉1個につき",
@@ -34841,6 +35211,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -34972,6 +35343,7 @@
    "いつでも発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF178%",
@@ -35038,6 +35410,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "チームの「恐怖の征服」カテゴリの",
    "味方1体につき",
@@ -35134,6 +35507,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -35208,6 +35582,7 @@
    4018131
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1、ATK/DEF150%",
@@ -35282,6 +35657,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "攻撃するたび",
@@ -35418,6 +35794,7 @@
    "敵が1体の時に発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "攻撃時のターゲットの状態：or",
@@ -35494,6 +35871,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "お菓子で回復",
@@ -35580,6 +35958,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -35651,6 +36030,7 @@
    4018281
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「人造人間」または「ターゲット孫悟空」",
@@ -35718,6 +36098,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+2、ATK/DEF20%",
@@ -35782,6 +36163,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "気力メーター12以上で攻撃時",
    "チームの「時空を超えし者」カテゴリの味方1体につき",
@@ -35809,6 +36191,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "全ての攻撃をガード",
@@ -35840,6 +36223,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "登場から3ターンの間",
@@ -35905,6 +36289,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+3、ATK/DEF40%、会心率12%",
@@ -36041,6 +36426,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -36070,6 +36456,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ランダム気玉変化：属性気玉1種→虹",
@@ -36134,6 +36521,7 @@
    4019021
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -36216,6 +36604,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "ランダム気玉変化：属性気玉1種→虹",
@@ -36247,6 +36636,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "超高確率で敵の攻撃を回避",
@@ -36306,6 +36696,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -36378,6 +36769,7 @@
    "味方が3体以上いれば発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "登場から5ターンの間",
@@ -36435,6 +36827,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター8以上で攻撃時",
@@ -36521,6 +36914,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+8",
@@ -36616,6 +37010,7 @@
    4017971
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "攻撃時",
@@ -36703,6 +37098,7 @@
    4017981
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "攻撃時",
@@ -36734,6 +37130,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気玉変化：知→虹",
@@ -36848,6 +37245,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "必殺技を発動するたび",
@@ -36906,6 +37304,7 @@
    4018731
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "正体がバレないように",
    "愛と正義のヒーローに変身する"
@@ -37052,6 +37451,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ダメージ軽減率58%",
@@ -37144,6 +37544,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF160%",
@@ -37239,6 +37640,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "中確率で敵の攻撃を回避",
@@ -37293,6 +37695,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "攻撃参加中の「純粋サイヤ人」カテゴリの",
@@ -37428,6 +37831,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気玉取得時の気力上昇量+2",
@@ -37518,6 +37922,7 @@
    "HP80%以下のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "名称に「孫悟空」を含むキャラ(ギニュー、Jr.等を除く)",
@@ -37608,6 +38013,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 4,
   "pre_eza_lines": [
    "基本効果",
    "気玉変化：体→力",
@@ -37679,6 +38085,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "高確率で敵の攻撃を回避",
@@ -37708,6 +38115,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF100%",
@@ -37786,6 +38194,7 @@
    "いつでも発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF150%",
@@ -37848,6 +38257,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "敵が1体のとき",
@@ -37915,6 +38325,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+3、ATK/DEF30%",
@@ -37975,6 +38386,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "自身の他に攻撃参加中の",
@@ -38038,6 +38450,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "取得気玉1個につき",
@@ -38166,6 +38579,7 @@
    "発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "攻撃参加中の「未来編」カテゴリの",
@@ -38244,6 +38658,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1、ATK/DEF250%",
@@ -38334,6 +38749,7 @@
    "HP70%以下のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -38402,6 +38818,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF250%",
@@ -38442,6 +38859,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -38526,6 +38944,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ダメージ軽減率50%",
@@ -38566,6 +38985,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ダメージ軽減率50%",
@@ -38649,6 +39069,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "高確率で敵の攻撃を回避",
@@ -38735,6 +39156,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -38800,6 +39222,7 @@
    4019611
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -38861,6 +39284,7 @@
    4019651
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF200%",
@@ -38916,6 +39340,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "登場から1ターンの間",
    "ダメージ軽減率30%",
@@ -38955,6 +39380,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "超系の味方全員のATK/DEF30%、",
@@ -38990,6 +39416,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -39033,6 +39460,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「第6宇宙」「ピチピチギャル」カテゴリの",
@@ -39072,6 +39500,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「純粋サイヤ人」「ピチピチギャル」カテゴリの",
@@ -39140,6 +39569,7 @@
    4019761
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1、DEF200%",
@@ -39208,6 +39638,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -39302,6 +39733,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "登場から7ターンの間",
@@ -39377,6 +39809,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "超高確率で敵の攻撃を回避",
@@ -39410,6 +39843,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気玉変化：力→速",
@@ -39447,6 +39881,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「孫悟空の系譜」カテゴリの",
@@ -39480,6 +39915,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF100%",
@@ -39509,6 +39945,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「孫悟空の系譜」カテゴリの",
@@ -39541,6 +39978,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「孫悟空の系譜」カテゴリの",
@@ -39569,6 +40007,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "登場から5ターンの間",
@@ -39605,6 +40044,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "全属性に効果抜群で攻撃",
@@ -39644,6 +40084,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "高確率で敵の攻撃を回避",
@@ -39686,6 +40127,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "攻撃した敵のATK/DEFを3ターン22%",
@@ -39722,6 +40164,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "極系の味方全員の気力+3、ATK/DEF30%、",
@@ -39850,6 +40293,7 @@
    "HP50%以下のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+4、ATK/DEF170%",
@@ -39927,6 +40371,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「第11宇宙」または「スペシャルポーズ」カテゴリの",
@@ -40015,6 +40460,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF100%",
@@ -40056,6 +40502,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -40134,6 +40581,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "敵が1体のとき",
@@ -40211,6 +40659,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -40320,6 +40769,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「孫悟空の系譜」カテゴリの敵がいるとき",
@@ -40383,6 +40833,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「第11宇宙」カテゴリの",
@@ -40416,6 +40867,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「スペシャルポーズ」カテゴリの",
@@ -40445,6 +40897,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「スペシャルポーズ」カテゴリの",
@@ -40547,6 +41000,7 @@
    "攻撃参加中の味方にいるとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF200%",
@@ -40820,6 +41274,7 @@
    "HP50%以上で発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "77%の確率で必殺技が追加発動",
@@ -40920,6 +41375,7 @@
    "HP50%以上で発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "必ず追加攻撃し77%の確率で必殺技が発動",
@@ -41014,6 +41470,7 @@
    "HP50%以上で発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "ターン開始時にHP20%回復",
@@ -41052,6 +41509,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "チームの「宇宙サバイバル編」カテゴリの",
    "味方1体につき",
@@ -41082,6 +41540,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「宇宙サバイバル編」カテゴリの",
@@ -41186,6 +41645,7 @@
    "HP77%以下のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF200%",
@@ -41373,6 +41833,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+3、ATK/DEF40%",
@@ -41478,6 +41939,7 @@
    4020631
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "残りHPが多いほど",
@@ -41549,6 +42011,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「クロスオーバー」カテゴリの",
@@ -41615,6 +42078,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "気力メーター12以上で攻撃時",
    "自身の他に攻撃参加中の",
@@ -41790,6 +42254,7 @@
    "発動可能(最大2回)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "「恐怖の征服」または「惑星破壊」カテゴリの",
@@ -41870,6 +42335,7 @@
    4020781
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "中確率で敵の攻撃を回避",
@@ -41932,6 +42398,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "ターン開始ごと",
    "気力+1(最大+4)",
@@ -41961,6 +42428,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "極系の味方全員の気力+4、DEF40%",
@@ -41990,6 +42458,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "攻撃時",
    "気力+3、ATK/DEF160%",
@@ -42022,6 +42491,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF150%",
@@ -42054,6 +42524,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "攻撃した敵のATK/DEFを2ターン30%",
@@ -42190,6 +42661,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -42258,6 +42730,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF150%",
@@ -42291,6 +42764,7 @@
    4020921
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF250%",
@@ -42338,6 +42812,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+3",
@@ -42375,6 +42850,7 @@
    4020951
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF250%",
@@ -42513,6 +42989,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+4、ATK/DEF300%",
@@ -42569,6 +43046,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+5、ATK/DEF150%",
@@ -42711,6 +43189,7 @@
    "敵が1体の時に発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "極系の味方全員のATK/DEF30%",
@@ -42780,6 +43259,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "HP50%以下",
@@ -42857,6 +43337,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "お菓子で回復",
@@ -42887,6 +43368,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF200%",
@@ -42981,6 +43463,7 @@
    "がいるときHP58%以下で発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気玉取得時の気力上昇量+2",
@@ -43108,6 +43591,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "全ての攻撃をガード",
@@ -43211,6 +43695,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "高確率で敵の攻撃を回避",
@@ -43408,6 +43893,7 @@
    4021391
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -43502,6 +43988,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "必ず2回追加攻撃し高確率で必殺技が発動",
@@ -43542,6 +44029,7 @@
    4021441
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -43569,6 +44057,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "1番目にいるとき",
@@ -43655,6 +44144,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "虹気玉取得時の気力上昇量+3",
@@ -43691,6 +44181,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "name_en": "Goku (Dokkan Butoden)"
  },
  "1021501": {
@@ -43707,6 +44198,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "name_en": "Vegeta (Dokkan Butoden)"
  },
  "1021510": {
@@ -43785,6 +44277,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「第7宇宙代表」カテゴリの",
@@ -43927,6 +44420,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "中確率で敵の攻撃を回避",
@@ -43991,6 +44485,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気玉変化：体→知",
@@ -44025,6 +44520,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "名称に「ブルマ」を含むキャラが",
@@ -44116,6 +44612,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -44197,6 +44694,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -44231,6 +44729,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「宇宙サバイバル編」カテゴリの",
@@ -44383,6 +44882,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「天才戦士」または「兄弟の絆」カテゴリの",
@@ -44468,6 +44968,7 @@
    "キャラがチームにいる時発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -44540,6 +45041,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「正義の味方」カテゴリの味方全員の",
@@ -44640,6 +45142,7 @@
    "発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+4、ATK/DEF177%",
@@ -44773,6 +45276,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ランダム気玉変化：属性気玉1種→虹",
@@ -44851,6 +45355,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ランダム気玉変化：属性気玉1種→虹",
@@ -45044,6 +45549,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "中確率で会心が発動",
@@ -45270,6 +45776,7 @@
    "バトル中自身が7回以上攻撃を受けると発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "会心率/ダメージ軽減率17%",
@@ -45435,6 +45942,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「時間制限」カテゴリの",
@@ -45525,6 +46033,7 @@
    "HP70%以上のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -45602,6 +46111,7 @@
    "HP58%以下のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+3、DEF58%",
@@ -45679,6 +46189,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "必ず2回追加攻撃し高確率で必殺技が発動",
@@ -45861,6 +46372,7 @@
    "HP50%以下のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気玉取得時の気力上昇量+2",
@@ -46005,6 +46517,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "自身の登場時、登場時演出が発動",
    "1ターンの間、ダメージ軽減率77%、",
@@ -46108,6 +46621,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "自身の登場時、登場時演出が発動",
    "1ターンの間、ダメージ軽減率77%、",
@@ -46329,6 +46843,7 @@
    "HP66%以上のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+6",
@@ -46431,6 +46946,7 @@
    "敵が1体で極系のとき、敵のHP30%以下で発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF200%",
@@ -46512,6 +47028,7 @@
    "自身が1回以上攻撃を受けると発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF200%",
@@ -46621,6 +47138,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "高確率で敵の攻撃を回避",
@@ -46753,6 +47271,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+4",
@@ -46857,6 +47376,7 @@
    "敵が1体で超系のとき、敵のHP30%以下で発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF200%",
@@ -46962,6 +47482,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -47055,6 +47576,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "名称に「孫悟空」を含むキャラ",
    "(少年期、ギニュー、Jr.等を除く)がチームにいるとき",
@@ -47131,6 +47653,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "必ず追加攻撃し高確率で必殺技が発動",
@@ -47266,6 +47789,7 @@
    "発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "高確率で敵の攻撃を回避",
@@ -47355,6 +47879,7 @@
    "発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "中確率で敵の攻撃を回避",
@@ -47533,6 +48058,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「宇宙をわたる戦士」カテゴリの",
@@ -47617,6 +48143,7 @@
    4023051
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -47776,6 +48303,7 @@
    "HP76%以下のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+5、ATK/DEF200%",
@@ -47861,6 +48389,7 @@
    "バトル中6回攻撃すると発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF150%",
@@ -47975,6 +48504,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "お菓子で回復",
@@ -48007,6 +48537,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -48090,6 +48621,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1、ATK/DEF200%",
@@ -48242,6 +48774,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "チームの「DBヒーローズ」",
    "または「時空を超えし者」カテゴリのうち",
@@ -48322,6 +48855,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「クロスオーバー」カテゴリの",
@@ -48357,6 +48891,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -48393,6 +48928,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -48427,6 +48963,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -48459,6 +48996,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「孫悟空の系譜」カテゴリの味方全員の",
@@ -48494,6 +49032,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「ベジータの系譜」カテゴリの味方全員の",
@@ -48570,6 +49109,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「クロスオーバー」カテゴリの",
@@ -48649,6 +49189,7 @@
    "または敵が3体以上のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ダメージ軽減率17%",
@@ -48731,6 +49272,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「人造人間」カテゴリの",
@@ -48857,6 +49399,7 @@
    "HP58%以下のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+4、ATK/DEF250%",
@@ -48936,6 +49479,7 @@
    "HP77%以下のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF200%",
@@ -49017,6 +49561,7 @@
    "発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF250%",
@@ -49122,6 +49667,7 @@
    "HP40%以下のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "自身の攻撃参加ターン開始時に",
    "名称に「孫悟空」(少年期、ギニュー、Jr.等を除く)",
@@ -49205,6 +49751,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1、ATK/DEF260%",
@@ -49293,6 +49840,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ランダム気玉変化：技を除く属性気玉1種→虹",
@@ -49402,6 +49950,7 @@
    "HP59%以下のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "自身の攻撃参加ターン開始時に",
    "名称に「ベジータ」を含むキャラ",
@@ -49440,6 +49989,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+1、ATK/DEF20%",
@@ -49470,6 +50020,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時にHP80%以下",
@@ -49496,6 +50047,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "HP10%回復",
@@ -49523,6 +50075,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気玉変化：技と知→体",
@@ -49551,6 +50104,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "中確率で敵の攻撃を回避",
@@ -49579,6 +50133,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "中確率で会心が発動",
@@ -49604,6 +50159,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「クロスオーバー」カテゴリの",
@@ -49629,6 +50185,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF150%",
@@ -49654,6 +50211,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "高確率で必殺技が追加発動",
@@ -49723,6 +50281,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "必ず追加攻撃し高確率で必殺技が発動",
@@ -49797,6 +50356,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ダメージ軽減率30%",
@@ -49885,6 +50445,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "必ず追加攻撃し高確率で必殺技が発動",
@@ -49987,6 +50548,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -50100,6 +50662,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "虹気玉取得時の気力上昇量+2",
@@ -50173,6 +50736,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "自身の登場時、登場時演出が発動",
    "7ターンの間、気力+3、ATK/DEF70%",
@@ -50206,6 +50770,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -50272,6 +50837,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "必ず追加攻撃し高確率で必殺技が発動",
@@ -50333,6 +50899,7 @@
    4023961
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「ベジータの系譜」または",
@@ -50415,6 +50982,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "自身の攻撃参加ターン開始時に",
    "名称に「トランクス」を含むキャラがチームにいるとき、",
@@ -50461,6 +51029,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員のATK/DEF20%",
@@ -50496,6 +51065,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "気力メーター12以上で攻撃時",
    "攻撃するたび",
@@ -50529,6 +51099,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "敵が2体以下のとき",
@@ -50560,6 +51131,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+4",
@@ -50592,6 +51164,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "敵全体のATK25%、DEF50%",
@@ -50677,6 +51250,7 @@
    "敵が1体のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF250%",
@@ -50772,6 +51346,7 @@
    "またはバトル開始から6回以上攻撃を受けると発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「サイヤ人編」カテゴリの",
@@ -50819,6 +51394,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -50895,6 +51471,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1、DEF333%",
@@ -50997,6 +51574,7 @@
    "HP50%以下のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "ダメージ軽減率35%",
@@ -51044,6 +51622,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "高確率で敵の攻撃を回避",
@@ -51088,6 +51667,7 @@
    4024171
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ターン開始時にHP8%回復し、",
@@ -51274,6 +51854,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "気力メーター6以上で攻撃時",
    "気力メーター9以上で攻撃時",
@@ -51355,6 +51936,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF200%",
@@ -51579,6 +52161,7 @@
    4024411
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1、ATK/DEF250%",
@@ -51658,6 +52241,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "自身の登場時、登場時演出が発動",
    "3ターンの間、気力+3、ATK/DEF150%、",
@@ -51759,6 +52343,7 @@
    "HP50%以下のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "自身の登場時、登場時演出が発動",
    "1ターンの間、全ての攻撃をガード",
@@ -51882,6 +52467,7 @@
    "HP50%以下のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "自身の登場時、チームに自身の他に",
    "「親子の絆」カテゴリの味方がいるとき",
@@ -52032,6 +52618,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "チームの「未来編」カテゴリの",
@@ -52158,6 +52745,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "自身の登場時、チームに自身の他に",
    "「ポタラ」カテゴリの味方がいるとき",
@@ -52250,6 +52838,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1、ATK/DEF230%",
@@ -52373,6 +52962,7 @@
    "HP50%以下のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "必ず追加攻撃",
@@ -52457,6 +53047,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -52606,6 +53197,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ダメージ軽減率50%",
@@ -52712,6 +53304,7 @@
    "バトル中8回攻撃すると発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "自身の登場時、チームに自身の他に",
    "「恐怖の征服」または「劇場版BOSS」",
@@ -52834,6 +53427,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+7、ATK/DEF259%",
@@ -52944,6 +53538,7 @@
    4024901
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+5、ATK/DEF250%",
@@ -53072,6 +53667,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "ターン開始時にHP15%回復",
@@ -53315,6 +53911,7 @@
    "攻撃参加中の味方にいるとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "必ず追加攻撃し超高確率で必殺技が発動",
@@ -53510,6 +54107,7 @@
    "またはHPが59%以下のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「少年編」または「少年・少女」",
@@ -53674,6 +54272,7 @@
    "HP59%以下で発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "登場から5ターンの間",
@@ -53703,6 +54302,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "取得気玉1個につき",
@@ -53732,6 +54332,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「GT BOSS」カテゴリの",
@@ -53760,6 +54361,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「最凶の一族」カテゴリの",
@@ -53791,6 +54393,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+2",
@@ -53825,6 +54428,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "攻撃した敵のATK/DEFを2ターン25%",
@@ -53859,6 +54463,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ターン開始時にHP10%回復",
@@ -53892,6 +54497,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員のATK/DEF20%",
@@ -53925,6 +54531,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "与えたダメージの15%回復",
@@ -53958,6 +54565,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「恐怖の征服」カテゴリの",
@@ -54023,6 +54631,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "超系の味方全員の気力+4、ATK/DEF40%",
@@ -54095,6 +54704,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "超系の味方全員の気力+1、ATK/DEF20%",
@@ -54571,6 +55181,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "中確率で敵の攻撃を回避",
@@ -54603,6 +55214,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員のATK/DEF20%",
@@ -54678,6 +55290,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "自身の登場時、登場時演出が発動",
    "6ターンの間、",
@@ -54764,6 +55377,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "自身の登場時、登場時演出が発動",
    "6ターンの間、",
@@ -54878,6 +55492,7 @@
    "敵が1体のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "自身の登場時、チームに自身の他に",
    "「親子の絆」カテゴリの味方がいるとき",
@@ -54998,6 +55613,7 @@
    "敵が1体のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "自身の登場時、チームに自身の他に",
    "「師弟の絆」カテゴリの味方がいるとき",
@@ -55047,6 +55663,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -55152,6 +55769,7 @@
    "発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+4、ATK/DEF180%",
@@ -55198,6 +55816,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気玉変化：速→技",
@@ -55417,6 +56036,7 @@
    4025741
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "全ての攻撃をガード",
@@ -55532,6 +56152,7 @@
    4025781
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "全ての攻撃をガード",
@@ -55634,6 +56255,7 @@
    "発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "自身の登場時、チームに自身の他に",
    "「地球育ちの戦士」カテゴリの味方がいるとき",
@@ -55879,6 +56501,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+5、ATK/DEF250%",
@@ -56045,6 +56668,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -56284,6 +56908,7 @@
    "いるとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "自身の登場時、登場時演出が発動",
    "7ターンの間、気力+4、",
@@ -56405,6 +57030,7 @@
    "いるとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "自身の登場時、登場時演出が発動",
    "7ターンの間、気力+4、",
@@ -56722,6 +57348,7 @@
    "発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "自身の登場時、チームに超系の味方が",
    "6体以上いるとき登場時演出が発動",
@@ -56842,6 +57469,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "自身の登場時、名称に「孫悟空(少年期)」",
    "を含むキャラがチームにいるとき登場時演出が発動",
@@ -56919,6 +57547,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "高確率で敵全体のATK/DEF20%",
@@ -56954,6 +57583,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "お菓子で回復",
@@ -56985,6 +57615,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "お菓子で回復",
@@ -57072,6 +57703,7 @@
    4026401
   ],
   "has_eza": true,
+  "eza_step": 4,
   "pre_eza_lines": [
    "基本効果",
    "気力+5、ATK/DEF250%",
@@ -57746,6 +58378,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1",
@@ -57936,6 +58569,7 @@
    "6ターン目以降発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "自身の攻撃参加ターン開始時に",
    "「孫悟空の系譜」または「純粋サイヤ人」カテゴリ",
@@ -58024,6 +58658,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「惑星破壊」カテゴリの",
@@ -58111,6 +58746,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF250%",
@@ -58255,6 +58891,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -58295,6 +58932,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "技属性と知属性の",
@@ -58490,6 +59128,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター6以上で攻撃時",
@@ -59109,6 +59748,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF200%",
@@ -59310,6 +59950,7 @@
    "発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF100%",
@@ -59530,6 +60171,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター9以上で攻撃時",
@@ -60049,6 +60691,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "1番目にいるとき",
@@ -60081,6 +60724,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "高確率で敵の攻撃を回避",
@@ -60363,6 +61007,7 @@
    4027631
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF250%",
@@ -60562,6 +61207,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF170%",
@@ -60929,6 +61575,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -61188,6 +61835,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1、ATK/DEF560%",
@@ -61230,6 +61878,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "敵が1体のとき",
@@ -61584,6 +62233,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "チームの「第6宇宙」または「ピチピチギャル」",
@@ -61630,6 +62280,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "チームの「第6宇宙」または",
@@ -61867,6 +62518,7 @@
    "発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "自身の登場時、登場時演出が発動",
    "5ターンの間、気力+4、ATK/DEF200%",
@@ -62267,6 +62919,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "取得気玉1個につき",
@@ -62786,6 +63439,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "攻撃不可",
@@ -62977,6 +63631,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF100%",
@@ -63310,6 +63965,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "チームに自身の他に",
    "「地球育ちの戦士」カテゴリの",
@@ -63428,6 +64084,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "取得気玉1個につき",
    "取得知気玉1個につき",
@@ -64941,6 +65598,7 @@
    "カテゴリの味方が3体いるとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "自身の登場時、チームに自身の他に",
    "「制御不能の力」カテゴリの味方がいるとき",
@@ -66593,6 +67251,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "高確率で敵の攻撃を回避",
@@ -67742,6 +68401,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1",
@@ -68897,6 +69557,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+2、ATK50%、",
@@ -68939,6 +69600,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+2、DEF50%、",
@@ -74040,6 +74702,7 @@
   ],
   "transformations": [],
   "has_eza": true,
+  "eza_step": 4,
   "pre_eza_lines": [
    "基本効果",
    "気力+7、ATK/DEF177%",
@@ -77916,6 +78579,7 @@
    "発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "自身の登場時、チームに超系の味方が",
    "6体以上いるとき登場時演出が発動",
@@ -79028,6 +79692,7 @@
    1005300
   ],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF160%",
@@ -79204,6 +79869,7 @@
    1006520
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "HP30%以上",
@@ -79265,6 +79931,7 @@
    1008290
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員のATK/DEF33%、",
@@ -79326,6 +79993,7 @@
    1010810
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ときどき大猿化(最大2回)",
@@ -79348,6 +80016,7 @@
    1010780
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ときどき大猿化(最大2回)",
@@ -79369,6 +80038,7 @@
    1007680
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ときどき大猿化(最大2回)",
@@ -79390,6 +80060,7 @@
    1011110
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "低確率で大猿化",
@@ -79480,6 +80151,7 @@
    1012421
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ダメージ軽減率50%",
@@ -79529,6 +80201,7 @@
    1012651
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1",
@@ -79565,6 +80238,7 @@
    1012901
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "中確率で会心が発動",
@@ -79593,6 +80267,7 @@
    1012931
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "中確率で会心が発動",
@@ -79616,6 +80291,7 @@
    1013121
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF150%",
@@ -79719,6 +80395,7 @@
    1013541
   ],
   "has_eza": true,
+  "eza_step": 8,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF200%",
@@ -79765,6 +80442,7 @@
    1013571
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+3、ATK40%",
@@ -79789,6 +80467,7 @@
    1013681
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ときどき大猿化(最大2回)",
@@ -79835,6 +80514,7 @@
    1013831
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "必ず2回追加攻撃し低確率で必殺技が発動",
@@ -79858,6 +80538,7 @@
    1013951
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気玉取得時の気力上昇量+1",
@@ -79894,6 +80575,7 @@
    1014061
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "戦場に可憐な花が咲き、愛の力が大爆発する"
   ],
@@ -79919,6 +80601,7 @@
    1014681
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "取得虹気玉1個につき",
@@ -79947,6 +80630,7 @@
    1014661
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF120%",
@@ -79979,6 +80663,7 @@
    4014801
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ダメージ軽減率21%",
@@ -80010,6 +80695,7 @@
    4014801
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ダメージ軽減率21%",
@@ -80041,6 +80727,7 @@
    4014801
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ダメージ軽減率21%",
@@ -80072,6 +80759,7 @@
    4014791
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ダメージ軽減率21%",
@@ -80103,6 +80791,7 @@
    4014861
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ターン開始時にHP11%回復",
@@ -80134,6 +80823,7 @@
    4014861
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ターン開始時にHP11%回復",
@@ -80165,6 +80855,7 @@
    4014861
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ターン開始時にHP11%回復",
@@ -80196,6 +80887,7 @@
    4014851
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ターン開始時にHP11%回復",
@@ -80222,6 +80914,7 @@
    1015051
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1",
@@ -80253,6 +80946,7 @@
    1015051
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1",
@@ -80284,6 +80978,7 @@
    1015051
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1",
@@ -80311,6 +81006,7 @@
    1015371
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -80346,6 +81042,7 @@
    1015471
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -80378,6 +81075,7 @@
    1015971
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -80406,6 +81104,7 @@
    1016001
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+6",
@@ -80436,6 +81135,7 @@
    1016311
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "味方全員の気力+2、ATK/DEF20%",
@@ -80463,6 +81163,7 @@
    1016401
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+6、ATK/DEF150%",
@@ -80500,6 +81201,7 @@
    4016551
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "超高確率で気玉変化：力→体",
@@ -80533,6 +81235,7 @@
    4016551
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "超高確率で気玉変化：力→体",
@@ -80566,6 +81269,7 @@
    4016551
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "超高確率で気玉変化：力→体",
@@ -80598,6 +81302,7 @@
    4016541
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "超高確率で気玉変化：力→体",
@@ -80635,6 +81340,7 @@
    "変身後に発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -80676,6 +81382,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "超系の味方全員の気力+2",
@@ -80705,6 +81412,7 @@
    4017091
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "超系の味方全員の気力+2",
@@ -80742,6 +81450,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "極系の味方全員の気力+2",
@@ -80774,6 +81483,7 @@
    4017131
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "極系の味方全員の気力+2",
@@ -80813,6 +81523,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -80840,6 +81551,7 @@
    4017191
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -80867,6 +81579,7 @@
    1017301
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1",
@@ -80902,6 +81615,7 @@
    1017491
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -80938,6 +81652,7 @@
    1016251
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "クシャミをして性格が入れかわる"
   ],
@@ -80966,6 +81681,7 @@
    1017631
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "ターン開始ごと",
@@ -80996,6 +81712,7 @@
    1017661
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF90%"
@@ -81018,6 +81735,7 @@
    1017741
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「孫悟空の系譜」カテゴリの",
@@ -81046,6 +81764,7 @@
    1017781
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "ランダム気玉変化：技を除く属性気玉1種→技",
@@ -81097,6 +81816,7 @@
    "敵が1体の時に発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "高確率で必殺技が追加発動",
@@ -81141,6 +81861,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "攻撃時",
@@ -81186,6 +81907,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "攻撃時",
@@ -81219,6 +81941,7 @@
    1018031
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF178%",
@@ -81255,6 +81978,7 @@
    1018121
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1、ATK/DEF150%",
@@ -81294,6 +82018,7 @@
    1018191
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "攻撃時のターゲットの状態：or",
@@ -81330,6 +82055,7 @@
    1018271
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「人造人間」または「ターゲット孫悟空」",
@@ -81367,6 +82093,7 @@
    1018721
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "正体がバレないように",
    "愛と正義のヒーローに変身する"
@@ -81397,6 +82124,7 @@
    1017411
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF150%",
@@ -81445,6 +82173,7 @@
    1017421
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF150%",
@@ -81501,6 +82230,7 @@
    1018881
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF160%",
@@ -81536,6 +82266,7 @@
    1018461
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -81572,6 +82303,7 @@
    1019141
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF150%",
@@ -81608,6 +82340,7 @@
    1019491
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "高確率で敵の攻撃を回避",
@@ -81644,6 +82377,7 @@
    "HP70%以上のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -81678,6 +82412,7 @@
    4019601
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -81720,6 +82455,7 @@
    "HP70%以上のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF200%",
@@ -81756,6 +82492,7 @@
    4019641
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF200%",
@@ -81793,6 +82530,7 @@
    4019761
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1、DEF200%",
@@ -81834,6 +82572,7 @@
    "カテゴリの敵がいるとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1、DEF200%",
@@ -81868,6 +82607,7 @@
    1020091
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -81923,6 +82663,7 @@
    1020371
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "ターン開始時にHP20%回復",
@@ -81965,6 +82706,7 @@
    1020461
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF200%",
@@ -82018,6 +82760,7 @@
    1020621
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "残りHPが多いほど",
@@ -82047,6 +82790,7 @@
    1020771
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "中確率で敵の攻撃を回避",
@@ -82075,6 +82819,7 @@
    1020921
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF250%",
@@ -82125,6 +82870,7 @@
    1020941
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF250%",
@@ -82165,6 +82911,7 @@
    1021051
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "極系の味方全員のATK/DEF30%",
@@ -82205,6 +82952,7 @@
    1021291
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "全ての攻撃をガード",
@@ -82239,6 +82987,7 @@
    1021391
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力メーター12以上で攻撃時",
@@ -82269,6 +83018,7 @@
    1021441
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -82326,6 +83076,7 @@
    1022191
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+2",
@@ -82375,6 +83126,7 @@
    "敵のHPが50%以下で発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "自身の登場時、登場時演出が発動",
    "1ターンの間、ダメージ軽減率77%、",
@@ -82427,6 +83179,7 @@
    "敵のHPが50%以下で発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "自身の登場時、登場時演出が発動",
    "1ターンの間、ダメージ軽減率77%、",
@@ -82463,6 +83216,7 @@
    1022591
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+6",
@@ -82507,6 +83261,7 @@
    1022831
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "必ず追加攻撃し高確率で必殺技が発動",
@@ -82541,6 +83296,7 @@
    1022881
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "高確率で敵の攻撃を回避",
@@ -82582,6 +83338,7 @@
    "発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "中確率で敵の攻撃を回避",
@@ -82621,6 +83378,7 @@
    1023041
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+3",
@@ -82660,6 +83418,7 @@
    1023111
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF150%",
@@ -82708,6 +83467,7 @@
    1023421
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+4、ATK/DEF250%",
@@ -82751,6 +83511,7 @@
    1023461
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF200%",
@@ -82779,6 +83540,7 @@
    1023521
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "自身の攻撃参加ターン開始時に",
    "名称に「孫悟空」(少年期、ギニュー、Jr.等を除く)",
@@ -82828,6 +83590,7 @@
    1023771
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "必ず追加攻撃し高確率で必殺技が発動",
@@ -82868,6 +83631,7 @@
    1023951
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "「ベジータの系譜」または",
@@ -82906,6 +83670,7 @@
    1024141
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "ダメージ軽減率35%",
@@ -82950,6 +83715,7 @@
    1024171
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "ターン開始時にHP8%回復し、",
@@ -83004,6 +83770,7 @@
    1024291
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+2、ATK/DEF200%",
@@ -83047,6 +83814,7 @@
    4024411
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1、ATK/DEF250%",
@@ -83093,6 +83861,7 @@
    "(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1、ATK/DEF250%",
@@ -83130,6 +83899,7 @@
    4024401
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+1、ATK/DEF250%",
@@ -83170,6 +83940,7 @@
    1024441
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "自身の登場時、登場時演出が発動",
    "3ターンの間、気力+3、ATK/DEF150%、",
@@ -83214,6 +83985,7 @@
    "敵が1体のとき発動可能(1回のみ)"
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "気力+5、ATK/DEF250%",
@@ -83255,6 +84027,7 @@
    1025111
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "登場から5ターンの間",
@@ -83312,6 +84085,7 @@
    1025591
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "自身の登場時、チームに自身の他に",
    "「師弟の絆」カテゴリの味方がいるとき",
@@ -83380,6 +84154,7 @@
    1025731
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "全ての攻撃をガード",
@@ -83423,6 +84198,7 @@
    1025771
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "全ての攻撃をガード",
@@ -83505,6 +84281,7 @@
    1026251
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "自身の登場時、チームに超系の味方が",
    "6体以上いるとき登場時演出が発動",
@@ -83580,6 +84357,7 @@
    1026391
   ],
   "has_eza": true,
+  "eza_step": 4,
   "pre_eza_lines": [
    "基本効果",
    "気力+5、ATK/DEF250%",
@@ -83910,6 +84688,7 @@
    1027621
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "基本効果",
    "気力+3、ATK/DEF250%",
@@ -84119,6 +84898,7 @@
    1028161
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "自身の登場時、登場時演出が発動",
    "5ターンの間、気力+4、ATK/DEF200%",
@@ -84290,6 +85070,7 @@
    1028551
   ],
   "has_eza": true,
+  "eza_step": 3,
   "pre_eza_lines": [
    "基本効果",
    "攻撃不可",
@@ -85836,6 +86617,7 @@
    1034461
   ],
   "has_eza": true,
+  "eza_step": 7,
   "pre_eza_lines": [
    "自身の登場時、チームに超系の味方が",
    "6体以上いるとき登場時演出が発動",

@@ -94,7 +94,12 @@ class MainActivity : ComponentActivity() {
                 }
 
                 val top = ranked.first()
-                fetchAndShow(top.record.id, top.record.altKeys.isNotEmpty(), ranked.drop(1).take(3))
+                fetchAndShow(
+                    top.record.id,
+                    top.record.altKeys.isNotEmpty(),
+                    top.record.ezaStep,
+                    ranked.drop(1).take(3),
+                )
             } catch (e: Exception) {
                 state = UiState.Failed(e.message ?: e.toString())
             }
@@ -103,12 +108,12 @@ class MainActivity : ComponentActivity() {
 
     /** Look up a card id (alternatives list, transformations). */
     private fun lookUp(cardId: String) {
-        val altView = CardIndex.load(this).firstOrNull { it.id == cardId }
-            ?.altKeys?.isNotEmpty() == true
+        val record = CardIndex.load(this).firstOrNull { it.id == cardId }
+        val altView = record?.altKeys?.isNotEmpty() == true
         val alternatives = (state as? UiState.Result)?.alternatives ?: emptyList()
         lifecycleScope.launch {
             try {
-                fetchAndShow(cardId, altView, alternatives)
+                fetchAndShow(cardId, altView, record?.ezaStep ?: 0, alternatives)
             } catch (e: Exception) {
                 state = UiState.Failed(e.message ?: e.toString())
             }
@@ -118,11 +123,12 @@ class MainActivity : ComponentActivity() {
     private suspend fun fetchAndShow(
         cardId: String,
         altView: Boolean,
+        ezaStep: Int,
         alternatives: List<Matcher.Candidate>,
     ) {
         state = UiState.Working("Fetching English kit…")
         val kit = withContext(Dispatchers.IO) {
-            DokkanInfo.fetch(this@MainActivity, cardId, altView)
+            DokkanInfo.fetch(this@MainActivity, cardId, altView, ezaStep)
         }
         state = UiState.Result(kit = kit, alternatives = alternatives)
     }

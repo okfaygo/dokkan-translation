@@ -25,12 +25,16 @@ testing from the gallery.
 4. `api/DokkanInfo` — fetches the GLOBAL `dokkaninfo.com/cards/<id>` page
    (embedded `datajson`), permanent disk cache under `cache/dokkaninfo/`
    (the v0.1 `cache/kits/` dir is purged on first use — its dokkan.wiki
-   payloads read as blank kits under this parser). Fetches whichever view
-   MATCHED the screenshot: the bare/?eza=true views aren't consistently
-   base/EZA (bare = base kit for EZA'd URs but SEZA kit for LRs), so the
-   screenshot itself decides which kit the player is looking at. No
-   pre/post-EZA labels anywhere, deliberately. Replaced dokkan.wiki,
-   which went stale.
+   payloads read as blank kits under this parser). The alt view
+   (`?eza=true&step=<max_eza_step>`) is the DEFAULT whenever the card has
+   one — field-validated as the right kit for EZA'd cards. The &step=
+   param matters: plain ?eza=true serves the wrong (untransformed) kit
+   for some transformed EZA'd LR forms, and &step=<max> is a no-op
+   everywhere else. No pre/post-EZA labels anywhere, deliberately.
+   Replaced dokkan.wiki, which went stale.
+   Passive text keeps its `{passiveImg:...}` tokens; `ui/PassiveIcons`
+   renders them inline as the bundled in-game icons
+   (`assets/passive_icons/`, sourced from DokkanInfo's layout assets).
 5. `ui/AppScreen` — Compose UI. Kit sections incl. Active Skill and a
    Transformations section (buttons jump between a card's forms), plus a
    "not the right card?" list of the next 3 candidates (English names).

@@ -53,16 +53,33 @@ object DokkanInfo {
     @Volatile
     private var legacyCachePurged = false
 
-    /** Fetch a card's English kit, using a permanent on-disk cache. */
-    fun fetch(context: Context, cardId: String, altView: Boolean = false): Kit {
+    /**
+     * Fetch a card's English kit, using a permanent on-disk cache.
+     *
+     * ezaStep is the card's max EZA step; it's appended as &step= on the
+     * alt view because plain ?eza=true serves the wrong (untransformed)
+     * kit for some transformed EZA'd LR forms, while &step=<max> is a
+     * verified no-op where ?eza=true already worked.
+     */
+    fun fetch(
+        context: Context,
+        cardId: String,
+        altView: Boolean = false,
+        ezaStep: Int = 0,
+    ): Kit {
         purgeLegacyCache(context)
         val dir = File(context.cacheDir, "dokkaninfo").apply { mkdirs() }
-        val cacheFile = File(dir, if (altView) "$cardId-alt.json" else "$cardId.json")
+        // step-aware name: entries cached before &step= support are never read
+        val cacheFile =
+            File(dir, if (altView) "$cardId-alt$ezaStep.json" else "$cardId.json")
         val text = if (cacheFile.exists()) {
             cacheFile.readText(Charsets.UTF_8)
         } else {
-            val url = "https://dokkaninfo.com/cards/$cardId" +
-                if (altView) "?eza=true" else ""
+            var url = "https://dokkaninfo.com/cards/$cardId"
+            if (altView) {
+                url += "?eza=true"
+                if (ezaStep > 0) url += "&step=$ezaStep"
+            }
             val body = try {
                 httpGet(url)
             } catch (e: FileNotFoundException) {
@@ -135,11 +152,14 @@ object DokkanInfo {
      * Itemized passive -> display rows. Headers are wrapped in *...* and may
      * span several lines; items start with "- " (EN) or "・" (JP); anything
      * else continues the previous row (the source wraps sentences mid-way).
+     *
+     * {passiveImg:...} tokens are KEPT — the UI renders them as the in-game
+     * icons (see PassiveIcons in the ui package).
      */
     fun parseItemized(text: String): List<Pair<Boolean, String>> {
         val rows = ArrayList<Pair<Boolean, String>>()
         var headerOpen = false
-        for (raw in clean(text).split("\n")) {
+        for (raw in text.trim().split("\n")) {
             val line = raw.trim(' ', '　')
             if (line.isEmpty()) continue
             when {

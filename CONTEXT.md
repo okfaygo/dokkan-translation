@@ -101,6 +101,24 @@ identify -> fetch -> render works end to end.
      now base-cards-first, then rarity, then id.
    - Alternatives list shows "[UR Extreme INT] Name" labels (rarity +
      element from the index) to disambiguate same-name cards.
+   **Field-test round 4 (2026-07-31, untested on device yet):**
+   - User decision (validated in the field): the alt (?eza=true) view is
+     the DEFAULT whenever a card has one — no matched-view logic. The
+     "SEZA'd LRs would show pre-SEZA kits" concern did not materialize.
+   - User finding: plain ?eza=true serves the wrong (untransformed) kit
+     for some transformed EZA'd LR forms; `?eza=true&step=<max>` is
+     required there (step=3 EZA'd LRs, step=4 SEZA'd). `max_eza_step` is
+     a top-level datajson field on every card page (LR=3, UR=7 etc.), so:
+     scraper now fetches alt views with &step=<max> (`--refresh-alt`
+     upgrades an old cache), index carries `eza_step` per card, app
+     appends &step= when fetching the alt view. Verified &step=<max> is a
+     no-op where plain ?eza=true was already correct; step>max = HTTP 500.
+   - Passive icons: {passiveImg:...} tokens (10 keys: up_g/down_r/down_y/
+     down_g arrows, once/forever badges, stun/atk_down/def_down/astute
+     status icons) are no longer stripped — rendered inline via Compose
+     InlineTextContent. PNGs bundled at assets/passive_icons/, pulled from
+     dokkaninfo.com/assets/global/en/layout/en/image/ingame/battle/
+     skill_dialog/ (mapping recovered from the site's app.js).
    Roadmap after that:
    v0.2 floating bubble + MediaProjection (manual trigger), v0.3 auto-detect
    card screens from captured frames (marker text or image-retrieval on
