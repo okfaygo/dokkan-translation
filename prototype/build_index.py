@@ -193,6 +193,15 @@ def extract_record(data):
         if active_lines:
             rec["active_name"] = active.get("name")
             rec["active_lines"] = active_lines
+
+    # SA names render in plain font on the card page — a strong signal there
+    sa_names = []
+    for sa in data.get("super_attacks") or []:
+        name = ((sa.get("attack") or {}).get("name") or "").strip()
+        if name and name not in sa_names:
+            sa_names.append(name)
+    if sa_names:
+        rec["sa_names"] = sa_names
     rec["has_eza"] = bool(data.get("eza_medals"))
     if data.get("max_eza_step"):
         rec["eza_step"] = data["max_eza_step"]
@@ -301,6 +310,10 @@ def main():
                     rec["pre_eza_lines"] = pre["lines"]
                     if pre["leader"]:
                         rec["pre_eza_leader"] = pre["leader"]
+                for name in pre.get("sa_names") or []:
+                    # EZA'd SA names carry a (極限) suffix on screen
+                    if name not in rec.get("sa_names", []):
+                        rec.setdefault("sa_names", []).append(name)
         except Exception as e:
             print(f"  {card_id}: FAILED {e}", file=sys.stderr)
             failed.append(card_id)

@@ -137,6 +137,26 @@ identify -> fetch -> render works end to end.
    transformations — hence the overlay rather than a straight swap.
    `?eza=false` on that endpoint is a 500; un-EZA'd forms use the bare
    card page, which is already correct.
+   **Card-page accuracy round (2026-08-02):** passive-screen input was
+   near-perfect; card-page input was the weak spot. Diagnosed causes:
+   (1) the in-game card page TRUNCATES leader/SA text to one line
+   (median best-match score 93, 7% of cards fully invisible at the 70
+   threshold); (2) SA names — plain-font and distinctive on the card
+   page — weren't in the index at all; (3) passive/active names were
+   stored but unused as keys. Fixes: `sa_names` added to the index
+   (5,161 records, incl. (極限) EZA variants from alt pages);
+   passive_name/active_name/unwrapped-leader added to match keys;
+   CONTAINMENT scoring (LCS coverage of the OCR line, 0.95 discount,
+   only for lines >= 14 chars vs longer keys — the length floor stops
+   category chips lighting up every kit mentioning them; derived from
+   fuzz.ratio with no extra computation: coverage = ratio*(m+n)/(2m)).
+   Synthetic card-page benchmark, 150 cards: 74% -> 97% top-1.
+   Passive-screen cost: 84->82 of 100 on an exact-lines sweep whose
+   misses are pre-existing same-character near-duplicates (right card
+   still in alternatives). Kotlin Matcher mirrors exactly (LCS computed
+   once, ratio+coverage derived; prefilter bypassed for containment).
+   Next accuracy instrument if field results still disappoint: a debug
+   view exposing raw ML Kit lines so failures become tunable data.
    Roadmap after that:
    v0.2 floating bubble + MediaProjection (manual trigger), v0.3 auto-detect
    card screens from captured frames (marker text or image-retrieval on

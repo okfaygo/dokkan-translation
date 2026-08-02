@@ -72,14 +72,28 @@ object Matcher {
         return head + sorted.drop(head.size)
     }
 
+    /** Card-page leader/SA text arrives as one TRUNCATED line; containment
+     *  (how much of the OCR line appears in-order inside the key) rescues
+     *  those at a 0.95 discount. The length floor keeps short category
+     *  chips from lighting up every kit that mentions them. */
+    private const val CONTAIN_MIN_LEN = 14
+
     private fun bestRatio(line: String, keys: List<String>, threshold: Double): Double {
         var best = 0.0
+        val containEligible = line.length >= CONTAIN_MIN_LEN
         for (key in keys) {
-            // cheap upper bound from the length difference alone
-            val upper = 200.0 * minOf(line.length, key.length) /
-                (line.length + key.length)
+            // cheap upper bound from the length difference alone; containment
+            // can reach 95 regardless of length, so it bypasses the bound
+            val contain = containEligible && key.length > line.length
+            val upper = if (contain) 95.0
+            else 200.0 * minOf(line.length, key.length) / (line.length + key.length)
             if (upper < threshold || upper <= best) continue
-            val r = ratio(line, key)
+            val lcs = lcsLength(line, key)
+            var r = 200.0 * lcs / (line.length + key.length)
+            if (contain) {
+                val coverage = 100.0 * lcs / line.length
+                r = maxOf(r, minOf(coverage, 100.0) * 0.95)
+            }
             if (r > best) best = r
         }
         return best

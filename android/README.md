@@ -18,10 +18,16 @@ testing from the gallery.
    normalized-indel ratio (identical to rapidfuzz `fuzz.ratio`, verified to
    float precision) against each card's keys; scores >= 70, weighted by
    line length (full sentences outvote category chips / UI labels), summed
-   per card. The two views are scored separately, and the winner remembers
-   WHICH view matched. Candidates within 2% of the top score are re-ranked
+   per card. Lines >= 14 chars also try CONTAINMENT (LCS coverage of the
+   line inside a longer key, 0.95 discount) — the in-game card page shows
+   leader/SA text as one TRUNCATED line, which plain ratio scores below
+   threshold on ~7% of cards. Keys include SA names + passive/active names
+   (plain-font on the card page) and the unwrapped leader text. The two
+   views are scored separately, and the winner remembers WHICH view
+   matched. Candidates within 2% of the top score are re-ranked
    base-cards-first, then rarity, then id — awakened beats unawakened, and
-   a base card beats its own transformed form.
+   a base card beats its own transformed form. Synthetic card-page
+   benchmark: 74% -> 97% top-1 with these changes.
 4. `api/DokkanInfo` — fetches the GLOBAL `dokkaninfo.com/cards/<id>` page
    (embedded `datajson`), permanent disk cache under `cache/dokkaninfo/`
    (the v0.1 `cache/kits/` dir is purged on first use — its dokkan.wiki
