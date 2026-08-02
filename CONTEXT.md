@@ -119,6 +119,24 @@ identify -> fetch -> render works end to end.
      InlineTextContent. PNGs bundled at assets/passive_icons/, pulled from
      dokkaninfo.com/assets/global/en/layout/en/image/ingame/battle/
      skill_dialog/ (mapping recovered from the site's app.js).
+   **Field-test round 5 (2026-08-02):** transformed forms of EZA'd cards
+   showed the wrong kit AND couldn't be identified. Root cause: a
+   transformed form's card page serves the BASE card's EZA passive at
+   every URL variant (bare, ?eza=true, ?eza=true&step=N). The form's own
+   EZA kit exists ONLY at the JSON API
+   `/api/cards/<id>/transformation?eza=true&step=<max>` — found by reading
+   dokkaninfo's app.js (its transformation arrows call it). Proof:
+   4019411 page -> passive #3933 (= base 1019401's EZA kit); API -> #3934
+   ("Recovers 50% HP, Ki +4, ATK & DEF 200%"), the form's real EZA kit.
+   Round-4's `&step=` was a no-op for forms — it only fixes base cards.
+   Fixed BOTH sides: app overlays the API's passive/SA/links onto the page
+   kit (leader/categories/form-list are already right); scraper fetches
+   form alt lines from the API so those ~119 forms become matchable at all
+   (their index text was previously the base card's).
+   API payload has only 9 keys — no leader_skill/categories/
+   transformations — hence the overlay rather than a straight swap.
+   `?eza=false` on that endpoint is a 500; un-EZA'd forms use the bare
+   card page, which is already correct.
    Roadmap after that:
    v0.2 floating bubble + MediaProjection (manual trigger), v0.3 auto-detect
    card screens from captured frames (marker text or image-retrieval on

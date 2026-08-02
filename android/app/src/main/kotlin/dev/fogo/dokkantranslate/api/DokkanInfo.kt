@@ -20,7 +20,7 @@ import org.json.JSONObject
  * displayed kit is the one on the player's screen. No pre/post-EZA
  * labeling exists on purpose — the views aren't consistently either.
  */
-class Kit(
+data class Kit(
     val cardId: String,
     val title: String,
     val name: String,
@@ -89,7 +89,54 @@ object DokkanInfo {
             cacheFile.writeText(json, Charsets.UTF_8)
             json
         }
-        return parse(cardId, JSONObject(text))
+        val kit = parse(cardId, JSONObject(text))
+
+        // A transformed form's card page serves the BASE card's EZA passive —
+        // the form's own EZA kit exists only behind the transformation API
+        // (the endpoint DokkanInfo's own transformation arrows call). Leader,
+        // categories and the form list on the page are already correct, so
+        // only the form-specific parts are overlaid. Best-effort: any failure
+        // leaves the page kit untouched.
+        if (altView && ezaStep > 0 && isTransformedForm(cardId)) {
+            runCatching { overlayFormKit(context, dir, cardId, ezaStep, kit) }
+                .getOrNull()
+                ?.let { return it }
+        }
+        return kit
+    }
+
+    /** 4xxxxxxx / 9xxxxxxx ids are transformed or story forms, not base cards. */
+    private fun isTransformedForm(cardId: String): Boolean =
+        (cardId.toLongOrNull() ?: 0L) >= 4_000_000
+
+    private fun overlayFormKit(
+        context: Context,
+        dir: File,
+        cardId: String,
+        ezaStep: Int,
+        kit: Kit,
+    ): Kit {
+        val cacheFile = File(dir, "$cardId-tf$ezaStep.json")
+        val text = if (cacheFile.exists()) {
+            cacheFile.readText(Charsets.UTF_8)
+        } else {
+            httpGet(
+                "https://dokkaninfo.com/api/cards/$cardId/transformation" +
+                    "?eza=true&step=$ezaStep"
+            ).also { cacheFile.writeText(it, Charsets.UTF_8) }
+        }
+        val api = JSONObject(text)
+        val passive = api.optJSONObject("passive_skill")
+        val supers = parseSupers(api)
+        val links = namesOf(api, "links")
+        return kit.copy(
+            passiveName = passive?.optString("name")?.ifEmpty { null } ?: kit.passiveName,
+            passiveRows = passive?.optString("itemized_description")
+                ?.ifEmpty { null }
+                ?.let { parseItemized(it) } ?: kit.passiveRows,
+            supers = supers.ifEmpty { kit.supers },
+            links = links.ifEmpty { kit.links },
+        )
     }
 
     /**
@@ -193,24 +240,7 @@ object DokkanInfo {
         val passive = data.optJSONObject("passive_skill")
         val active = data.optJSONObject("active_skill")
 
-        val supers = ArrayList<Pair<String, String>>()
-        val seen = HashSet<String>()
-        data.optJSONArray("super_attacks")?.let { arr ->
-            for (i in 0 until arr.length()) {
-                val attack = arr.getJSONObject(i).optJSONObject("attack") ?: continue
-                val name = attack.optString("name")
-                val desc = clean(attack.optString("description")).replace("\n", " ")
-                if (name.isNotEmpty() && seen.add("$name|$desc")) {
-                    supers.add(name to desc)
-                }
-            }
-        }
-
-        fun names(field: String): List<String> {
-            val arr = data.optJSONArray(field) ?: return emptyList()
-            return (0 until arr.length()).map { arr.getJSONObject(it).optString("name") }
-        }
-
+        val supers = parseSupers(data)
         val transformations = ArrayList<Pair<String, String>>()
         data.optJSONArray("transformations")?.let { arr ->
             for (i in 0 until arr.length()) {
@@ -239,9 +269,30 @@ object DokkanInfo {
             supers = supers,
             activeName = active?.optString("name") ?: "",
             activeDesc = activeDesc,
-            links = names("links"),
-            categories = names("categories"),
+            links = namesOf(data, "links"),
+            categories = namesOf(data, "categories"),
             transformations = transformations,
         )
+    }
+
+    private fun parseSupers(data: JSONObject): List<Pair<String, String>> {
+        val supers = ArrayList<Pair<String, String>>()
+        val seen = HashSet<String>()
+        data.optJSONArray("super_attacks")?.let { arr ->
+            for (i in 0 until arr.length()) {
+                val attack = arr.getJSONObject(i).optJSONObject("attack") ?: continue
+                val name = attack.optString("name")
+                val desc = clean(attack.optString("description")).replace("\n", " ")
+                if (name.isNotEmpty() && seen.add("$name|$desc")) {
+                    supers.add(name to desc)
+                }
+            }
+        }
+        return supers
+    }
+
+    private fun namesOf(data: JSONObject, field: String): List<String> {
+        val arr = data.optJSONArray(field) ?: return emptyList()
+        return (0 until arr.length()).map { arr.getJSONObject(it).optString("name") }
     }
 }

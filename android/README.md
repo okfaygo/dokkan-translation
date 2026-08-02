@@ -35,6 +35,14 @@ testing from the gallery.
    Passive text keeps its `{passiveImg:...}` tokens; `ui/PassiveIcons`
    renders them inline as the bundled in-game icons
    (`assets/passive_icons/`, sourced from DokkanInfo's layout assets).
+   **Transformed forms of EZA'd cards** (id >= 4000000) need a second
+   request: their card page — with or without `?eza=true&step=` — serves
+   the BASE card's EZA passive, and the form's own EZA kit exists only at
+   `/api/cards/<id>/transformation?eza=true&step=<max>` (the endpoint the
+   site's own transformation arrows call). `overlayFormKit` fetches it and
+   overlays passive/SA/links; leader, categories and the form list from
+   the card page are already correct. Best-effort — a failure leaves the
+   page kit as-is.
 5. `ui/AppScreen` — Compose UI. Kit sections incl. Active Skill and a
    Transformations section (buttons jump between a card's forms), plus a
    "not the right card?" list of the next 3 candidates (English names).

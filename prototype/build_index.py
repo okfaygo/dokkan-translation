@@ -134,6 +134,28 @@ def fetch_card(session, card_id, delay=1.0, refresh=False, pre_eza=False,
     return data
 
 
+def fetch_form_alt(session, card_id, eza_step, delay=1.0, refresh=False):
+    """A transformed form's OWN EZA kit, from the transformation API.
+
+    The form's card page (even with ?eza=true&step=N) serves the BASE card's
+    EZA passive — verified on 4019411, where the page gives the base's
+    passive #3933 and this endpoint gives the form's own #3934. This is the
+    endpoint DokkanInfo's own transformation arrows call.
+    """
+    CARD_CACHE.mkdir(parents=True, exist_ok=True)
+    cache_file = CARD_CACHE / f"{card_id}.tf_eza.json.gz"
+    if cache_file.exists() and not refresh:
+        with gzip.open(cache_file, "rt", encoding="utf-8") as f:
+            return json.load(f)
+    url = (f"{BASE}/api/cards/{card_id}/transformation"
+           f"?eza=true&step={eza_step}")
+    data = json.loads(_get(session, url))
+    with gzip.open(cache_file, "wt", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False)
+    time.sleep(delay)
+    return data
+
+
 def clean_lines(text):
     """Skill description -> the plain lines the game renders on screen."""
     if not text:
@@ -263,13 +285,22 @@ def main():
             data = fetch_card(session, card_id, delay=args.delay)
             rec = extract_record(data)
             if rec["has_eza"]:
-                pre = extract_record(
-                    fetch_card(session, card_id, delay=args.delay,
-                               pre_eza=True, refresh=args.refresh_alt,
-                               eza_step=data.get("max_eza_step")))
+                step = data.get("max_eza_step")
+                if card_id >= 4_000_000 and step:
+                    # transformed form: its own EZA kit lives behind the
+                    # transformation API, not its card page
+                    alt = fetch_form_alt(session, card_id, step,
+                                         delay=args.delay,
+                                         refresh=args.refresh_alt)
+                else:
+                    alt = fetch_card(session, card_id, delay=args.delay,
+                                     pre_eza=True, refresh=args.refresh_alt,
+                                     eza_step=step)
+                pre = extract_record(alt)
                 if pre["lines"] != rec["lines"]:
                     rec["pre_eza_lines"] = pre["lines"]
-                    rec["pre_eza_leader"] = pre["leader"]
+                    if pre["leader"]:
+                        rec["pre_eza_leader"] = pre["leader"]
         except Exception as e:
             print(f"  {card_id}: FAILED {e}", file=sys.stderr)
             failed.append(card_id)
