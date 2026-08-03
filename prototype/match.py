@@ -11,6 +11,8 @@ several kits share — only the right card accumulates score across ALL lines.
 """
 
 import json
+import math
+from collections import Counter
 
 from rapidfuzz import fuzz
 
@@ -49,6 +51,37 @@ def _weight(text):
 
 
 CONTAIN_MIN_LEN = 14
+
+# How many cards share a key before it counts as "generic". Used ONLY to
+# judge confidence, never to score.
+#
+# IDF-style score weighting was tried here and REJECTED on benchmark data
+# (both textbook log(N/n) and a flat-below-threshold variant): damping a
+# shared name lowers the true signal while junk lines that happen to match
+# some card's rare key keep full weight, so noise wins relatively. Every
+# arm got worse — name-only top-4 19->16, general misread 141->133.
+COMMON_AT = 10
+_IDF_CACHE = {}
+
+
+def _idf_weight(n):
+    if n < COMMON_AT:
+        return 1.0
+    return 1.0 / (1.0 + math.log(n / COMMON_AT))
+
+
+def key_idf(index):
+    """key string -> weight in (0, 1]. Cached per index object."""
+    cached = _IDF_CACHE.get(id(index))
+    if cached is not None:
+        return cached
+    counts = Counter()
+    for rec in index.values():
+        for k in set(_keys(rec)):
+            counts[k] += 1
+    idf = {k: _idf_weight(n) for k, n in counts.items()}
+    _IDF_CACHE[id(index)] = idf
+    return idf
 
 
 def _score(text, key):

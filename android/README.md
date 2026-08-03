@@ -56,6 +56,13 @@ testing from the gallery.
 5. `ui/AppScreen` — Compose UI. Kit sections incl. Active Skill and a
    Transformations section (buttons jump between a card's forms), plus a
    "not the right card?" list of the next 3 candidates (English names).
+   **Ambiguity:** when 3+ candidates tie within `TIE_MARGIN`
+   (`Matcher.tiedCount`), the screenshot lacked card-specific text — a
+   card page where only the character name was readable ties every card
+   of that character. Those results show a warning banner and 8
+   alternatives instead of 3. **Debug panel:** collapsible on both the
+   result and failure screens — raw ML Kit lines, whether the type/rarity
+   badges were read, and the top 6 candidates with scores.
 
 ## Build & run
 

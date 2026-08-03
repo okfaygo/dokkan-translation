@@ -15,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import dev.fogo.dokkantranslate.api.DokkanInfo
 import dev.fogo.dokkantranslate.api.Kit
 import dev.fogo.dokkantranslate.match.CardIndex
+import dev.fogo.dokkantranslate.match.CardRecord
 import dev.fogo.dokkantranslate.match.Matcher
 import dev.fogo.dokkantranslate.ocr.OcrEngine
 import dev.fogo.dokkantranslate.ui.AppScreen
@@ -22,13 +23,25 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/** What the matcher saw, kept for the debug panel. */
+data class MatchDebug(
+    val ocrLines: List<String> = emptyList(),
+    val topCandidates: List<Pair<String, Double>> = emptyList(),
+    val tiedCount: Int = 0,
+    val typeHint: String? = null,
+    val rarityHint: String? = null,
+)
+
 sealed interface UiState {
     data object Idle : UiState
     data class Working(val step: String) : UiState
-    data class Failed(val message: String) : UiState
+    data class Failed(val message: String, val debug: MatchDebug = MatchDebug()) : UiState
     data class Result(
         val kit: Kit,
         val alternatives: List<Matcher.Candidate>,
+        /** several cards matched equally — the shown kit is a guess */
+        val ambiguous: Boolean = false,
+        val debug: MatchDebug = MatchDebug(),
     ) : UiState
 }
 
@@ -77,7 +90,8 @@ class MainActivity : ComponentActivity() {
                     state = UiState.Failed(
                         "No Japanese text found in the image. " +
                             "Share a screenshot from JP Dokkan — the passive-detail " +
-                            "popup works best, the card page also works."
+                            "popup works best, the card page also works.",
+                        MatchDebug(),
                     )
                     return@launch
                 }
@@ -86,19 +100,34 @@ class MainActivity : ComponentActivity() {
                 val ranked = withContext(Dispatchers.Default) {
                     Matcher.rank(lines, CardIndex.load(this@MainActivity))
                 }
+                val (elHint, rarHint) = Matcher.extractHints(lines)
+                val debug = MatchDebug(
+                    ocrLines = lines,
+                    topCandidates = ranked.take(6)
+                        .map { it.record.displayLabel to it.score },
+                    tiedCount = Matcher.tiedCount(ranked),
+                    typeHint = elHint?.let { CardRecord.elementName(it) },
+                    rarityHint = rarHint?.let { RARITY_NAMES[it] },
+                )
                 if (ranked.isEmpty()) {
                     state = UiState.Failed(
-                        "Couldn't match any card from ${lines.size} recognized lines."
+                        "Couldn't match any card from ${lines.size} recognized lines.",
+                        debug,
                     )
                     return@launch
                 }
 
-                val top = ranked.first()
+                // When many candidates tie the screenshot lacked card-specific
+                // text; show a longer list so the right card stays reachable.
+                val ambiguous = debug.tiedCount >= Matcher.AMBIGUOUS_AT
+                val altCount = if (ambiguous) 8 else 3
                 fetchAndShow(
-                    top.record.id,
-                    top.record.altKeys.isNotEmpty(),
-                    top.record.ezaStep,
-                    ranked.drop(1).take(3),
+                    ranked.first().record.id,
+                    ranked.first().record.altKeys.isNotEmpty(),
+                    ranked.first().record.ezaStep,
+                    ranked.drop(1).take(altCount),
+                    ambiguous,
+                    debug,
                 )
             } catch (e: Exception) {
                 state = UiState.Failed(e.message ?: e.toString())
@@ -110,10 +139,18 @@ class MainActivity : ComponentActivity() {
     private fun lookUp(cardId: String) {
         val record = CardIndex.load(this).firstOrNull { it.id == cardId }
         val altView = record?.altKeys?.isNotEmpty() == true
-        val alternatives = (state as? UiState.Result)?.alternatives ?: emptyList()
+        val prev = state as? UiState.Result
         lifecycleScope.launch {
             try {
-                fetchAndShow(cardId, altView, record?.ezaStep ?: 0, alternatives)
+                fetchAndShow(
+                    cardId,
+                    altView,
+                    record?.ezaStep ?: 0,
+                    prev?.alternatives ?: emptyList(),
+                    // the user picked this one, so it's no longer a guess
+                    ambiguous = false,
+                    debug = prev?.debug ?: MatchDebug(),
+                )
             } catch (e: Exception) {
                 state = UiState.Failed(e.message ?: e.toString())
             }
@@ -125,15 +162,21 @@ class MainActivity : ComponentActivity() {
         altView: Boolean,
         ezaStep: Int,
         alternatives: List<Matcher.Candidate>,
+        ambiguous: Boolean,
+        debug: MatchDebug,
     ) {
         state = UiState.Working("Fetching English kit…")
         val kit = withContext(Dispatchers.IO) {
             DokkanInfo.fetch(this@MainActivity, cardId, altView, ezaStep)
         }
-        state = UiState.Result(kit = kit, alternatives = alternatives)
+        state = UiState.Result(kit, alternatives, ambiguous, debug)
     }
 
     private fun decode(uri: Uri): Bitmap =
         contentResolver.openInputStream(uri).use { BitmapFactory.decodeStream(it) }
             ?: throw IllegalArgumentException("Couldn't decode the shared image")
+
+    companion object {
+        private val RARITY_NAMES = mapOf(3 to "SSR", 4 to "UR", 5 to "LR")
+    }
 }

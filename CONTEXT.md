@@ -168,6 +168,37 @@ identify -> fetch -> render works end to end.
    vs boost-only 98/120 on hostile same-character cases (baseline 57),
    but collapses 148->108/150 when both badges misread vs boost-only's
    141. Type/rarity separates 451 of 507 same-name groups.
+   **Same-character misses diagnosed + confidence UI (2026-08-03):**
+   user reported a UR PHY card returning an LR STR of the same character,
+   correct card absent from alternatives. Reproduced exactly by feeding
+   ONLY the character name (stylized title/leader unread): all same-name
+   cards score IDENTICALLY (49.4 each, 105 cards named 超サイヤ人孫悟空),
+   so the tie-break decides — and it sorts rarity DESC, so LRs fill the
+   top 4 while the correct UR sits at rank 28. 80% of the index shares a
+   name with 4+ cards. Also proves badge hints aren't being OCR'd: a read
+   badge would give 1.12^2 = 1.25x, mathematically enough to win.
+   - IDF key weighting TRIED AND REJECTED (kept as a documented dead end
+     in match.py): damping a shared name lowers the true signal while junk
+     lines matching some card's rare key keep full weight, so noise wins
+     relatively. Textbook log(N/n) AND a flat-below-10 variant both lost
+     on every arm (name-only top-4 19->16/11, general misread 141->133).
+   - SHIPPED instead — confidence surfacing: `Matcher.tiedCount()` counts
+     candidates within TIE_MARGIN of the winner. Measured separation:
+     median 2 on healthy card pages (1 of 80 reaching 3) vs median 7 when
+     only the name is readable (51 of 60 reaching 3), so >=3 = ambiguous.
+     Ambiguous results show an explicit "this may be the wrong card,
+     screenshot the passive popup instead" banner + 8 alternatives
+     instead of 3, and the section retitles to "Did you mean one of
+     these?". Type/rarity diversification of that list was tested and NOT
+     shipped (26/40 vs 29/40 plain — no ordering rescues a 105-way tie).
+   - Debug panel (ui/AppScreen DebugPanel): collapsible, on both result
+     and failure screens; shows the raw ML Kit lines, whether the type/
+     rarity badges were read, and the top 6 candidates with scores +
+     tied count. Turns a bad screenshot into data instead of guesswork.
+   - Known gap: alternatives show JP titles only in the index, so an
+     ambiguous list can't show English titles (the one label that would
+     let a user pick their exact card visually). Would need a global-site
+     scrape pass for `title_en` — ~5k requests, not done.
    Roadmap after that:
    v0.2 floating bubble + MediaProjection (manual trigger), v0.3 auto-detect
    card screens from captured frames (marker text or image-retrieval on

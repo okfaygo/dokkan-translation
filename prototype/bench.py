@@ -31,12 +31,14 @@ class FastMatcher:
                 self.keys.append(k)
         self.owner = np.array(self.owner)
         self.klen = np.array([len(k) for k in self.keys], dtype=np.float64)
+        idf = M.key_idf(index)
+        self.kidf = np.array([idf.get(k, 1.0) for k in self.keys])
         self.rarity = np.array([index[c].get("rarity") or 0 for c in self.ids])
         self.element = np.array(
             [int(index[c].get("element") or -1) % 10 if index[c].get("element")
              else -1 for c in self.ids])
 
-    def rank(self, lines, threshold=70.0, penalty=None):
+    def rank(self, lines, threshold=70.0, penalty=None, use_idf=True):
         penalty = M.HINT_PENALTY if penalty is None else penalty
         el, rar = M.extract_hints(lines)
         total = np.zeros(len(self.ids))
@@ -52,9 +54,11 @@ class FastMatcher:
                 coverage = np.minimum(r * (m + self.klen) / (2 * m), 100.0)
                 r = np.where(self.klen > m,
                              np.maximum(r, coverage * 0.95), r)
+            # raw similarity gates; idf decides which match is informative
+            val = np.where(r >= threshold, r * (self.kidf if use_idf else 1.0), 0.0)
             best = np.zeros(len(self.ids))
-            np.maximum.at(best, self.owner, r)
-            total += np.where(best >= threshold, best, 0.0) * w
+            np.maximum.at(best, self.owner, val)
+            total += best * w
         if el is not None:
             total *= np.where(self.element == el, M.HINT_BOOST, penalty)
         if rar is not None:
@@ -129,16 +133,46 @@ def main():
     sample = rng.sample(pool, 150)
 
     print("=== general card-page benchmark (150 cards) ===")
-    print("penalty   none   correct   MISREAD-both")
-    for pen in (0.88, 1.0):
+    print("idf     none   correct   MISREAD-both")
+    for use_idf in (False, True):
         row = []
         for mode in ("none", "correct", "wrong"):
             rng.seed(11)
             ok = sum(1 for cid, rec in sample
-                     if (rk := fm.rank(page_input(rec, mode), penalty=pen))
+                     if (rk := fm.rank(page_input(rec, mode), use_idf=use_idf))
                      and is_correct(index, rk[0][0], cid))
             row.append(ok)
-        print(f"  {pen:4}   {row[0]:3}     {row[1]:3}       {row[2]:3}")
+        print(f"  {str(use_idf):5}  {row[0]:3}     {row[1]:3}       {row[2]:3}")
+
+    # NAME-ONLY degenerate case: the reported failure shape
+    print("\n=== name-only input (stylized text unread) — 60 cards ===")
+    from collections import defaultdict as _dd
+    gname = _dd(list)
+    for cid, r in index.items():
+        if int(cid) < 4_000_000 and r.get("name"):
+            gname[r["name"]].append(cid)
+    rng.seed(5)
+    big = [ids for ids in gname.values() if len(ids) >= 6]
+    picks = [rng.choice(ids) for ids in rng.sample(big, 60)]
+    print("idf     top1   in-top4   in-top8   tied@top")
+    for use_idf in (False, True):
+        t1 = t4 = t8 = 0
+        tied = []
+        for cid in picks:
+            rec = index[cid]
+            lines = [rec["name"], "リーダースキル", "必殺技Lv", "カテゴリ",
+                     "詳細一覧", "超サイヤ人"]
+            rk = fm.rank(lines, use_idf=use_idf)
+            if rk and is_correct(index, rk[0][0], cid):
+                t1 += 1
+            if any(is_correct(index, c, cid) for c, _ in rk[:4]):
+                t4 += 1
+            if any(is_correct(index, c, cid) for c, _ in rk[:8]):
+                t8 += 1
+            if rk:
+                tied.append(sum(1 for _, s in rk if s >= rk[0][1] * M.TIE_MARGIN))
+        print(f"  {str(use_idf):5}  {t1:3}    {t4:3}       {t8:3}      "
+              f"median {sorted(tied)[len(tied)//2]}")
 
     # hostile same-character benchmark
     def heavy_noise(s):

@@ -39,6 +39,23 @@ object Matcher {
         val matchedAltView: Boolean,
     )
 
+    /**
+     * How many candidates are effectively tied with the winner. 1-2 is
+     * normal (a card and its awakening twin share text); 3+ means the
+     * screenshot didn't contain enough card-specific text to separate a
+     * group — e.g. only the character name was readable, and 105 cards
+     * are named 超サイヤ人孫悟空. Measured separation: median 2 on good
+     * card-page input (1 of 80 reaching 3) vs median 7 when only the name
+     * is readable (51 of 60 reaching 3).
+     */
+    fun tiedCount(ranked: List<Candidate>): Int {
+        if (ranked.isEmpty()) return 0
+        val cutoff = ranked.first().score * TIE_MARGIN
+        return ranked.count { it.score >= cutoff }
+    }
+
+    const val AMBIGUOUS_AT = 3
+
     /** (element type 0-4 or null, rarity or null) from badge-like lines.
      *  Only unambiguous forms count: 超X/極X for type, exact UR/LR/SSR. */
     fun extractHints(lines: List<String>): Pair<Int?, Int?> {
