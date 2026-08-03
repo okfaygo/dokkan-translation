@@ -21,44 +21,101 @@ package dev.fogo.dokkantranslate.match
  */
 object Matcher {
 
-    private const val TIE_MARGIN = 0.98
+    /**
+     * How close two scores must be before the preference ordering (base
+     * card, then rarity, then id) overrides the score. Deliberately TIGHT:
+     * the cases it exists for — awakening twins, a base card vs its own
+     * transformed form — score EXACTLY equal. A loose band silently
+     * discards real score differences: at 0.98 a card scoring 161.9 lost
+     * to one scoring 160.0 purely because the loser had a higher id.
+     */
+    private const val TIE_MARGIN = 0.995
+
+    /** Separate, looser band for "several cards are close" — a confidence
+     *  signal, not an ordering rule. */
+    const val AMBIGUITY_MARGIN = 0.98
+
+    /** Boost-only type/rarity hints from the card page's badges (超知/極力
+     *  style type badge, UR/LR emblem). Matching cards get boosted; no
+     *  mismatch penalty — benchmarks show a penalty collapses accuracy
+     *  when the tiny stylized badges misread, which they will. */
+    private const val HINT_BOOST = 1.12
+    private val ELEMENT_KANJI =
+        mapOf('速' to 0, '技' to 1, '知' to 2, '力' to 3, '体' to 4)
+    private val RARITY_MARKERS = mapOf("UR" to 4, "LR" to 5, "SSR" to 3)
 
     data class Candidate(
         val record: CardRecord,
         val score: Double,
-        /** true when the ?eza=true view matched better than the bare view */
-        val matchedAltView: Boolean,
     )
+
+    /**
+     * How many candidates are effectively tied with the winner. 1-2 is
+     * normal (a card and its awakening twin share text); 3+ means the
+     * screenshot didn't contain enough card-specific text to separate a
+     * group — e.g. only the character name was readable, and 105 cards
+     * are named 超サイヤ人孫悟空. Measured separation: median 2 on good
+     * card-page input (1 of 80 reaching 3) vs median 7 when only the name
+     * is readable (51 of 60 reaching 3).
+     */
+    fun tiedCount(ranked: List<Candidate>): Int {
+        if (ranked.isEmpty()) return 0
+        // against the MAX score, not ranked.first() — the preference
+        // ordering can put a slightly lower-scoring card first
+        val max = ranked.maxOf { it.score }
+        return ranked.count { it.score >= max * AMBIGUITY_MARGIN }
+    }
+
+    const val AMBIGUOUS_AT = 3
+
+    /** (element type 0-4 or null, rarity or null) from badge-like lines.
+     *  Only unambiguous forms count: 超X/極X for type, exact UR/LR/SSR. */
+    fun extractHints(lines: List<String>): Pair<Int?, Int?> {
+        var el: Int? = null
+        var rar: Int? = null
+        for (raw in lines) {
+            val s = raw.trim()
+            RARITY_MARKERS[s.uppercase()]?.let { rar = it }
+            if (s.length == 2 && (s[0] == '超' || s[0] == '極')) {
+                ELEMENT_KANJI[s[1]]?.let { el = it }
+            }
+        }
+        return el to rar
+    }
 
     fun rank(
         ocrLines: List<String>,
         index: List<CardRecord>,
         threshold: Double = 70.0,
     ): List<Candidate> {
-        val main = HashMap<CardRecord, Double>()
-        val alt = HashMap<CardRecord, Double>()
+        val (elHint, rarHint) = extractHints(ocrLines)
+        val scores = HashMap<CardRecord, Double>()
         for (raw in ocrLines) {
             val line = raw.trim()
             if (line.length < 4) continue
             val weight = minOf(line.length, 24) / 24.0
             for (rec in index) {
-                val bestMain = bestRatio(line, rec.keys, threshold)
-                if (bestMain >= threshold) {
-                    main[rec] = (main[rec] ?: 0.0) + bestMain * weight
-                }
+                // both views pooled into one key set, matching match.py —
+                // scoring them separately made the app disagree with the
+                // benchmarks that are supposed to predict it
+                var best = bestRatio(line, rec.keys, threshold)
                 if (rec.altKeys.isNotEmpty()) {
-                    val bestAlt = bestRatio(line, rec.altKeys, threshold)
-                    if (bestAlt >= threshold) {
-                        alt[rec] = (alt[rec] ?: 0.0) + bestAlt * weight
-                    }
+                    best = maxOf(best, bestRatio(line, rec.altKeys, threshold))
+                }
+                if (best >= threshold) {
+                    scores[rec] = (scores[rec] ?: 0.0) + best * weight
                 }
             }
         }
-        val all = HashSet<CardRecord>(main.keys).apply { addAll(alt.keys) }
-        val sorted = all.map { rec ->
-            val m = main[rec] ?: 0.0
-            val a = alt[rec] ?: 0.0
-            Candidate(rec, maxOf(m, a), matchedAltView = a > m)
+        val sorted = scores.map { (rec, raw) ->
+            var score = raw
+            if (elHint != null && rec.element >= 0 && rec.element % 10 == elHint) {
+                score *= HINT_BOOST
+            }
+            if (rarHint != null && rec.rarity == rarHint) {
+                score *= HINT_BOOST
+            }
+            Candidate(rec, score)
         }.sortedByDescending { it.score }
         if (sorted.isEmpty()) return sorted
 
@@ -72,14 +129,28 @@ object Matcher {
         return head + sorted.drop(head.size)
     }
 
+    /** Card-page leader/SA text arrives as one TRUNCATED line; containment
+     *  (how much of the OCR line appears in-order inside the key) rescues
+     *  those at a 0.95 discount. The length floor keeps short category
+     *  chips from lighting up every kit that mentions them. */
+    private const val CONTAIN_MIN_LEN = 14
+
     private fun bestRatio(line: String, keys: List<String>, threshold: Double): Double {
         var best = 0.0
+        val containEligible = line.length >= CONTAIN_MIN_LEN
         for (key in keys) {
-            // cheap upper bound from the length difference alone
-            val upper = 200.0 * minOf(line.length, key.length) /
-                (line.length + key.length)
+            // cheap upper bound from the length difference alone; containment
+            // can reach 95 regardless of length, so it bypasses the bound
+            val contain = containEligible && key.length > line.length
+            val upper = if (contain) 95.0
+            else 200.0 * minOf(line.length, key.length) / (line.length + key.length)
             if (upper < threshold || upper <= best) continue
-            val r = ratio(line, key)
+            val lcs = lcsLength(line, key)
+            var r = 200.0 * lcs / (line.length + key.length)
+            if (contain) {
+                val coverage = 100.0 * lcs / line.length
+                r = maxOf(r, minOf(coverage, 100.0) * 0.95)
+            }
             if (r > best) best = r
         }
         return best

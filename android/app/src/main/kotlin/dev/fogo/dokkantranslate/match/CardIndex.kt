@@ -23,6 +23,10 @@ class CardRecord(
     val title: String,
     val rarity: Int,
     val element: Int,
+    /** max EZA step from the game data; 0 when the card has no EZA.
+     *  Passed as &step= on the alt view — required for some transformed
+     *  EZA'd LR forms, a no-op everywhere else. */
+    val ezaStep: Int,
     val keys: List<String>,
     val altKeys: List<String>,
 ) {
@@ -74,9 +78,12 @@ object CardIndex {
                 val keys = ArrayList<String>()
                 keys.addAll(strings(rec.optJSONArray("lines")))
                 keys.addAll(strings(rec.optJSONArray("active_lines")))
+                keys.addAll(strings(rec.optJSONArray("sa_names")))
                 keys.addAll(leaderLines(rec.optString("leader", "")))
                 if (title.isNotEmpty()) keys.add(title)
                 if (name.isNotEmpty()) keys.add(name)
+                rec.optString("passive_name", "").ifEmpty { null }?.let { keys.add(it) }
+                rec.optString("active_name", "").ifEmpty { null }?.let { keys.add(it) }
 
                 val altKeys = ArrayList<String>()
                 altKeys.addAll(strings(rec.optJSONArray("pre_eza_lines")))
@@ -91,6 +98,7 @@ object CardIndex {
                         title = title,
                         rarity = rec.optInt("rarity"),
                         element = rec.optString("element").toIntOrNull() ?: -1,
+                        ezaStep = rec.optInt("eza_step", 0),
                         keys = keys,
                         altKeys = altKeys,
                     )
@@ -106,8 +114,14 @@ object CardIndex {
         return (0 until arr.length()).map { arr.getString(it) }
     }
 
-    private fun leaderLines(text: String): List<String> =
-        text.split("\n")
+    /** Wrapped display lines PLUS the unwrapped full text — the in-game card
+     *  page shows the leader as one truncated line, and containment scoring
+     *  matches that against the full string regardless of wrap points. */
+    private fun leaderLines(text: String): List<String> {
+        if (text.isBlank()) return emptyList()
+        val lines = text.split("\n")
             .map { it.trim('、', ' ', '　') }
             .filter { it.isNotEmpty() }
+        return lines + text.replace("\n", "")
+    }
 }

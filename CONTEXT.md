@@ -101,6 +101,128 @@ identify -> fetch -> render works end to end.
      now base-cards-first, then rarity, then id.
    - Alternatives list shows "[UR Extreme INT] Name" labels (rarity +
      element from the index) to disambiguate same-name cards.
+   **Field-test round 4 (2026-07-31, untested on device yet):**
+   - User decision (validated in the field): the alt (?eza=true) view is
+     the DEFAULT whenever a card has one — no matched-view logic. The
+     "SEZA'd LRs would show pre-SEZA kits" concern did not materialize.
+   - User finding: plain ?eza=true serves the wrong (untransformed) kit
+     for some transformed EZA'd LR forms; `?eza=true&step=<max>` is
+     required there (step=3 EZA'd LRs, step=4 SEZA'd). `max_eza_step` is
+     a top-level datajson field on every card page (LR=3, UR=7 etc.), so:
+     scraper now fetches alt views with &step=<max> (`--refresh-alt`
+     upgrades an old cache), index carries `eza_step` per card, app
+     appends &step= when fetching the alt view. Verified &step=<max> is a
+     no-op where plain ?eza=true was already correct; step>max = HTTP 500.
+   - Passive icons: {passiveImg:...} tokens (10 keys: up_g/down_r/down_y/
+     down_g arrows, once/forever badges, stun/atk_down/def_down/astute
+     status icons) are no longer stripped — rendered inline via Compose
+     InlineTextContent. PNGs bundled at assets/passive_icons/, pulled from
+     dokkaninfo.com/assets/global/en/layout/en/image/ingame/battle/
+     skill_dialog/ (mapping recovered from the site's app.js).
+   **Field-test round 5 (2026-08-02):** transformed forms of EZA'd cards
+   showed the wrong kit AND couldn't be identified. Root cause: a
+   transformed form's card page serves the BASE card's EZA passive at
+   every URL variant (bare, ?eza=true, ?eza=true&step=N). The form's own
+   EZA kit exists ONLY at the JSON API
+   `/api/cards/<id>/transformation?eza=true&step=<max>` — found by reading
+   dokkaninfo's app.js (its transformation arrows call it). Proof:
+   4019411 page -> passive #3933 (= base 1019401's EZA kit); API -> #3934
+   ("Recovers 50% HP, Ki +4, ATK & DEF 200%"), the form's real EZA kit.
+   Round-4's `&step=` was a no-op for forms — it only fixes base cards.
+   Fixed BOTH sides: app overlays the API's passive/SA/links onto the page
+   kit (leader/categories/form-list are already right); scraper fetches
+   form alt lines from the API so those ~119 forms become matchable at all
+   (their index text was previously the base card's).
+   API payload has only 9 keys — no leader_skill/categories/
+   transformations — hence the overlay rather than a straight swap.
+   `?eza=false` on that endpoint is a 500; un-EZA'd forms use the bare
+   card page, which is already correct.
+   **Card-page accuracy round (2026-08-02):** passive-screen input was
+   near-perfect; card-page input was the weak spot. Diagnosed causes:
+   (1) the in-game card page TRUNCATES leader/SA text to one line
+   (median best-match score 93, 7% of cards fully invisible at the 70
+   threshold); (2) SA names — plain-font and distinctive on the card
+   page — weren't in the index at all; (3) passive/active names were
+   stored but unused as keys. Fixes: `sa_names` added to the index
+   (5,161 records, incl. (極限) EZA variants from alt pages);
+   passive_name/active_name/unwrapped-leader added to match keys;
+   CONTAINMENT scoring (LCS coverage of the OCR line, 0.95 discount,
+   only for lines >= 14 chars vs longer keys — the length floor stops
+   category chips lighting up every kit mentioning them; derived from
+   fuzz.ratio with no extra computation: coverage = ratio*(m+n)/(2m)).
+   Synthetic card-page benchmark, 150 cards: 74% -> 97% top-1.
+   Passive-screen cost: 84->82 of 100 on an exact-lines sweep whose
+   misses are pre-existing same-character near-duplicates (right card
+   still in alternatives). Kotlin Matcher mirrors exactly (LCS computed
+   once, ratio+coverage derived; prefilter bypassed for containment).
+   Next accuracy instrument if field results still disappoint: a debug
+   view exposing raw ML Kit lines so failures become tunable data.
+   **Badge hints (2026-08-02, after field report of a same-character
+   miss: UR PHY input -> LR STR output, right card not in alternatives):**
+   the card page's type badge (超知/極力 etc.) and rarity emblem (UR/LR)
+   are 1-3 char OCR lines that never vote — now extracted as hints
+   (only unambiguous forms: 超X/極X, exact UR/LR/SSR; OcrEngine keeps
+   rarity-only lines that the JP filter used to drop). BOOST-ONLY 1.12x
+   per matching hint, no mismatch penalty — benchmarked (prototype/
+   bench.py, vectorized cdist harness): penalty variant scores 105/120
+   vs boost-only 98/120 on hostile same-character cases (baseline 57),
+   but collapses 148->108/150 when both badges misread vs boost-only's
+   141. Type/rarity separates 451 of 507 same-name groups.
+   **Same-character misses diagnosed + confidence UI (2026-08-03):**
+   user reported a UR PHY card returning an LR STR of the same character,
+   correct card absent from alternatives. Reproduced exactly by feeding
+   ONLY the character name (stylized title/leader unread): all same-name
+   cards score IDENTICALLY (49.4 each, 105 cards named 超サイヤ人孫悟空),
+   so the tie-break decides — and it sorts rarity DESC, so LRs fill the
+   top 4 while the correct UR sits at rank 28. 80% of the index shares a
+   name with 4+ cards. Also proves badge hints aren't being OCR'd: a read
+   badge would give 1.12^2 = 1.25x, mathematically enough to win.
+   - IDF key weighting TRIED AND REJECTED (kept as a documented dead end
+     in match.py): damping a shared name lowers the true signal while junk
+     lines matching some card's rare key keep full weight, so noise wins
+     relatively. Textbook log(N/n) AND a flat-below-10 variant both lost
+     on every arm (name-only top-4 19->16/11, general misread 141->133).
+   - SHIPPED instead — confidence surfacing: `Matcher.tiedCount()` counts
+     candidates within TIE_MARGIN of the winner. Measured separation:
+     median 2 on healthy card pages (1 of 80 reaching 3) vs median 7 when
+     only the name is readable (51 of 60 reaching 3), so >=3 = ambiguous.
+     Ambiguous results show an explicit "this may be the wrong card,
+     screenshot the passive popup instead" banner + 8 alternatives
+     instead of 3, and the section retitles to "Did you mean one of
+     these?". Type/rarity diversification of that list was tested and NOT
+     shipped (26/40 vs 29/40 plain — no ordering rescues a 105-way tie).
+   - Debug panel (ui/AppScreen DebugPanel): collapsible, on both result
+     and failure screens; shows the raw ML Kit lines, whether the type/
+     rarity badges were read, and the top 6 candidates with scores +
+     tied count. Turns a bad screenshot into data instead of guesswork.
+   - Known gap: alternatives show JP titles only in the index, so an
+     ambiguous list can't show English titles (the one label that would
+     let a user pick their exact card visually). Would need a global-site
+     scrape pass for `title_en` — ~5k requests, not done.
+   **Two bugs the debug panel caught on its first real use (2026-08-03)** —
+   user screenshotted UR PHY Cooler (Final Form), got UR PHY Frieza (2nd
+   Form), and the panel showed Cooler scoring HIGHER (161.9 vs 160.0):
+   - TIE_MARGIN was far too loose. At 0.98 anything within 2% counted as
+     "tied" and the head group was re-sorted by (base, rarity, id) with
+     the SCORE DISCARDED — so Frieza won on having a higher id despite
+     scoring 1.2% lower. The cases the tie-break exists for (awakening
+     twins, base vs its own transformed form) score EXACTLY equal, so the
+     band is now 0.995; a separate AMBIGUITY_MARGIN = 0.98 keeps the
+     looser band for the confidence signal only. tied_count/tiedCount now
+     measure against the MAX score, not ranked.first() (the preference
+     ordering can put a lower-scoring card first — that was a second,
+     latent inconsistency in the ambiguity count).
+   - App and prototype scored DIFFERENTLY: Kotlin scored the main and alt
+     key sets separately and took max(), while match.py pools them — same
+     screenshot gave 161.9 in the app vs 165.7 in the prototype, so the
+     benchmarks weren't predicting app behavior. Kotlin now pools too
+     (Candidate.matchedAltView deleted — dead since alt-view-by-default).
+   Verified on the user's real OCR lines: Cooler 165.7 > Frieza 160.0,
+   tied_count 1 (confident). Benchmarks after the tighter margin: general
+   144/147/141 (was 145/147/141 — noise), hostile arm 45 vs 50 no-badge /
+   86 vs 88 with badges. The synthetic hostile arm slightly prefers the
+   loose band because its targets are random within near-tied groups; the
+   field failure it causes is real, so the tight band ships.
    Roadmap after that:
    v0.2 floating bubble + MediaProjection (manual trigger), v0.3 auto-detect
    card screens from captured frames (marker text or image-retrieval on

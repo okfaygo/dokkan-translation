@@ -11,6 +11,8 @@ several kits share — only the right card accumulates score across ALL lines.
 """
 
 import json
+import math
+from collections import Counter
 
 from rapidfuzz import fuzz
 
@@ -24,13 +26,19 @@ def _keys(rec):
     keys = list(rec.get("lines", []))
     keys += rec.get("pre_eza_lines", [])
     keys += rec.get("active_lines", [])
+    keys += rec.get("sa_names", [])
     # leader-skill text: the one plain-font element on the card page itself,
-    # so it makes card-page screenshots identifiable, not just passive popups
+    # so it makes card-page screenshots identifiable, not just passive popups.
+    # The unwrapped full text is included too: the in-game card page shows
+    # the leader as ONE truncated line, which containment scoring matches
+    # against the full string regardless of wrap points.
     for field in ("leader", "pre_eza_leader"):
         text = rec.get(field)
         if text:
             keys += [l.strip("、 　") for l in text.splitlines() if l.strip()]
-    for k in (rec.get("title"), rec.get("name")):
+            keys.append(text.replace("\n", ""))
+    for k in (rec.get("title"), rec.get("name"),
+              rec.get("passive_name"), rec.get("active_name")):
         if k:
             keys.append(k)
     return keys
@@ -42,11 +50,108 @@ def _weight(text):
     return min(len(text), 24) / 24
 
 
-TIE_MARGIN = 0.98
+CONTAIN_MIN_LEN = 14
+
+# How many cards share a key before it counts as "generic". Used ONLY to
+# judge confidence, never to score.
+#
+# IDF-style score weighting was tried here and REJECTED on benchmark data
+# (both textbook log(N/n) and a flat-below-threshold variant): damping a
+# shared name lowers the true signal while junk lines that happen to match
+# some card's rare key keep full weight, so noise wins relatively. Every
+# arm got worse — name-only top-4 19->16, general misread 141->133.
+COMMON_AT = 10
+_IDF_CACHE = {}
+
+
+def _idf_weight(n):
+    if n < COMMON_AT:
+        return 1.0
+    return 1.0 / (1.0 + math.log(n / COMMON_AT))
+
+
+def key_idf(index):
+    """key string -> weight in (0, 1]. Cached per index object."""
+    cached = _IDF_CACHE.get(id(index))
+    if cached is not None:
+        return cached
+    counts = Counter()
+    for rec in index.values():
+        for k in set(_keys(rec)):
+            counts[k] += 1
+    idf = {k: _idf_weight(n) for k, n in counts.items()}
+    _IDF_CACHE[id(index)] = idf
+    return idf
+
+
+def _score(text, key):
+    """Similarity of an OCR line to an index key.
+
+    Base: fuzz.ratio (normalized indel). For long-enough lines against
+    longer keys, also try CONTAINMENT — how much of the OCR line appears
+    in-order inside the key — at a 0.95 discount. This is what makes the
+    card page's truncated single-line leader/SA text matchable; the length
+    floor keeps short category chips from lighting up every kit that
+    mentions them.
+
+    fuzz.ratio == 200*LCS/(m+n), so coverage derives with no extra work:
+    LCS/m*100 == ratio*(m+n)/(2m).
+    """
+    r = fuzz.ratio(text, key)
+    if len(text) >= CONTAIN_MIN_LEN and len(key) > len(text):
+        coverage = min(r * (len(text) + len(key)) / (2 * len(text)), 100.0)
+        r = max(r, coverage * 0.95)
+    return r
+
+
+# How close scores must be before the preference ordering (base card, then
+# rarity, then id) overrides the score. TIGHT on purpose: the cases it
+# exists for score EXACTLY equal, and a loose band discards real score
+# differences — at 0.98 a card scoring 161.9 lost to one scoring 160.0
+# purely because the loser had a higher id (real field failure).
+TIE_MARGIN = 0.995
+
+# Looser band, used only to judge "several cards are close" (confidence).
+AMBIGUITY_MARGIN = 0.98
+
+
+def tied_count(ranked):
+    """Candidates within AMBIGUITY_MARGIN of the best score. Measured
+    against the MAX, since the preference ordering can put a slightly
+    lower-scoring card first."""
+    if not ranked:
+        return 0
+    top = max(s for _, s in ranked)
+    return sum(1 for _, s in ranked if s >= top * AMBIGUITY_MARGIN)
+
+# The card page shows the card's type badge (超知/極力 etc.) and rarity
+# emblem (UR/LR) — 1-3 char OCR lines that never vote (too short) but
+# disambiguate same-character cards of different type/rarity. BOOST-ONLY
+# (penalty 1.0): benchmarked, a mismatch penalty scores slightly better
+# when badges read correctly but collapses (150-case: 148 vs 108) when
+# both badges misread — and tiny stylized badges will misread in the wild.
+ELEMENT_KANJI = {"速": 0, "技": 1, "知": 2, "力": 3, "体": 4}
+RARITY_MARKERS = {"UR": 4, "LR": 5, "SSR": 3}
+HINT_BOOST = 1.12
+HINT_PENALTY = 1.0
+
+
+def extract_hints(lines):
+    """(element_type or None, rarity or None) from badge-like OCR lines.
+    Only the unambiguous forms count: 超X/極X for type, exact UR/LR/SSR."""
+    el = rar = None
+    for raw in lines:
+        s = raw.strip()
+        if s.upper() in RARITY_MARKERS:
+            rar = RARITY_MARKERS[s.upper()]
+        if len(s) == 2 and s[0] in "超極" and s[1] in ELEMENT_KANJI:
+            el = ELEMENT_KANJI[s[1]]
+    return el, rar
 
 
 def rank(candidates, index, threshold=70):
     """candidates: [(text, ocr_conf)]; returns [(card_id, total_score)]."""
+    el_hint, rar_hint = extract_hints(t for t, _ in candidates)
     scores = {}
     for text, _conf in candidates:
         text = text.strip()
@@ -54,9 +159,19 @@ def rank(candidates, index, threshold=70):
             continue
         w = _weight(text)
         for cid, rec in index.items():
-            best = max((fuzz.ratio(text, k) for k in _keys(rec)), default=0)
+            best = max((_score(text, k) for k in _keys(rec)), default=0)
             if best >= threshold:
                 scores[cid] = scores.get(cid, 0) + best * w
+
+    for cid in scores:
+        rec = index[cid]
+        mult = 1.0
+        if el_hint is not None and rec.get("element") is not None:
+            mult *= (HINT_BOOST if int(rec["element"]) % 10 == el_hint
+                     else HINT_PENALTY)
+        if rar_hint is not None and rec.get("rarity") is not None:
+            mult *= HINT_BOOST if rec["rarity"] == rar_hint else HINT_PENALTY
+        scores[cid] *= mult
     ranked = sorted(scores.items(), key=lambda kv: -kv[1])
     if not ranked:
         return ranked

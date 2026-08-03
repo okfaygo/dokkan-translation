@@ -18,22 +18,51 @@ testing from the gallery.
    normalized-indel ratio (identical to rapidfuzz `fuzz.ratio`, verified to
    float precision) against each card's keys; scores >= 70, weighted by
    line length (full sentences outvote category chips / UI labels), summed
-   per card. The two views are scored separately, and the winner remembers
-   WHICH view matched. Candidates within 2% of the top score are re-ranked
+   per card. Lines >= 14 chars also try CONTAINMENT (LCS coverage of the
+   line inside a longer key, 0.95 discount) — the in-game card page shows
+   leader/SA text as one TRUNCATED line, which plain ratio scores below
+   threshold on ~7% of cards. Keys include SA names + passive/active names
+   (plain-font on the card page) and the unwrapped leader text. The two
+   views are scored separately, and the winner remembers WHICH view
+   matched. Candidates within 2% of the top score are re-ranked
    base-cards-first, then rarity, then id — awakened beats unawakened, and
-   a base card beats its own transformed form.
+   a base card beats its own transformed form. The card page's type badge
+   (超知/極力) and rarity emblem (UR/LR) are extracted as BOOST-ONLY hints
+   (1.12x per matching hint, no mismatch penalty — misread badges must not
+   sink the right card); they separate 451 of 507 same-name groups.
+   Synthetic card-page benchmark: 74% -> 97% top-1; hostile
+   same-character benchmark 48% -> 82% top-1 with badges.
 4. `api/DokkanInfo` — fetches the GLOBAL `dokkaninfo.com/cards/<id>` page
    (embedded `datajson`), permanent disk cache under `cache/dokkaninfo/`
    (the v0.1 `cache/kits/` dir is purged on first use — its dokkan.wiki
-   payloads read as blank kits under this parser). Fetches whichever view
-   MATCHED the screenshot: the bare/?eza=true views aren't consistently
-   base/EZA (bare = base kit for EZA'd URs but SEZA kit for LRs), so the
-   screenshot itself decides which kit the player is looking at. No
-   pre/post-EZA labels anywhere, deliberately. Replaced dokkan.wiki,
-   which went stale.
+   payloads read as blank kits under this parser). The alt view
+   (`?eza=true&step=<max_eza_step>`) is the DEFAULT whenever the card has
+   one — field-validated as the right kit for EZA'd cards. The &step=
+   param matters: plain ?eza=true serves the wrong (untransformed) kit
+   for some transformed EZA'd LR forms, and &step=<max> is a no-op
+   everywhere else. No pre/post-EZA labels anywhere, deliberately.
+   Replaced dokkan.wiki, which went stale.
+   Passive text keeps its `{passiveImg:...}` tokens; `ui/PassiveIcons`
+   renders them inline as the bundled in-game icons
+   (`assets/passive_icons/`, sourced from DokkanInfo's layout assets).
+   **Transformed forms of EZA'd cards** (id >= 4000000) need a second
+   request: their card page — with or without `?eza=true&step=` — serves
+   the BASE card's EZA passive, and the form's own EZA kit exists only at
+   `/api/cards/<id>/transformation?eza=true&step=<max>` (the endpoint the
+   site's own transformation arrows call). `overlayFormKit` fetches it and
+   overlays passive/SA/links; leader, categories and the form list from
+   the card page are already correct. Best-effort — a failure leaves the
+   page kit as-is.
 5. `ui/AppScreen` — Compose UI. Kit sections incl. Active Skill and a
    Transformations section (buttons jump between a card's forms), plus a
    "not the right card?" list of the next 3 candidates (English names).
+   **Ambiguity:** when 3+ candidates tie within `TIE_MARGIN`
+   (`Matcher.tiedCount`), the screenshot lacked card-specific text — a
+   card page where only the character name was readable ties every card
+   of that character. Those results show a warning banner and 8
+   alternatives instead of 3. **Debug panel:** collapsible on both the
+   result and failure screens — raw ML Kit lines, whether the type/rarity
+   badges were read, and the top 6 candidates with scores.
 
 ## Build & run
 

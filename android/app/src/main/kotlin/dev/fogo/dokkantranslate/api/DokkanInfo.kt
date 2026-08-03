@@ -20,7 +20,7 @@ import org.json.JSONObject
  * displayed kit is the one on the player's screen. No pre/post-EZA
  * labeling exists on purpose — the views aren't consistently either.
  */
-class Kit(
+data class Kit(
     val cardId: String,
     val title: String,
     val name: String,
@@ -53,16 +53,33 @@ object DokkanInfo {
     @Volatile
     private var legacyCachePurged = false
 
-    /** Fetch a card's English kit, using a permanent on-disk cache. */
-    fun fetch(context: Context, cardId: String, altView: Boolean = false): Kit {
+    /**
+     * Fetch a card's English kit, using a permanent on-disk cache.
+     *
+     * ezaStep is the card's max EZA step; it's appended as &step= on the
+     * alt view because plain ?eza=true serves the wrong (untransformed)
+     * kit for some transformed EZA'd LR forms, while &step=<max> is a
+     * verified no-op where ?eza=true already worked.
+     */
+    fun fetch(
+        context: Context,
+        cardId: String,
+        altView: Boolean = false,
+        ezaStep: Int = 0,
+    ): Kit {
         purgeLegacyCache(context)
         val dir = File(context.cacheDir, "dokkaninfo").apply { mkdirs() }
-        val cacheFile = File(dir, if (altView) "$cardId-alt.json" else "$cardId.json")
+        // step-aware name: entries cached before &step= support are never read
+        val cacheFile =
+            File(dir, if (altView) "$cardId-alt$ezaStep.json" else "$cardId.json")
         val text = if (cacheFile.exists()) {
             cacheFile.readText(Charsets.UTF_8)
         } else {
-            val url = "https://dokkaninfo.com/cards/$cardId" +
-                if (altView) "?eza=true" else ""
+            var url = "https://dokkaninfo.com/cards/$cardId"
+            if (altView) {
+                url += "?eza=true"
+                if (ezaStep > 0) url += "&step=$ezaStep"
+            }
             val body = try {
                 httpGet(url)
             } catch (e: FileNotFoundException) {
@@ -72,7 +89,54 @@ object DokkanInfo {
             cacheFile.writeText(json, Charsets.UTF_8)
             json
         }
-        return parse(cardId, JSONObject(text))
+        val kit = parse(cardId, JSONObject(text))
+
+        // A transformed form's card page serves the BASE card's EZA passive —
+        // the form's own EZA kit exists only behind the transformation API
+        // (the endpoint DokkanInfo's own transformation arrows call). Leader,
+        // categories and the form list on the page are already correct, so
+        // only the form-specific parts are overlaid. Best-effort: any failure
+        // leaves the page kit untouched.
+        if (altView && ezaStep > 0 && isTransformedForm(cardId)) {
+            runCatching { overlayFormKit(context, dir, cardId, ezaStep, kit) }
+                .getOrNull()
+                ?.let { return it }
+        }
+        return kit
+    }
+
+    /** 4xxxxxxx / 9xxxxxxx ids are transformed or story forms, not base cards. */
+    private fun isTransformedForm(cardId: String): Boolean =
+        (cardId.toLongOrNull() ?: 0L) >= 4_000_000
+
+    private fun overlayFormKit(
+        context: Context,
+        dir: File,
+        cardId: String,
+        ezaStep: Int,
+        kit: Kit,
+    ): Kit {
+        val cacheFile = File(dir, "$cardId-tf$ezaStep.json")
+        val text = if (cacheFile.exists()) {
+            cacheFile.readText(Charsets.UTF_8)
+        } else {
+            httpGet(
+                "https://dokkaninfo.com/api/cards/$cardId/transformation" +
+                    "?eza=true&step=$ezaStep"
+            ).also { cacheFile.writeText(it, Charsets.UTF_8) }
+        }
+        val api = JSONObject(text)
+        val passive = api.optJSONObject("passive_skill")
+        val supers = parseSupers(api)
+        val links = namesOf(api, "links")
+        return kit.copy(
+            passiveName = passive?.optString("name")?.ifEmpty { null } ?: kit.passiveName,
+            passiveRows = passive?.optString("itemized_description")
+                ?.ifEmpty { null }
+                ?.let { parseItemized(it) } ?: kit.passiveRows,
+            supers = supers.ifEmpty { kit.supers },
+            links = links.ifEmpty { kit.links },
+        )
     }
 
     /**
@@ -135,11 +199,14 @@ object DokkanInfo {
      * Itemized passive -> display rows. Headers are wrapped in *...* and may
      * span several lines; items start with "- " (EN) or "・" (JP); anything
      * else continues the previous row (the source wraps sentences mid-way).
+     *
+     * {passiveImg:...} tokens are KEPT — the UI renders them as the in-game
+     * icons (see PassiveIcons in the ui package).
      */
     fun parseItemized(text: String): List<Pair<Boolean, String>> {
         val rows = ArrayList<Pair<Boolean, String>>()
         var headerOpen = false
-        for (raw in clean(text).split("\n")) {
+        for (raw in text.trim().split("\n")) {
             val line = raw.trim(' ', '　')
             if (line.isEmpty()) continue
             when {
@@ -173,24 +240,7 @@ object DokkanInfo {
         val passive = data.optJSONObject("passive_skill")
         val active = data.optJSONObject("active_skill")
 
-        val supers = ArrayList<Pair<String, String>>()
-        val seen = HashSet<String>()
-        data.optJSONArray("super_attacks")?.let { arr ->
-            for (i in 0 until arr.length()) {
-                val attack = arr.getJSONObject(i).optJSONObject("attack") ?: continue
-                val name = attack.optString("name")
-                val desc = clean(attack.optString("description")).replace("\n", " ")
-                if (name.isNotEmpty() && seen.add("$name|$desc")) {
-                    supers.add(name to desc)
-                }
-            }
-        }
-
-        fun names(field: String): List<String> {
-            val arr = data.optJSONArray(field) ?: return emptyList()
-            return (0 until arr.length()).map { arr.getJSONObject(it).optString("name") }
-        }
-
+        val supers = parseSupers(data)
         val transformations = ArrayList<Pair<String, String>>()
         data.optJSONArray("transformations")?.let { arr ->
             for (i in 0 until arr.length()) {
@@ -219,9 +269,30 @@ object DokkanInfo {
             supers = supers,
             activeName = active?.optString("name") ?: "",
             activeDesc = activeDesc,
-            links = names("links"),
-            categories = names("categories"),
+            links = namesOf(data, "links"),
+            categories = namesOf(data, "categories"),
             transformations = transformations,
         )
+    }
+
+    private fun parseSupers(data: JSONObject): List<Pair<String, String>> {
+        val supers = ArrayList<Pair<String, String>>()
+        val seen = HashSet<String>()
+        data.optJSONArray("super_attacks")?.let { arr ->
+            for (i in 0 until arr.length()) {
+                val attack = arr.getJSONObject(i).optJSONObject("attack") ?: continue
+                val name = attack.optString("name")
+                val desc = clean(attack.optString("description")).replace("\n", " ")
+                if (name.isNotEmpty() && seen.add("$name|$desc")) {
+                    supers.add(name to desc)
+                }
+            }
+        }
+        return supers
+    }
+
+    private fun namesOf(data: JSONObject, field: String): List<String> {
+        val arr = data.optJSONArray(field) ?: return emptyList()
+        return (0 until arr.length()).map { arr.getJSONObject(it).optString("name") }
     }
 }

@@ -105,11 +105,15 @@ def english_names(session, refresh=False):
     return {c["id"]: c["name"] for c in cards if c.get("name")}
 
 
-def fetch_card(session, card_id, delay=1.0, refresh=False, pre_eza=False):
+def fetch_card(session, card_id, delay=1.0, refresh=False, pre_eza=False,
+               eza_step=None):
     """Raw datajson dict for one card, cached gzipped on disk.
 
-    pre_eza=True fetches ?eza=true, which (counterintuitively) serves the
-    ORIGINAL pre-EZA kit; the bare URL serves the current max-EZA state.
+    pre_eza=True fetches the ?eza=true view (NOT literally "pre-EZA": it's
+    the other of DokkanInfo's two per-card views — see NOTES.md). Pass
+    eza_step=<max_eza_step from the bare page> too: plain ?eza=true serves
+    the wrong (untransformed) kit for some transformed EZA'd LR forms, and
+    &step=<max> is a verified no-op where ?eza=true already worked.
     """
     CARD_CACHE.mkdir(parents=True, exist_ok=True)
     suffix = ".pre_eza.json.gz" if pre_eza else ".json.gz"
@@ -117,9 +121,35 @@ def fetch_card(session, card_id, delay=1.0, refresh=False, pre_eza=False):
     if cache_file.exists() and not refresh:
         with gzip.open(cache_file, "rt", encoding="utf-8") as f:
             return json.load(f)
-    url = f"{BASE}/cards/{card_id}" + ("?eza=true" if pre_eza else "")
+    url = f"{BASE}/cards/{card_id}"
+    if pre_eza:
+        url += "?eza=true"
+        if eza_step:
+            url += f"&step={eza_step}"
     text = _get(session, url)
     data = _embedded_json(text, "datajson")
+    with gzip.open(cache_file, "wt", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False)
+    time.sleep(delay)
+    return data
+
+
+def fetch_form_alt(session, card_id, eza_step, delay=1.0, refresh=False):
+    """A transformed form's OWN EZA kit, from the transformation API.
+
+    The form's card page (even with ?eza=true&step=N) serves the BASE card's
+    EZA passive — verified on 4019411, where the page gives the base's
+    passive #3933 and this endpoint gives the form's own #3934. This is the
+    endpoint DokkanInfo's own transformation arrows call.
+    """
+    CARD_CACHE.mkdir(parents=True, exist_ok=True)
+    cache_file = CARD_CACHE / f"{card_id}.tf_eza.json.gz"
+    if cache_file.exists() and not refresh:
+        with gzip.open(cache_file, "rt", encoding="utf-8") as f:
+            return json.load(f)
+    url = (f"{BASE}/api/cards/{card_id}/transformation"
+           f"?eza=true&step={eza_step}")
+    data = json.loads(_get(session, url))
     with gzip.open(cache_file, "wt", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False)
     time.sleep(delay)
@@ -163,7 +193,18 @@ def extract_record(data):
         if active_lines:
             rec["active_name"] = active.get("name")
             rec["active_lines"] = active_lines
+
+    # SA names render in plain font on the card page — a strong signal there
+    sa_names = []
+    for sa in data.get("super_attacks") or []:
+        name = ((sa.get("attack") or {}).get("name") or "").strip()
+        if name and name not in sa_names:
+            sa_names.append(name)
+    if sa_names:
+        rec["sa_names"] = sa_names
     rec["has_eza"] = bool(data.get("eza_medals"))
+    if data.get("max_eza_step"):
+        rec["eza_step"] = data["max_eza_step"]
     return rec
 
 
@@ -218,6 +259,9 @@ def main():
                     help="seconds between requests")
     ap.add_argument("--rebuild", action="store_true",
                     help="reparse cached pages only, no network")
+    ap.add_argument("--refresh-alt", action="store_true",
+                    help="re-fetch ?eza=true pages (with &step=max) even if "
+                         "cached — use once to upgrade a pre-step cache")
     ap.add_argument("--follow-transformations", action="store_true",
                     default=True)
     args = ap.parse_args()
@@ -250,12 +294,26 @@ def main():
             data = fetch_card(session, card_id, delay=args.delay)
             rec = extract_record(data)
             if rec["has_eza"]:
-                pre = extract_record(
-                    fetch_card(session, card_id, delay=args.delay,
-                               pre_eza=True))
+                step = data.get("max_eza_step")
+                if card_id >= 4_000_000 and step:
+                    # transformed form: its own EZA kit lives behind the
+                    # transformation API, not its card page
+                    alt = fetch_form_alt(session, card_id, step,
+                                         delay=args.delay,
+                                         refresh=args.refresh_alt)
+                else:
+                    alt = fetch_card(session, card_id, delay=args.delay,
+                                     pre_eza=True, refresh=args.refresh_alt,
+                                     eza_step=step)
+                pre = extract_record(alt)
                 if pre["lines"] != rec["lines"]:
                     rec["pre_eza_lines"] = pre["lines"]
-                    rec["pre_eza_leader"] = pre["leader"]
+                    if pre["leader"]:
+                        rec["pre_eza_leader"] = pre["leader"]
+                for name in pre.get("sa_names") or []:
+                    # EZA'd SA names carry a (極限) suffix on screen
+                    if name not in rec.get("sa_names", []):
+                        rec.setdefault("sa_names", []).append(name)
         except Exception as e:
             print(f"  {card_id}: FAILED {e}", file=sys.stderr)
             failed.append(card_id)
