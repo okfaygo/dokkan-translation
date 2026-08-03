@@ -223,6 +223,27 @@ identify -> fetch -> render works end to end.
    86 vs 88 with badges. The synthetic hostile arm slightly prefers the
    loose band because its targets are random within near-tied groups; the
    field failure it causes is real, so the tight band ships.
+   **v0.2 floating bubble scaffolded (2026-08-03, NOT device-tested):**
+   overlay bubble + MediaProjection, tap-to-identify without leaving the
+   game. Key API constraint that shaped the design: on Android 14+ a
+   MediaProjection token is SINGLE-USE (createVirtualDisplay twice on one
+   token throws; a consent Intent can be exchanged once), so a
+   capture-per-tap design would prompt for consent on every tap. Instead
+   one VirtualDisplay + ImageReader is created per bubble SESSION and each
+   tap pulls the newest frame. Required ordering: startForeground() before
+   getMediaProjection(), and a MediaProjection.Callback must be registered
+   or createVirtualDisplay() throws. Android 15 QPR1+ auto-stops the
+   projection on screen lock -> panel offers Resume, which re-requests
+   consent through an invisible activity (consent needs an Activity; the
+   bubble lives in a Service). Two non-obvious hazards handled: the
+   ImageReader must be DRAINED before each capture (only 2 buffers; a full
+   buffer blocks new frames, so a stale frame can be returned), and the
+   bubble hides itself before capturing or it lands in its own OCR input.
+   Compose in an overlay needs lifecycle/ViewModelStore/SavedStateRegistry
+   owners that a Service lacks — OverlayComposeHost supplies them so the
+   panel reuses the main screen's composables. The identify pipeline was
+   extracted to identify/CardIdentifier so bubble and share-sheet can't
+   drift. Not compiled here (no Android SDK on this machine).
    Roadmap after that:
    v0.2 floating bubble + MediaProjection (manual trigger), v0.3 auto-detect
    card screens from captured frames (marker text or image-retrieval on

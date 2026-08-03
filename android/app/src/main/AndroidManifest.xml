@@ -2,6 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- floating bubble drawn over the game -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- screen capture runs in a foreground service (required since API 29) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+    <uses-permission
+        android:name="android.permission.POST_NOTIFICATIONS"
+        android:minSdkVersion="33" />
 
     <application
         android:label="@string/app_name"
@@ -22,5 +30,25 @@
                 <data android:mimeType="image/*" />
             </intent-filter>
         </activity>
+
+        <!--
+          Screen-capture consent must be requested from an Activity. This one
+          is invisible and finishes immediately; the bubble uses it to (re-)ask
+          for consent without the user leaving the game, which is needed
+          because a MediaProjection token is single-use: Android 14+ throws if
+          createVirtualDisplay() is called twice on one token, so every new
+          capture session needs a fresh consent.
+        -->
+        <activity
+            android:name=".bubble.ProjectionRequestActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <service
+            android:name=".bubble.BubbleService"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection" />
     </application>
 </manifest>

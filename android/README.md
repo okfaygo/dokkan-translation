@@ -1,4 +1,49 @@
-# Dokkan Translate — Android v0.1
+# Dokkan Translate — Android
+
+## v0.2: floating bubble (new, not yet device-tested)
+
+Tap **Start bubble** in the app. A bubble floats over the game; tap it on
+any card screen and the English kit slides up in an overlay panel — no
+screenshot, no leaving Dokkan. Drag the bubble to move it; tap it again to
+dismiss the panel; stop it from the notification.
+
+Permissions it asks for, in order: *display over other apps*,
+notifications (Android 13+, for the required service banner), then the
+system screen-capture prompt.
+
+**Why the architecture looks the way it does** — Android 14+ enforces that
+a `MediaProjection` token is single-use: `createVirtualDisplay()` throws if
+called twice on one token, and a consent Intent can only be exchanged
+once. A naive capture-per-tap design would therefore show a system consent
+dialog on *every tap*. So `ScreenCapture` creates ONE virtual display when
+the bubble starts and keeps the screen mirrored into an `ImageReader` for
+the session; each tap just pulls the newest frame. Consequences:
+
+- The reader holds only 2 buffers, and a full buffer blocks new frames, so
+  each capture **drains first**, waits ~150ms, then grabs — otherwise you
+  can get a frame from minutes ago.
+- The bubble hides itself before capturing, or it appears in its own OCR
+  input.
+- The service must call `startForeground()` **before** `getMediaProjection()`
+  and must register a `MediaProjection.Callback` (`createVirtualDisplay()`
+  throws without one).
+- When the system stops the projection — screen lock on Android 15 QPR1+,
+  or the user revoking it — the session cannot be resumed. The panel offers
+  **Resume**, which re-requests consent via the invisible
+  `ProjectionRequestActivity`.
+
+Files: `bubble/BubbleService` (foreground service, bubble window, capture
+orchestration), `bubble/ScreenCapture` (projection + virtual display +
+frame grabs), `bubble/OverlayComposeHost` (a Service has no lifecycle /
+ViewModelStore / SavedStateRegistry owners, which `ComposeView` requires —
+this supplies them so the panel reuses the same composables as the main
+screen), `bubble/ProjectionRequestActivity` (consent from a Service),
+`ui/BubblePanel` (the sheet).
+
+`identify/CardIdentifier` holds the screenshot → kit pipeline shared by
+both the bubble and the share-sheet flow, so they cannot drift apart.
+
+## v0.1: share sheet
 
 Share-sheet MVP: screenshot a card's passive-detail screen in JP Dokkan,
 tap **Share → Dokkan Translate**, get the English kit. No special

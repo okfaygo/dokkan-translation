@@ -28,14 +28,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.fogo.dokkantranslate.MatchDebug
-import dev.fogo.dokkantranslate.UiState
+import dev.fogo.dokkantranslate.identify.MatchDebug
 
 @Composable
 fun AppScreen(
     state: UiState,
     onPickImage: () -> Unit,
     onSelectCard: (String) -> Unit,
+    bubbleRunning: Boolean = false,
+    onStartBubble: () -> Unit = {},
+    onStopBubble: () -> Unit = {},
 ) {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Scaffold { padding ->
@@ -46,6 +48,7 @@ fun AppScreen(
                     .padding(16.dp)
                     .verticalScroll(rememberScrollState()),
             ) {
+                BubbleControls(bubbleRunning, onStartBubble, onStopBubble)
                 when (state) {
                     is UiState.Idle -> Idle(onPickImage)
                     is UiState.Working -> Working(state.step)
@@ -55,6 +58,38 @@ fun AppScreen(
             }
         }
     }
+}
+
+/**
+ * v2 entry point: start the floating bubble so cards can be identified
+ * without leaving the game. The share-sheet flow below stays as a fallback
+ * (and for identifying screenshots after the fact).
+ */
+@Composable
+private fun BubbleControls(
+    running: Boolean,
+    onStart: () -> Unit,
+    onStop: () -> Unit,
+) {
+    Text("Floating bubble", style = MaterialTheme.typography.titleMedium)
+    Spacer(Modifier.height(4.dp))
+    Text(
+        if (running) {
+            "The bubble is active. Switch to Dokkan and tap it over a card."
+        } else {
+            "Shows a bubble over the game — tap it on any card screen to " +
+                "identify that card. Needs the \"display over other apps\" " +
+                "permission and a screen-capture prompt."
+        },
+        style = MaterialTheme.typography.bodySmall,
+    )
+    Spacer(Modifier.height(8.dp))
+    if (running) {
+        OutlinedButton(onClick = onStop) { Text("Stop bubble") }
+    } else {
+        Button(onClick = onStart) { Text("Start bubble") }
+    }
+    Spacer(Modifier.height(20.dp))
 }
 
 @Composable
@@ -72,7 +107,7 @@ private fun Idle(onPickImage: () -> Unit) {
 }
 
 @Composable
-private fun Working(step: String) {
+internal fun Working(step: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         CircularProgressIndicator()
         Text("  $step")
@@ -80,7 +115,7 @@ private fun Working(step: String) {
 }
 
 @Composable
-private fun Failed(message: String, debug: MatchDebug, onPickImage: () -> Unit) {
+internal fun Failed(message: String, debug: MatchDebug, onPickImage: () -> Unit) {
     Text("Couldn't identify the card", style = MaterialTheme.typography.titleLarge)
     Spacer(Modifier.height(8.dp))
     Text(message, color = MaterialTheme.colorScheme.error)
@@ -96,7 +131,7 @@ private fun Failed(message: String, debug: MatchDebug, onPickImage: () -> Unit) 
  * but the scores are flat, it's matching.
  */
 @Composable
-private fun DebugPanel(debug: MatchDebug) {
+internal fun DebugPanel(debug: MatchDebug) {
     if (debug.ocrLines.isEmpty() && debug.topCandidates.isEmpty()) return
     var open by remember { mutableStateOf(false) }
     Spacer(Modifier.height(24.dp))
@@ -145,10 +180,11 @@ private fun SectionHeader(text: String) {
 }
 
 @Composable
-private fun KitView(
+internal fun KitView(
     result: UiState.Result,
     onSelectCard: (String) -> Unit,
     onPickImage: () -> Unit,
+    bottomActionLabel: String = "Identify another screenshot",
 ) {
     val kit = result.kit
 
@@ -247,6 +283,6 @@ private fun KitView(
     }
 
     Spacer(Modifier.height(24.dp))
-    OutlinedButton(onClick = onPickImage) { Text("Identify another screenshot") }
+    OutlinedButton(onClick = onPickImage) { Text(bottomActionLabel) }
     DebugPanel(result.debug)
 }
