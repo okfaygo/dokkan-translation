@@ -12,6 +12,10 @@ object OcrEngine {
 
     private val jpChars = Regex("[\\u3040-\\u30FF\\u4E00-\\u9FFF]")
 
+    /** Rarity emblems have no Japanese characters but feed the matcher's
+     *  type/rarity hints, so they survive the Japanese-text filter. */
+    private val rarityMarkers = setOf("UR", "LR", "SSR")
+
     /** All recognized lines containing Japanese text, in reading order. */
     suspend fun recognizeJapaneseLines(bitmap: Bitmap): List<String> {
         val recognizer =
@@ -26,7 +30,10 @@ object OcrEngine {
         for (block in text.textBlocks) {
             for (line in block.lines) {
                 val s = line.text.trim()
-                if (s.isNotEmpty() && jpChars.containsMatchIn(s)) lines.add(s)
+                if (s.isEmpty()) continue
+                if (jpChars.containsMatchIn(s) ||
+                    s.uppercase() in rarityMarkers
+                ) lines.add(s)
             }
         }
         return lines.distinct()

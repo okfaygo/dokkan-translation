@@ -73,9 +73,34 @@ def _score(text, key):
 
 TIE_MARGIN = 0.98
 
+# The card page shows the card's type badge (超知/極力 etc.) and rarity
+# emblem (UR/LR) — 1-3 char OCR lines that never vote (too short) but
+# disambiguate same-character cards of different type/rarity. BOOST-ONLY
+# (penalty 1.0): benchmarked, a mismatch penalty scores slightly better
+# when badges read correctly but collapses (150-case: 148 vs 108) when
+# both badges misread — and tiny stylized badges will misread in the wild.
+ELEMENT_KANJI = {"速": 0, "技": 1, "知": 2, "力": 3, "体": 4}
+RARITY_MARKERS = {"UR": 4, "LR": 5, "SSR": 3}
+HINT_BOOST = 1.12
+HINT_PENALTY = 1.0
+
+
+def extract_hints(lines):
+    """(element_type or None, rarity or None) from badge-like OCR lines.
+    Only the unambiguous forms count: 超X/極X for type, exact UR/LR/SSR."""
+    el = rar = None
+    for raw in lines:
+        s = raw.strip()
+        if s.upper() in RARITY_MARKERS:
+            rar = RARITY_MARKERS[s.upper()]
+        if len(s) == 2 and s[0] in "超極" and s[1] in ELEMENT_KANJI:
+            el = ELEMENT_KANJI[s[1]]
+    return el, rar
+
 
 def rank(candidates, index, threshold=70):
     """candidates: [(text, ocr_conf)]; returns [(card_id, total_score)]."""
+    el_hint, rar_hint = extract_hints(t for t, _ in candidates)
     scores = {}
     for text, _conf in candidates:
         text = text.strip()
@@ -86,6 +111,16 @@ def rank(candidates, index, threshold=70):
             best = max((_score(text, k) for k in _keys(rec)), default=0)
             if best >= threshold:
                 scores[cid] = scores.get(cid, 0) + best * w
+
+    for cid in scores:
+        rec = index[cid]
+        mult = 1.0
+        if el_hint is not None and rec.get("element") is not None:
+            mult *= (HINT_BOOST if int(rec["element"]) % 10 == el_hint
+                     else HINT_PENALTY)
+        if rar_hint is not None and rec.get("rarity") is not None:
+            mult *= HINT_BOOST if rec["rarity"] == rar_hint else HINT_PENALTY
+        scores[cid] *= mult
     ranked = sorted(scores.items(), key=lambda kv: -kv[1])
     if not ranked:
         return ranked

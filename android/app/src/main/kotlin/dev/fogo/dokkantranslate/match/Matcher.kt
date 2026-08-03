@@ -23,6 +23,15 @@ object Matcher {
 
     private const val TIE_MARGIN = 0.98
 
+    /** Boost-only type/rarity hints from the card page's badges (超知/極力
+     *  style type badge, UR/LR emblem). Matching cards get boosted; no
+     *  mismatch penalty — benchmarks show a penalty collapses accuracy
+     *  when the tiny stylized badges misread, which they will. */
+    private const val HINT_BOOST = 1.12
+    private val ELEMENT_KANJI =
+        mapOf('速' to 0, '技' to 1, '知' to 2, '力' to 3, '体' to 4)
+    private val RARITY_MARKERS = mapOf("UR" to 4, "LR" to 5, "SSR" to 3)
+
     data class Candidate(
         val record: CardRecord,
         val score: Double,
@@ -30,11 +39,27 @@ object Matcher {
         val matchedAltView: Boolean,
     )
 
+    /** (element type 0-4 or null, rarity or null) from badge-like lines.
+     *  Only unambiguous forms count: 超X/極X for type, exact UR/LR/SSR. */
+    fun extractHints(lines: List<String>): Pair<Int?, Int?> {
+        var el: Int? = null
+        var rar: Int? = null
+        for (raw in lines) {
+            val s = raw.trim()
+            RARITY_MARKERS[s.uppercase()]?.let { rar = it }
+            if (s.length == 2 && (s[0] == '超' || s[0] == '極')) {
+                ELEMENT_KANJI[s[1]]?.let { el = it }
+            }
+        }
+        return el to rar
+    }
+
     fun rank(
         ocrLines: List<String>,
         index: List<CardRecord>,
         threshold: Double = 70.0,
     ): List<Candidate> {
+        val (elHint, rarHint) = extractHints(ocrLines)
         val main = HashMap<CardRecord, Double>()
         val alt = HashMap<CardRecord, Double>()
         for (raw in ocrLines) {
@@ -58,7 +83,14 @@ object Matcher {
         val sorted = all.map { rec ->
             val m = main[rec] ?: 0.0
             val a = alt[rec] ?: 0.0
-            Candidate(rec, maxOf(m, a), matchedAltView = a > m)
+            var score = maxOf(m, a)
+            if (elHint != null && rec.element >= 0 && rec.element % 10 == elHint) {
+                score *= HINT_BOOST
+            }
+            if (rarHint != null && rec.rarity == rarHint) {
+                score *= HINT_BOOST
+            }
+            Candidate(rec, score, matchedAltView = a > m)
         }.sortedByDescending { it.score }
         if (sorted.isEmpty()) return sorted
 

@@ -26,8 +26,12 @@ testing from the gallery.
    views are scored separately, and the winner remembers WHICH view
    matched. Candidates within 2% of the top score are re-ranked
    base-cards-first, then rarity, then id — awakened beats unawakened, and
-   a base card beats its own transformed form. Synthetic card-page
-   benchmark: 74% -> 97% top-1 with these changes.
+   a base card beats its own transformed form. The card page's type badge
+   (超知/極力) and rarity emblem (UR/LR) are extracted as BOOST-ONLY hints
+   (1.12x per matching hint, no mismatch penalty — misread badges must not
+   sink the right card); they separate 451 of 507 same-name groups.
+   Synthetic card-page benchmark: 74% -> 97% top-1; hostile
+   same-character benchmark 48% -> 82% top-1 with badges.
 4. `api/DokkanInfo` — fetches the GLOBAL `dokkaninfo.com/cards/<id>` page
    (embedded `datajson`), permanent disk cache under `cache/dokkaninfo/`
    (the v0.1 `cache/kits/` dir is purged on first use — its dokkan.wiki

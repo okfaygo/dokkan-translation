@@ -157,6 +157,17 @@ identify -> fetch -> render works end to end.
    once, ratio+coverage derived; prefilter bypassed for containment).
    Next accuracy instrument if field results still disappoint: a debug
    view exposing raw ML Kit lines so failures become tunable data.
+   **Badge hints (2026-08-02, after field report of a same-character
+   miss: UR PHY input -> LR STR output, right card not in alternatives):**
+   the card page's type badge (超知/極力 etc.) and rarity emblem (UR/LR)
+   are 1-3 char OCR lines that never vote — now extracted as hints
+   (only unambiguous forms: 超X/極X, exact UR/LR/SSR; OcrEngine keeps
+   rarity-only lines that the JP filter used to drop). BOOST-ONLY 1.12x
+   per matching hint, no mismatch penalty — benchmarked (prototype/
+   bench.py, vectorized cdist harness): penalty variant scores 105/120
+   vs boost-only 98/120 on hostile same-character cases (baseline 57),
+   but collapses 148->108/150 when both badges misread vs boost-only's
+   141. Type/rarity separates 451 of 507 same-name groups.
    Roadmap after that:
    v0.2 floating bubble + MediaProjection (manual trigger), v0.3 auto-detect
    card screens from captured frames (marker text or image-retrieval on
