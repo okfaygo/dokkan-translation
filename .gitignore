@@ -2,3 +2,6 @@
 prototype/cache/
 prototype/index.json
 __pycache__/
+
+# scratch id lists from targeted re-scrapes
+prototype/_*.txt
