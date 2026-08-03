@@ -199,6 +199,30 @@ identify -> fetch -> render works end to end.
      ambiguous list can't show English titles (the one label that would
      let a user pick their exact card visually). Would need a global-site
      scrape pass for `title_en` — ~5k requests, not done.
+   **Two bugs the debug panel caught on its first real use (2026-08-03)** —
+   user screenshotted UR PHY Cooler (Final Form), got UR PHY Frieza (2nd
+   Form), and the panel showed Cooler scoring HIGHER (161.9 vs 160.0):
+   - TIE_MARGIN was far too loose. At 0.98 anything within 2% counted as
+     "tied" and the head group was re-sorted by (base, rarity, id) with
+     the SCORE DISCARDED — so Frieza won on having a higher id despite
+     scoring 1.2% lower. The cases the tie-break exists for (awakening
+     twins, base vs its own transformed form) score EXACTLY equal, so the
+     band is now 0.995; a separate AMBIGUITY_MARGIN = 0.98 keeps the
+     looser band for the confidence signal only. tied_count/tiedCount now
+     measure against the MAX score, not ranked.first() (the preference
+     ordering can put a lower-scoring card first — that was a second,
+     latent inconsistency in the ambiguity count).
+   - App and prototype scored DIFFERENTLY: Kotlin scored the main and alt
+     key sets separately and took max(), while match.py pools them — same
+     screenshot gave 161.9 in the app vs 165.7 in the prototype, so the
+     benchmarks weren't predicting app behavior. Kotlin now pools too
+     (Candidate.matchedAltView deleted — dead since alt-view-by-default).
+   Verified on the user's real OCR lines: Cooler 165.7 > Frieza 160.0,
+   tied_count 1 (confident). Benchmarks after the tighter margin: general
+   144/147/141 (was 145/147/141 — noise), hostile arm 45 vs 50 no-badge /
+   86 vs 88 with badges. The synthetic hostile arm slightly prefers the
+   loose band because its targets are random within near-tied groups; the
+   field failure it causes is real, so the tight band ships.
    Roadmap after that:
    v0.2 floating bubble + MediaProjection (manual trigger), v0.3 auto-detect
    card screens from captured frames (marker text or image-retrieval on

@@ -21,7 +21,19 @@ package dev.fogo.dokkantranslate.match
  */
 object Matcher {
 
-    private const val TIE_MARGIN = 0.98
+    /**
+     * How close two scores must be before the preference ordering (base
+     * card, then rarity, then id) overrides the score. Deliberately TIGHT:
+     * the cases it exists for — awakening twins, a base card vs its own
+     * transformed form — score EXACTLY equal. A loose band silently
+     * discards real score differences: at 0.98 a card scoring 161.9 lost
+     * to one scoring 160.0 purely because the loser had a higher id.
+     */
+    private const val TIE_MARGIN = 0.995
+
+    /** Separate, looser band for "several cards are close" — a confidence
+     *  signal, not an ordering rule. */
+    const val AMBIGUITY_MARGIN = 0.98
 
     /** Boost-only type/rarity hints from the card page's badges (超知/極力
      *  style type badge, UR/LR emblem). Matching cards get boosted; no
@@ -35,8 +47,6 @@ object Matcher {
     data class Candidate(
         val record: CardRecord,
         val score: Double,
-        /** true when the ?eza=true view matched better than the bare view */
-        val matchedAltView: Boolean,
     )
 
     /**
@@ -50,8 +60,10 @@ object Matcher {
      */
     fun tiedCount(ranked: List<Candidate>): Int {
         if (ranked.isEmpty()) return 0
-        val cutoff = ranked.first().score * TIE_MARGIN
-        return ranked.count { it.score >= cutoff }
+        // against the MAX score, not ranked.first() — the preference
+        // ordering can put a slightly lower-scoring card first
+        val max = ranked.maxOf { it.score }
+        return ranked.count { it.score >= max * AMBIGUITY_MARGIN }
     }
 
     const val AMBIGUOUS_AT = 3
@@ -77,37 +89,33 @@ object Matcher {
         threshold: Double = 70.0,
     ): List<Candidate> {
         val (elHint, rarHint) = extractHints(ocrLines)
-        val main = HashMap<CardRecord, Double>()
-        val alt = HashMap<CardRecord, Double>()
+        val scores = HashMap<CardRecord, Double>()
         for (raw in ocrLines) {
             val line = raw.trim()
             if (line.length < 4) continue
             val weight = minOf(line.length, 24) / 24.0
             for (rec in index) {
-                val bestMain = bestRatio(line, rec.keys, threshold)
-                if (bestMain >= threshold) {
-                    main[rec] = (main[rec] ?: 0.0) + bestMain * weight
-                }
+                // both views pooled into one key set, matching match.py —
+                // scoring them separately made the app disagree with the
+                // benchmarks that are supposed to predict it
+                var best = bestRatio(line, rec.keys, threshold)
                 if (rec.altKeys.isNotEmpty()) {
-                    val bestAlt = bestRatio(line, rec.altKeys, threshold)
-                    if (bestAlt >= threshold) {
-                        alt[rec] = (alt[rec] ?: 0.0) + bestAlt * weight
-                    }
+                    best = maxOf(best, bestRatio(line, rec.altKeys, threshold))
+                }
+                if (best >= threshold) {
+                    scores[rec] = (scores[rec] ?: 0.0) + best * weight
                 }
             }
         }
-        val all = HashSet<CardRecord>(main.keys).apply { addAll(alt.keys) }
-        val sorted = all.map { rec ->
-            val m = main[rec] ?: 0.0
-            val a = alt[rec] ?: 0.0
-            var score = maxOf(m, a)
+        val sorted = scores.map { (rec, raw) ->
+            var score = raw
             if (elHint != null && rec.element >= 0 && rec.element % 10 == elHint) {
                 score *= HINT_BOOST
             }
             if (rarHint != null && rec.rarity == rarHint) {
                 score *= HINT_BOOST
             }
-            Candidate(rec, score, matchedAltView = a > m)
+            Candidate(rec, score)
         }.sortedByDescending { it.score }
         if (sorted.isEmpty()) return sorted
 

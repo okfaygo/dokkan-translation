@@ -104,7 +104,25 @@ def _score(text, key):
     return r
 
 
-TIE_MARGIN = 0.98
+# How close scores must be before the preference ordering (base card, then
+# rarity, then id) overrides the score. TIGHT on purpose: the cases it
+# exists for score EXACTLY equal, and a loose band discards real score
+# differences — at 0.98 a card scoring 161.9 lost to one scoring 160.0
+# purely because the loser had a higher id (real field failure).
+TIE_MARGIN = 0.995
+
+# Looser band, used only to judge "several cards are close" (confidence).
+AMBIGUITY_MARGIN = 0.98
+
+
+def tied_count(ranked):
+    """Candidates within AMBIGUITY_MARGIN of the best score. Measured
+    against the MAX, since the preference ordering can put a slightly
+    lower-scoring card first."""
+    if not ranked:
+        return 0
+    top = max(s for _, s in ranked)
+    return sum(1 for _, s in ranked if s >= top * AMBIGUITY_MARGIN)
 
 # The card page shows the card's type badge (超知/極力 etc.) and rarity
 # emblem (UR/LR) — 1-3 char OCR lines that never vote (too short) but

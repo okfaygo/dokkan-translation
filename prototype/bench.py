@@ -170,7 +170,7 @@ def main():
             if any(is_correct(index, c, cid) for c, _ in rk[:8]):
                 t8 += 1
             if rk:
-                tied.append(sum(1 for _, s in rk if s >= rk[0][1] * M.TIE_MARGIN))
+                tied.append(sum(1 for _, s in rk if s >= rk[0][1] * M.AMBIGUITY_MARGIN))
         print(f"  {str(use_idf):5}  {t1:3}    {t4:3}       {t8:3}      "
               f"median {sorted(tied)[len(tied)//2]}")
 
