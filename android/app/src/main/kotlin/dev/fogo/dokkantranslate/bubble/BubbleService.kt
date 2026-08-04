@@ -88,6 +88,7 @@ class BubbleService : Service() {
                     stopSelf()
                     return START_NOT_STICKY
                 }
+                isRunning = true
                 showBubble()
                 // parse the 3.5MB index now rather than on the first tap
                 scope.launch(Dispatchers.Default) { CardIndex.load(this@BubbleService) }
@@ -305,6 +306,7 @@ class BubbleService : Service() {
     }
 
     override fun onDestroy() {
+        isRunning = false
         work?.cancel()
         scope.cancel()
         hidePanel()
@@ -316,6 +318,12 @@ class BubbleService : Service() {
     }
 
     companion object {
+        /** So the activity can show the real state — the bubble can also be
+         *  stopped from the notification or by the system ending capture. */
+        @Volatile
+        var isRunning: Boolean = false
+            private set
+
         const val ACTION_START = "dev.fogo.dokkantranslate.START_BUBBLE"
         const val ACTION_STOP = "dev.fogo.dokkantranslate.STOP_BUBBLE"
         const val EXTRA_RESULT_CODE = "result_code"

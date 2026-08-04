@@ -77,6 +77,13 @@ class MainActivity : ComponentActivity() {
         handleShareIntent(intent)
     }
 
+    override fun onResume() {
+        super.onResume()
+        // the bubble can be stopped from its notification, or by the system
+        // ending screen capture, so trust the service rather than our flag
+        bubbleRunning = BubbleService.isRunning
+    }
+
     private fun handleShareIntent(intent: Intent?) {
         if (intent?.action != Intent.ACTION_SEND) return
         @Suppress("DEPRECATION")
