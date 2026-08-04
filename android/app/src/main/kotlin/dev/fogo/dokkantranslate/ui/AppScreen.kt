@@ -254,7 +254,7 @@ internal fun KitView(
             Text(sa.description)
             for (effect in sa.effects) {
                 Text(
-                    PassiveIcons.annotate(effect),
+                    PassiveIcons.annotate("•  $effect"),
                     inlineContent = passiveIcons,
                     modifier = Modifier.padding(start = 8.dp),
                 )

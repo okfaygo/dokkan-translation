@@ -282,6 +282,17 @@ identify -> fetch -> render works end to end.
      The main skipped code (84, 70 occurrences) has NO case in
      dokkaninfo's own renderer either, so the app shows exactly what the
      site shows; codes 90 and 111 (1 occurrence each) are also skipped.
+   **optString("null") bug (2026-08-03):** org.json's `optString` returns
+   the literal STRING "null" for a JSON null — not "" and not null — so
+   `.ifEmpty { null }` guards sail straight past it. Surfaced as "null"
+   printed under a super attack (causality_description is null on every
+   card), but the same trap had a second victim: 1,150 index records have
+   `passive_name: null`, so the string "null" was being added as a MATCH
+   KEY for each of them (practically harmless — the OCR filter drops
+   short non-Japanese lines — but junk). All optString calls in
+   DokkanInfo and CardIndex now go through util/Json.kt's
+   `stringOrNull` / `stringOr`, which check `isNull` first.
+   SA effect lines also now render as bullets.
    Roadmap after that:
    v0.2 floating bubble + MediaProjection (manual trigger), v0.3 auto-detect
    card screens from captured frames (marker text or image-retrieval on

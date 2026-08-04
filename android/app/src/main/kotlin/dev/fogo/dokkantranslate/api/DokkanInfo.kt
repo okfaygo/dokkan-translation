@@ -5,21 +5,10 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.net.HttpURLConnection
 import java.net.URL
+import dev.fogo.dokkantranslate.util.stringOr
+import dev.fogo.dokkantranslate.util.stringOrNull
 import org.json.JSONObject
 
-/**
- * English kit source: the GLOBAL dokkaninfo.com card page, which embeds the
- * full kit as HTML-entity-escaped JSON in a `datajson="..."` attribute.
- * Always up to date (JP/GLB release simultaneously), same card ids as the
- * bundled index.
- *
- * DokkanInfo serves two views per card and which one is the player's
- * current kit varies by card (bare URL = base kit for EZA'd URs but SEZA
- * kit for LRs; ?eza=true is the other one). `altView` picks the ?eza=true
- * view; the caller passes whichever view MATCHED the screenshot, so the
- * displayed kit is the one on the player's screen. No pre/post-EZA
- * labeling exists on purpose — the views aren't consistently either.
- */
 /**
  * One super attack. Dokkan gates these on Ki and sometimes on extra
  * conditions, and the numeric effect values live in a separate `specials`
@@ -68,6 +57,19 @@ data class Kit(
 class CardNotOnGlobalException(cardId: String) :
     Exception("This card isn't on the Global server yet (id $cardId), so no English kit exists for it.")
 
+/**
+ * English kit source: the GLOBAL dokkaninfo.com card page, which embeds the
+ * full kit as HTML-entity-escaped JSON in a `datajson="..."` attribute.
+ * Always up to date (JP/GLB release simultaneously), same card ids as the
+ * bundled index.
+ *
+ * DokkanInfo serves two views per card and which one is the player's
+ * current kit varies by card (bare URL = base kit for EZA'd URs but SEZA
+ * kit for LRs; ?eza=true is the other one). `altView` picks the ?eza=true
+ * view; the caller passes whichever view MATCHED the screenshot, so the
+ * displayed kit is the one on the player's screen. No pre/post-EZA
+ * labeling exists on purpose — the views aren't consistently either.
+ */
 object DokkanInfo {
 
     private const val UA =
@@ -156,9 +158,8 @@ object DokkanInfo {
         val supers = parseSupers(api)
         val links = namesOf(api, "links")
         return kit.copy(
-            passiveName = passive?.optString("name")?.ifEmpty { null } ?: kit.passiveName,
-            passiveRows = passive?.optString("itemized_description")
-                ?.ifEmpty { null }
+            passiveName = passive?.stringOrNull("name") ?: kit.passiveName,
+            passiveRows = passive?.stringOrNull("itemized_description")
                 ?.let { parseItemized(it) } ?: kit.passiveRows,
             supers = supers.ifEmpty { kit.supers },
             links = links.ifEmpty { kit.links },
@@ -273,27 +274,27 @@ object DokkanInfo {
                 val form = arr.getJSONObject(i)
                 val id = form.optLong("id").toString()
                 if (id == cardId) continue
-                val name = form.optString("name").replace("\n", " ")
-                if (name.isNotEmpty()) transformations.add(id to name)
+                val name = form.stringOrNull("name")?.replace("\n", " ")
+                if (!name.isNullOrEmpty()) transformations.add(id to name)
             }
         }
 
         val activeDesc = listOfNotNull(
-            active?.optString("effect_description")?.ifEmpty { null },
-            active?.optString("condition_description")?.ifEmpty { null },
+            active?.stringOrNull("effect_description"),
+            active?.stringOrNull("condition_description"),
         ).joinToString(" — ") { clean(it).replace("\n", " ") }
 
         return Kit(
             cardId = cardId,
-            title = leader?.optString("name") ?: "",
-            name = card.optString("name").replace("\n", " "),
+            title = leader?.stringOr("name") ?: "",
+            name = card.stringOr("name").replace("\n", " "),
             rarity = RARITIES[card.optInt("rarity")] ?: card.optInt("rarity").toString(),
-            element = elementName(card.optString("element").toIntOrNull() ?: -1),
-            leader = clean(leader?.optString("description") ?: "-").replace("\n", " "),
-            passiveName = passive?.optString("name") ?: "",
-            passiveRows = parseItemized(passive?.optString("itemized_description") ?: ""),
+            element = elementName(card.stringOr("element").toIntOrNull() ?: -1),
+            leader = clean(leader?.stringOr("description", "-") ?: "-").replace("\n", " "),
+            passiveName = passive?.stringOr("name") ?: "",
+            passiveRows = parseItemized(passive?.stringOr("itemized_description") ?: ""),
             supers = supers,
-            activeName = active?.optString("name") ?: "",
+            activeName = active?.stringOr("name") ?: "",
             activeDesc = activeDesc,
             links = namesOf(data, "links"),
             categories = namesOf(data, "categories"),
@@ -308,8 +309,8 @@ object DokkanInfo {
             for (i in 0 until arr.length()) {
                 val entry = arr.getJSONObject(i)
                 val attack = entry.optJSONObject("attack") ?: continue
-                val name = attack.optString("name")
-                val desc = clean(attack.optString("description"))
+                val name = attack.stringOr("name")
+                val desc = clean(attack.stringOr("description"))
                     .replace("\n", " ").replace(Regex(" {2,}"), " ")
                 val ki = entry.optInt("eball_num_start")
                 if (name.isEmpty() || !seen.add("$name|$desc|$ki")) continue
@@ -325,9 +326,9 @@ object DokkanInfo {
                         name = name,
                         description = desc,
                         kiRequired = ki,
-                        style = entry.optString("style"),
-                        condition = attack.optString("causality_description")
-                            .ifEmpty { null }?.replace("\n", " "),
+                        style = entry.stringOr("style"),
+                        condition = attack.stringOrNull("causality_description")
+                            ?.replace("\n", " "),
                         effects = effects,
                     )
                 )
@@ -370,6 +371,6 @@ object DokkanInfo {
 
     private fun namesOf(data: JSONObject, field: String): List<String> {
         val arr = data.optJSONArray(field) ?: return emptyList()
-        return (0 until arr.length()).map { arr.getJSONObject(it).optString("name") }
+        return (0 until arr.length()).mapNotNull { arr.getJSONObject(it).stringOrNull("name") }
     }
 }
