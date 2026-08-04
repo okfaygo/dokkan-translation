@@ -137,6 +137,24 @@ gradle assembleDebug
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
+## Keeping the index current (v0.4)
+
+New cards would otherwise be unmatchable until someone re-scraped by hand
+and rebuilt the APK. Two halves, both required:
+
+1. **CI** (`.github/workflows/refresh-index.yml`, weekly) runs
+   `build_index.py --sync`, which fetches only the ids the committed index
+   is missing and commits the result. Never a full scrape — that is ~11k
+   requests against someone else's server.
+2. **`match/IndexUpdater`** fetches that committed index at runtime with a
+   conditional request (usually a 304; ~402KB gzipped when it has actually
+   changed) into internal storage, which `CardIndex` prefers over the
+   bundled asset. The asset stays as the offline floor. All failures are
+   silent — a missed update just means the previous index keeps working.
+
+Without the second half, a refreshed index in the repo would sit there
+doing nothing until a rebuild and reinstall.
+
 ## Updating the bundled index
 
 After re-running the scraper:

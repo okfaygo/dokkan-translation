@@ -28,6 +28,7 @@ import dev.fogo.dokkantranslate.identify.CardIdentifier
 import dev.fogo.dokkantranslate.identify.MatchDebug
 import dev.fogo.dokkantranslate.identify.Outcome
 import dev.fogo.dokkantranslate.match.CardIndex
+import dev.fogo.dokkantranslate.match.IndexUpdater
 import dev.fogo.dokkantranslate.ui.BubblePanel
 import dev.fogo.dokkantranslate.ui.UiState
 import dev.fogo.dokkantranslate.ui.toUiState
@@ -105,8 +106,14 @@ class BubbleService : Service() {
                 }
                 isRunning = true
                 showBubble()
-                // parse the 3.5MB index now rather than on the first tap
-                scope.launch(Dispatchers.Default) { CardIndex.load(this@BubbleService) }
+                // parse the 3.5MB index now rather than on the first tap,
+                // after checking for a newer one (usually a 304)
+                scope.launch(Dispatchers.IO) {
+                    if (IndexUpdater.refresh(this@BubbleService)) {
+                        CardIndex.invalidate()
+                    }
+                    CardIndex.load(this@BubbleService)
+                }
             }
         }
         return START_NOT_STICKY

@@ -64,12 +64,21 @@ object CardIndex {
     @Volatile
     private var cached: List<CardRecord>? = null
 
+    /** Drop the parsed copy so the next load() picks up a fresh download. */
+    fun invalidate() {
+        synchronized(this) { cached = null }
+    }
+
     fun load(context: Context): List<CardRecord> {
         cached?.let { return it }
         synchronized(this) {
             cached?.let { return it }
-            val text = context.assets.open("index.json")
-                .bufferedReader(Charsets.UTF_8).readText()
+            // A downloaded index (kept current by CI) wins over the one
+            // baked into the APK, which is only as new as the last build.
+            val text = IndexUpdater.downloadedIndex(context)
+                ?.let { runCatching { it.readText(Charsets.UTF_8) }.getOrNull() }
+                ?: context.assets.open("index.json")
+                    .bufferedReader(Charsets.UTF_8).readText()
             val root = JSONObject(text)
             val records = ArrayList<CardRecord>(root.length())
             for (id in root.keys()) {

@@ -339,7 +339,36 @@ identify -> fetch -> render works end to end.
      applyPanelCollapsed.
    - possibly: drag the bubble onto a specific card to disambiguate
 
-   **v0.4 (pinned, after v0.3): automated index refresh.**
+   **v0.4 BUILT (2026-08-04, CI run not yet observed).**
+   - `build_index.py --sync --index <path>` fetches only ids the index is
+     missing (list diff), capped by `--max-new`, and refuses to write if
+     the record count shrank.
+   - **Skip ledger** (`prototype/skipped_ids.json`, committed) was the
+     non-obvious requirement: 224 of the missing ids are kit-less
+     event/filler units that get skipped and therefore never enter the
+     index, so a naive sync re-fetched the same ~224 dead ids EVERY run,
+     forever. Ledger holds "no kit" skips plus deterministic 404/500 ids.
+     Measured: first sync 224 fetches -> second 4 -> third 0
+     (`NOTHING_NEW`, one list request, ~4s).
+   - `.github/workflows/refresh-index.yml`: Monday cron +
+     workflow_dispatch, 1.5s delay, validates old-vs-new counts in a
+     second gate before committing, uploads the log on failure.
+   - App side `match/IndexUpdater`: conditional GET (If-None-Match) of the
+     committed index from raw.githubusercontent, downloaded to filesDir
+     where `CardIndex` prefers it over the bundled asset; bundled asset
+     remains the offline floor. Writes to a `.part` file then renames — a
+     half-written index breaks matching outright, worse than a stale one.
+     Silent on failure. Called on bubble start and app start.
+     Verified against the live URL: 3.47MB plain, **402KB gzipped**,
+     ETag revalidation returns 304.
+   - Kotlin gotcha: do NOT name the constant `URL` — it shadows
+     `java.net.URL` and `URL(URL)` then resolves to the String.
+   **Still unproven: whether Cloudflare lets GitHub Actions IPs scrape at
+   all.** The first scheduled (or manually dispatched) run is the test.
+   If blocked, fall back to the same `--sync` command on a local
+   scheduler, pushing from home.
+
+   **v0.4 original plan (kept for reference):**
    Manually re-scraping for every new banner does not scale. Two halves,
    and BOTH are needed — either alone still leaves manual work:
    1. CI (GitHub Actions, weekly cron) does an INCREMENTAL scrape: diff

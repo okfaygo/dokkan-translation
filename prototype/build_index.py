@@ -208,18 +208,59 @@ def extract_record(data):
     return rec
 
 
-def load_index():
-    path = HERE / "index.json"
+def index_path(override=None):
+    return Path(override) if override else HERE / "index.json"
+
+
+def load_index(override=None):
+    path = index_path(override)
     if path.exists():
         return json.loads(path.read_text(encoding="utf-8"))
     return {}
 
 
-def save_index(index):
-    path = HERE / "index.json"
+def save_index(index, override=None):
+    path = index_path(override)
     path.write_text(json.dumps(index, ensure_ascii=False, indent=1),
                     encoding="utf-8")
-    print(f"index.json: {len(index)} cards")
+    print(f"{path.name}: {len(index)} cards")
+
+
+# Cards that exist in the card list but carry no kit at all (event/filler
+# units) are skipped every time they are fetched — without remembering them
+# a nightly sync would re-request the same ~200 dead ids forever. Committed
+# so CI, which has no scrape cache, benefits from it too.
+SKIP_LEDGER = HERE / "skipped_ids.json"
+
+
+def load_skips():
+    if SKIP_LEDGER.exists():
+        return set(json.loads(SKIP_LEDGER.read_text(encoding="utf-8")))
+    return set()
+
+
+def save_skips(ids):
+    SKIP_LEDGER.write_text(json.dumps(sorted(ids)), encoding="utf-8")
+
+
+def missing_ids(cards, index, skips, min_rarity, limit):
+    """Cards on the site that the index doesn't have yet, oldest first.
+
+    Far-future open_at values are placeholders for unreleased story bosses
+    (2029/2030 dates appear in the live list), so anything not yet released
+    is left alone.
+    """
+    now = time.time()
+    known = set(index.keys())
+    fresh = [
+        c for c in cards
+        if (c.get("rarity") or 0) >= min_rarity
+        and 0 < (c.get("open_at") or 0) <= now
+        and str(c["id"]) not in known
+        and c["id"] not in skips
+    ]
+    fresh.sort(key=lambda c: c.get("open_at") or 0)
+    return [c["id"] for c in fresh[:limit]]
 
 
 def stratified_sample(cards, n, seed=7):
@@ -264,15 +305,35 @@ def main():
                          "cached — use once to upgrade a pre-step cache")
     ap.add_argument("--follow-transformations", action="store_true",
                     default=True)
+    ap.add_argument("--sync", action="store_true",
+                    help="fetch only cards the index is missing (for CI)")
+    ap.add_argument("--index", help="path to the index to read/write; "
+                                    "defaults to prototype/index.json")
+    ap.add_argument("--max-new", type=int, default=400,
+                    help="safety cap on how many cards one --sync may fetch")
     args = ap.parse_args()
 
     session = _session()
-    index = load_index()
+    index = load_index(args.index)
+    started_with = len(index)
+    skips = load_skips()
 
     if args.rebuild:
         ids = [int(p.name.split(".")[0]) for p in CARD_CACHE.glob("*.json.gz")]
     elif args.ids:
         ids = args.ids
+    elif args.sync:
+        if not index:
+            print("refusing to --sync against an empty index; "
+                  "run --all once first", file=sys.stderr)
+            return 1
+        cards = fetch_list(session, refresh=True)
+        ids = missing_ids(cards, index, skips, args.min_rarity, args.max_new)
+        print(f"index has {started_with} cards; "
+              f"{len(ids)} new to fetch (skip ledger: {len(skips)})")
+        if not ids:
+            print("NOTHING_NEW")
+            return 0
     else:
         cards = fetch_list(session)
         if args.sample:
@@ -280,7 +341,7 @@ def main():
         elif args.all:
             ids = [c["id"] for c in cards if c["rarity"] >= args.min_rarity]
         else:
-            ap.error("need --ids, --sample, --all, or --rebuild")
+            ap.error("need --ids, --sample, --all, --sync, or --rebuild")
 
     queue = list(ids)
     seen = set()
@@ -317,9 +378,16 @@ def main():
         except Exception as e:
             print(f"  {card_id}: FAILED {e}", file=sys.stderr)
             failed.append(card_id)
+            # 404/500 from this site are deterministic (a handful of ids are
+            # simply broken upstream), so stop retrying them every sync.
+            # Transient codes are retried inside _get and never land here.
+            status = getattr(getattr(e, "response", None), "status_code", None)
+            if status in (404, 500):
+                skips.add(card_id)
             continue
         if not rec["title"] and not rec["lines"]:
             print(f"  {card_id} skipped (no kit — event/filler card)")
+            skips.add(card_id)   # deterministic: never worth re-fetching
             continue
         index[str(card_id)] = rec
         eza_tag = " +preEZA" if rec.get("pre_eza_lines") else ""
@@ -330,7 +398,7 @@ def main():
                 if tid not in seen:
                     queue.append(tid)
         if len(seen) % 50 == 0:
-            save_index(index)
+            save_index(index, args.index)
 
     try:
         en = english_names(session)
@@ -344,13 +412,25 @@ def main():
     except Exception as e:
         print(f"English-name merge skipped: {e}", file=sys.stderr)
 
-    save_index(index)
+    # An automated run must never be able to shrink the index — a partial
+    # scrape or a site-wide outage would otherwise ship a gutted index to
+    # the app on the next release.
+    if len(index) < started_with:
+        print(f"REFUSING to write: index shrank {started_with} -> {len(index)}",
+              file=sys.stderr)
+        return 1
+
+    save_index(index, args.index)
+    save_skips(skips)
     if failed:
         print(f"failed ids: {failed}", file=sys.stderr)
+    added = len(index) - started_with
+    print(f"ADDED {added}")
+    return 0
 
 
 if __name__ == "__main__":
     if sys.platform == "win32":
         sys.stdout.reconfigure(encoding="utf-8")
         sys.stderr.reconfigure(encoding="utf-8")
-    main()
+    sys.exit(main() or 0)
