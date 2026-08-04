@@ -59,7 +59,14 @@ class BubbleService : Service() {
     private var state by mutableStateOf<UiState>(UiState.Idle)
     private var history by mutableStateOf<List<HistoryEntry>>(emptyList())
     private var panelCollapsed by mutableStateOf(false)
-    private var autoRefresh by mutableStateOf(true)
+    /**
+     * Experimental, and OFF by default. It works, but going card-to-card is
+     * rare in practice, and each refresh costs a visible flicker: capturing
+     * means hiding our own overlays first, which is inherent to the design
+     * rather than a bug that can be polished out. Not worth a poll loop and
+     * a flicker by default.
+     */
+    private var autoRefresh by mutableStateOf(false)
     private var panelVisible = false
     private var watch: Job? = null
 

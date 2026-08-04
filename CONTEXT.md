@@ -311,16 +311,27 @@ identify -> fetch -> render works end to end.
      disk-cached, so re-showing is instant) — kills the repetition that
      motivated auto-detect
    - collapsible / resizable panel, so it stops covering the game
-   - auto-refresh WHILE THE PANEL IS OPEN — BUILT. `ScreenCapture.
-     sampleRegion()` fingerprints a 16x16 luminance grid straight out of
-     the frame buffer (no Bitmap, no OCR) above the panel, so the watcher
-     is cheap enough to poll on a timer; a full hide -> capture -> show
-     identify runs only once the picture has CHANGED and then held still
-     for 2 polls (avoids firing mid-animation). Two rules that matter:
-     an automatic pass NEVER overwrites a good result on failure (walking
-     into a menu must not wipe the kit being read) and never re-sets state
-     for the same card (that would reset the scroll position). Toggle in
-     the panel header; watcher is tied to panel visibility.
+   - auto-refresh WHILE THE PANEL IS OPEN — built, then **demoted to an
+     experimental opt-in, OFF by default, after user testing.** It works,
+     but the verdict was "not innovative, few use-cases, the flicker is
+     why I wouldn't use it": going card-to-card is rare, and every refresh
+     costs a visible ~150ms flicker because capturing requires hiding our
+     own overlays. That flicker is INHERENT to the hide -> capture -> show
+     design, not a polishable bug. Treat it as a curiosity, not a
+     headline feature, and do not re-enable it by default.
+     If it is ever worth reviving: the flicker could be avoided by
+     cropping the captured frame to the region the panel does not cover
+     instead of hiding the panel — only viable while COLLAPSED, since a
+     card page keeps its leader/SA text near the bottom, exactly where an
+     expanded panel sits.
+     Implementation, for reference: `ScreenCapture.sampleRegion()`
+     fingerprints a 16x16 luminance grid straight out of the frame buffer
+     (no Bitmap, no OCR) above the panel, so polling is cheap; a full
+     identify runs only once the picture CHANGED and then held still for
+     2 polls (avoids firing mid-animation). Two rules worth keeping if
+     touched: an automatic pass NEVER overwrites a good result on failure
+     (walking into a menu must not wipe the kit being read) and never
+     re-sets state for the same card (that would reset scroll position).
      JVM gotcha hit here: a `panelCollapsed` property plus a
      `setPanelCollapsed()` function are the SAME JVM signature — Kotlin
      generates setPanelCollapsed(Z)V for the property (the `by` delegate

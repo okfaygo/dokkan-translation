@@ -84,9 +84,9 @@ fun BubblePanel(
 
                 if (collapsed) return@Column
 
-                // Auto-follow only runs while this panel is open, so it
-                // continues what the user asked for rather than interrupting
-                // them — but it stays switchable.
+                // Experimental and off by default — see BubbleService.
+                // Kept because it is occasionally handy when flipping through
+                // a box, not because it is a headline feature.
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -94,7 +94,8 @@ fun BubblePanel(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        if (autoRefresh) "Following the game" else "Auto-follow off",
+                        if (autoRefresh) "Auto-follow on (experimental)"
+                        else "Auto-follow off (experimental)",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
