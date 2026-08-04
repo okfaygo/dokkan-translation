@@ -1,0 +1,97 @@
+name: Refresh card index
+
+# New Dokkan cards land roughly weekly. This fetches only the ones the
+# index is missing and commits the result, so the app's index keeps up
+# without anyone re-running the scraper by hand.
+#
+# It must never run a full scrape: that is ~11k requests over ~3.5 hours
+# against someone else's server, which is not something to point a cron at.
+# `--sync` fetches only missing ids and `--max-new` caps the blast radius
+# if the diff ever goes wrong.
+
+on:
+  schedule:
+    - cron: "17 5 * * 1"   # Mondays, 05:17 UTC
+  workflow_dispatch:        # and on demand, for testing
+
+concurrency:
+  group: refresh-index
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Sync index with the card list
+        id: sync
+        working-directory: prototype
+        run: |
+          set -o pipefail
+          python -X utf8 build_index.py \
+            --sync \
+            --index ../android/app/src/main/assets/index.json \
+            --max-new 400 \
+            --delay 1.5 \
+            2>&1 | tee sync.log
+          if grep -q "NOTHING_NEW" sync.log; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # The scraper already refuses to write a shrunken index; this is the
+      # second gate, against a truncated or corrupt write reaching the repo.
+      - name: Validate the index before committing
+        if: steps.sync.outputs.changed == 'true'
+        run: |
+          python - <<'PY'
+          import json, subprocess, sys
+          path = "android/app/src/main/assets/index.json"
+          new = json.load(open(path, encoding="utf-8"))
+          old_raw = subprocess.run(
+              ["git", "show", f"HEAD:{path}"], capture_output=True, text=True,
+          ).stdout
+          old = json.loads(old_raw) if old_raw.strip() else {}
+          print(f"{len(old)} -> {len(new)} cards")
+          if len(new) < len(old):
+              sys.exit(f"index shrank ({len(old)} -> {len(new)}), refusing")
+          missing = [k for k in ("lines", "title") if not any(k in r for r in new.values())]
+          if missing:
+              sys.exit(f"index looks malformed, missing {missing}")
+          PY
+
+      - name: Commit the refreshed index
+        if: steps.sync.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add android/app/src/main/assets/index.json prototype/skipped_ids.json
+          if git diff --cached --quiet; then
+            echo "nothing to commit"
+            exit 0
+          fi
+          COUNT=$(python -c "import json;print(len(json.load(open('android/app/src/main/assets/index.json',encoding='utf-8'))))")
+          git commit -m "Refresh card index ($COUNT cards)"
+          git push
+
+      - name: Keep the log when something went wrong
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sync-log
+          path: prototype/sync.log
+          if-no-files-found: ignore
