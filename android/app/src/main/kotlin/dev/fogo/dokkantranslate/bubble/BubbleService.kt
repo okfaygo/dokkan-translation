@@ -189,7 +189,7 @@ class BubbleService : Service() {
 
             state = UiState.Working("Reading the screen…")
             // a tap means "show me this" — undo a collapse from last time
-            if (panelCollapsed) setPanelCollapsed(false)
+            if (panelCollapsed) applyPanelCollapsed(false)
             showPanel()
             state = if (frame == null) {
                 UiState.Failed("Couldn't read the screen. The projection may have been stopped — tap the notification to restart it.")
@@ -232,7 +232,7 @@ class BubbleService : Service() {
                 history = history,
                 collapsed = panelCollapsed,
                 onSelectCard = ::lookUp,
-                onToggleCollapse = { setPanelCollapsed(!panelCollapsed) },
+                onToggleCollapse = { applyPanelCollapsed(!panelCollapsed) },
                 onClose = { hidePanel() },
                 onResume = {
                     hidePanel()
@@ -259,8 +259,12 @@ class BubbleService : Service() {
      * Collapsing resizes the WINDOW, not just its contents: an overlay that
      * still covered the lower screen would keep swallowing touches meant for
      * the game even with nothing drawn in it.
+     *
+     * Not named setPanelCollapsed — that is the JVM signature Kotlin already
+     * generates for the `panelCollapsed` property's setter, so the two would
+     * collide.
      */
-    private fun setPanelCollapsed(collapsed: Boolean) {
+    private fun applyPanelCollapsed(collapsed: Boolean) {
         panelCollapsed = collapsed
         val host = panelHost ?: return
         val params = panelParams ?: return
