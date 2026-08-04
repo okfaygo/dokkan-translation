@@ -311,12 +311,21 @@ identify -> fetch -> render works end to end.
      disk-cached, so re-showing is instant) — kills the repetition that
      motivated auto-detect
    - collapsible / resizable panel, so it stops covering the game
-   - auto-refresh WHILE THE PANEL IS OPEN — the one place automatic
-     behaviour is welcome, because the user explicitly opened it.
-     Design note: the panel occludes the screen we would capture, so
-     detect change only in the region the panel does NOT cover, then do a
-     single hide -> capture -> show cycle when it settles. Do the
-     collapsible panel FIRST — less occlusion makes this tractable.
+   - auto-refresh WHILE THE PANEL IS OPEN — BUILT. `ScreenCapture.
+     sampleRegion()` fingerprints a 16x16 luminance grid straight out of
+     the frame buffer (no Bitmap, no OCR) above the panel, so the watcher
+     is cheap enough to poll on a timer; a full hide -> capture -> show
+     identify runs only once the picture has CHANGED and then held still
+     for 2 polls (avoids firing mid-animation). Two rules that matter:
+     an automatic pass NEVER overwrites a good result on failure (walking
+     into a menu must not wipe the kit being read) and never re-sets state
+     for the same card (that would reset the scroll position). Toggle in
+     the panel header; watcher is tied to panel visibility.
+     JVM gotcha hit here: a `panelCollapsed` property plus a
+     `setPanelCollapsed()` function are the SAME JVM signature — Kotlin
+     generates setPanelCollapsed(Z)V for the property (the `by` delegate
+     forces real accessors even though it is private). Renamed to
+     applyPanelCollapsed.
    - possibly: drag the bubble onto a specific card to disambiguate
 
    **v0.4 (pinned, after v0.3): automated index refresh.**

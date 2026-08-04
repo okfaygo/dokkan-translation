@@ -55,6 +55,50 @@ class ScreenCapture private constructor(
         }
     }
 
+    /**
+     * A coarse fingerprint of the screen ABOVE [excludeBottomPx], used to
+     * notice that the game moved to a different card.
+     *
+     * Deliberately cheap: it samples a small grid straight out of the
+     * frame's byte buffer, with no Bitmap allocation and no OCR, so it can
+     * run on a timer without the battery cost that made continuous
+     * auto-detection a bad idea. The bottom is excluded because our own
+     * panel sits there — including it would fingerprint our own UI.
+     */
+    fun sampleRegion(excludeBottomPx: Int, grid: Int = 16): IntArray? {
+        if (released) return null
+        val image = runCatching { imageReader.acquireLatestImage() }.getOrNull()
+            ?: return null
+        try {
+            val plane = image.planes[0]
+            val buffer = plane.buffer
+            val pixelStride = plane.pixelStride
+            val rowStride = plane.rowStride
+            val usableHeight = (height - excludeBottomPx).coerceAtLeast(1)
+            val samples = IntArray(grid * grid)
+            var i = 0
+            for (gy in 0 until grid) {
+                val y = (usableHeight.toLong() * gy / grid).toInt()
+                    .coerceIn(0, height - 1)
+                for (gx in 0 until grid) {
+                    val x = (width.toLong() * gx / grid).toInt().coerceIn(0, width - 1)
+                    val offset = y * rowStride + x * pixelStride
+                    samples[i++] = if (offset + 2 < buffer.limit()) {
+                        val r = buffer.get(offset).toInt() and 0xFF
+                        val g = buffer.get(offset + 1).toInt() and 0xFF
+                        val b = buffer.get(offset + 2).toInt() and 0xFF
+                        (r * 299 + g * 587 + b * 114) / 1000 // rough luminance
+                    } else 0
+                }
+            }
+            return samples
+        } catch (e: Exception) {
+            return null
+        } finally {
+            image.close()
+        }
+    }
+
     /** Newest mirrored frame, or null if none has arrived yet. */
     fun captureLatest(): Bitmap? {
         if (released) return null

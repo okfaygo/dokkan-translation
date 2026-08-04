@@ -41,8 +41,10 @@ fun BubblePanel(
     state: UiState,
     history: List<HistoryEntry>,
     collapsed: Boolean,
+    autoRefresh: Boolean,
     onSelectCard: (String) -> Unit,
     onToggleCollapse: () -> Unit,
+    onToggleAutoRefresh: () -> Unit,
     onClose: () -> Unit,
     onResume: () -> Unit,
 ) {
@@ -81,6 +83,28 @@ fun BubblePanel(
                 }
 
                 if (collapsed) return@Column
+
+                // Auto-follow only runs while this panel is open, so it
+                // continues what the user asked for rather than interrupting
+                // them — but it stays switchable.
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        if (autoRefresh) "Following the game" else "Auto-follow off",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    TextButton(onClick = onToggleAutoRefresh) {
+                        Text(
+                            if (autoRefresh) "Turn off" else "Turn on",
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                    }
+                }
 
                 if (history.size > 1) {
                     RecentStrip(history, onSelectCard)
