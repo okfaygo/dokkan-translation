@@ -140,6 +140,8 @@ internal fun DebugPanel(debug: MatchDebug) {
     }
     if (!open) return
 
+    Text(debug.timings, style = MaterialTheme.typography.labelMedium)
+    Spacer(Modifier.height(6.dp))
     Text(
         "OCR read ${debug.ocrLines.size} line(s)" +
             (debug.typeHint?.let { "  ·  type badge: $it" } ?: "  ·  type badge: not read") +

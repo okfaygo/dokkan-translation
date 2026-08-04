@@ -244,6 +244,21 @@ identify -> fetch -> render works end to end.
    panel reuses the main screen's composables. The identify pipeline was
    extracted to identify/CardIdentifier so bubble and share-sheet can't
    drift. Not compiled here (no Android SDK on this machine).
+   **v0.2 CONFIRMED WORKING on device (2026-08-03).** User reports accuracy
+   "near 1-to-1 with both the card page AND the passive detail screen" —
+   card-page accuracy is now BETTER via the bubble than via the share
+   sheet, consistent with MediaProjection giving clean full-resolution
+   pixels where a shared screenshot can carry compression artifacts.
+   Remaining complaint: "sometimes takes a little while to fetch". First
+   response is instrumentation, not guessing — per-stage timings (index /
+   OCR / match / fetch) now show in the debug panel. Speculative fixes
+   applied alongside: index preloaded when the bubble starts (was a ~3.5MB
+   JSON parse on first tap), matching parallelised across cores
+   (Matcher.rankParallel — partitioning by record is exact since records
+   score independently, verified in Python: chunked merge == whole-index,
+   0 differences, so ordering and benchmark parity are preserved), and the
+   identified card is now named in the progress line while the network
+   fetch runs. Await real timings before optimising further.
    Roadmap after that:
    v0.2 floating bubble + MediaProjection (manual trigger), v0.3 auto-detect
    card screens from captured frames (marker text or image-retrieval on

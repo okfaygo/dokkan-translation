@@ -2,6 +2,7 @@ package dev.fogo.dokkantranslate.identify
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.os.SystemClock
 import dev.fogo.dokkantranslate.api.DokkanInfo
 import dev.fogo.dokkantranslate.api.Kit
 import dev.fogo.dokkantranslate.match.CardIndex
@@ -18,7 +19,15 @@ data class MatchDebug(
     val tiedCount: Int = 0,
     val typeHint: String? = null,
     val rarityHint: String? = null,
-)
+    /** per-stage timings, so slowness can be attributed instead of guessed */
+    val indexMs: Long = 0,
+    val ocrMs: Long = 0,
+    val matchMs: Long = 0,
+    val fetchMs: Long = 0,
+) {
+    val timings: String
+        get() = "index ${indexMs}ms · OCR ${ocrMs}ms · match ${matchMs}ms · fetch ${fetchMs}ms"
+}
 
 sealed interface Outcome {
     data class Success(
@@ -50,7 +59,9 @@ object CardIdentifier {
         progress: Progress = Progress {},
     ): Outcome {
         progress.onStep("Recognizing Japanese text…")
+        val ocrStart = SystemClock.elapsedRealtime()
         val lines = OcrEngine.recognizeJapaneseLines(bitmap)
+        val ocrMs = SystemClock.elapsedRealtime() - ocrStart
         if (lines.isEmpty()) {
             return Outcome.Failure(
                 "No Japanese text found. Open a card's page or its " +
@@ -59,9 +70,16 @@ object CardIdentifier {
         }
 
         progress.onStep("Matching against the card index…")
-        val ranked = withContext(Dispatchers.Default) {
-            Matcher.rank(lines, CardIndex.load(context))
-        }
+        // usually already warm (BubbleService preloads it), but the first
+        // run in a process pays a ~3.5MB JSON parse
+        val indexStart = SystemClock.elapsedRealtime()
+        val index = withContext(Dispatchers.Default) { CardIndex.load(context) }
+        val indexMs = SystemClock.elapsedRealtime() - indexStart
+
+        val matchStart = SystemClock.elapsedRealtime()
+        val ranked = Matcher.rankParallel(lines, index)
+        val matchMs = SystemClock.elapsedRealtime() - matchStart
+
         val (elHint, rarHint) = Matcher.extractHints(lines)
         val debug = MatchDebug(
             ocrLines = lines,
@@ -69,6 +87,9 @@ object CardIdentifier {
             tiedCount = Matcher.tiedCount(ranked),
             typeHint = elHint?.let { CardRecord.elementName(it) },
             rarityHint = rarHint?.let { RARITY_NAMES[it] },
+            indexMs = indexMs,
+            ocrMs = ocrMs,
+            matchMs = matchMs,
         )
         if (ranked.isEmpty()) {
             return Outcome.Failure(
@@ -110,7 +131,7 @@ object CardIdentifier {
         progress: Progress,
     ): Outcome = fetchById(
         context, record.id, record.ezaStep, record.altKeys.isNotEmpty(),
-        alternatives, debug, progress, ambiguous,
+        alternatives, debug, progress, ambiguous, record.displayLabel,
     )
 
     private suspend fun fetchById(
@@ -122,13 +143,20 @@ object CardIdentifier {
         debug: MatchDebug,
         progress: Progress,
         ambiguous: Boolean = false,
+        label: String? = null,
     ): Outcome {
-        progress.onStep("Fetching English kit…")
+        // naming the card while the network call runs makes the wait
+        // legible — the user can already tell whether we got it right
+        progress.onStep(
+            if (label != null) "Fetching kit for $label…" else "Fetching English kit…"
+        )
+        val start = SystemClock.elapsedRealtime()
         return try {
             val kit = withContext(Dispatchers.IO) {
                 DokkanInfo.fetch(context, cardId, altView, ezaStep)
             }
-            Outcome.Success(kit, alternatives, ambiguous, debug)
+            val timed = debug.copy(fetchMs = SystemClock.elapsedRealtime() - start)
+            Outcome.Success(kit, alternatives, ambiguous, timed)
         } catch (e: Exception) {
             Outcome.Failure(e.message ?: e.toString(), debug)
         }

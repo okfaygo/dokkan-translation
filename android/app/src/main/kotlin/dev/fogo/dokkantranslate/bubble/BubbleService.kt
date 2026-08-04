@@ -24,6 +24,7 @@ import dev.fogo.dokkantranslate.MainActivity
 import dev.fogo.dokkantranslate.R
 import dev.fogo.dokkantranslate.identify.CardIdentifier
 import dev.fogo.dokkantranslate.identify.MatchDebug
+import dev.fogo.dokkantranslate.match.CardIndex
 import dev.fogo.dokkantranslate.ui.BubblePanel
 import dev.fogo.dokkantranslate.ui.UiState
 import dev.fogo.dokkantranslate.ui.toUiState
@@ -88,6 +89,8 @@ class BubbleService : Service() {
                     return START_NOT_STICKY
                 }
                 showBubble()
+                // parse the 3.5MB index now rather than on the first tap
+                scope.launch(Dispatchers.Default) { CardIndex.load(this@BubbleService) }
             }
         }
         return START_NOT_STICKY
