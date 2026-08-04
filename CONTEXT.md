@@ -259,6 +259,29 @@ identify -> fetch -> render works end to end.
    0 differences, so ordering and benchmark parity are preserved), and the
    identified card is now named in the progress line while the network
    fetch runs. Await real timings before optimising further.
+   **Super-attack detail + icon spacing (2026-08-03, untested on device):**
+   - Icon spacing: the gap after every status icon was NOT in the source
+     text (checked: only 2 of 6 tokens on a sample card are followed by a
+     real space). It was ContentScale.Fit letterboxing inside hardcoded
+     placeholder boxes whose aspect didn't match the PNGs. Placeholders are
+     now derived from each bitmap's own aspect ratio (height fixed at 15sp,
+     width = height x aspect), so there is nothing to letterbox.
+   - SA conditions: `eball_num_start` is the Ki gate (12 = Super Attack,
+     18 = Ultra Super Attack) and `style` is Normal/Hyper/Condition/Extra.
+     Cards with a second, higher-Ki SA now show both, each labelled.
+     `attack.causality_description` carries any extra gate (null on all
+     2,491 cached cards, but rendered when present).
+   - SA effect numbers: the prose omits them ("Raises ATK for 4 turns"
+     never says by how much) — the values live in `specials[]`.
+     Mapping recovered from dokkaninfo's app.js: efficacy_type 1=ATK,
+     2=DEF, 3=both (eff_value1/2), 9=stun, 48=seal; calc_option 2=raise,
+     3=lower; plus turn and prob. Rendered with the real game icons
+     (st_0001/st_0002 downloaded as atk_up/def_up alongside the existing
+     down/stun/seal set), e.g. "[ATK↑]30% [DEF↑]30% for 4 turns".
+     Coverage over 2,491 cached cards: 96% of effect entries rendered.
+     The main skipped code (84, 70 occurrences) has NO case in
+     dokkaninfo's own renderer either, so the app shows exactly what the
+     site shows; codes 90 and 111 (1 occurrence each) are also skipped.
    Roadmap after that:
    v0.2 floating bubble + MediaProjection (manual trigger), v0.3 auto-detect
    card screens from captured frames (marker text or image-retrieval on

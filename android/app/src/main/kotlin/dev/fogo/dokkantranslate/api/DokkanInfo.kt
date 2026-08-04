@@ -20,6 +20,32 @@ import org.json.JSONObject
  * displayed kit is the one on the player's screen. No pre/post-EZA
  * labeling exists on purpose — the views aren't consistently either.
  */
+/**
+ * One super attack. Dokkan gates these on Ki and sometimes on extra
+ * conditions, and the numeric effect values live in a separate `specials`
+ * array rather than in the prose description — "Raises ATK for 4 turns"
+ * never says by how much.
+ */
+data class SuperAttack(
+    val name: String,
+    val description: String,
+    /** Ki needed to launch it: 12 = Super Attack, 18 = Ultra Super Attack */
+    val kiRequired: Int,
+    /** Normal / Hyper / Condition / Extra, as DokkanInfo labels them */
+    val style: String,
+    /** extra gate beyond Ki, when the card has one */
+    val condition: String?,
+    /** rendered effects with {passiveImg:...} icon tokens, e.g. ATK +30% */
+    val effects: List<String>,
+) {
+    val label: String
+        get() = when {
+            kiRequired >= 18 -> "Ultra Super Attack · $kiRequired Ki"
+            kiRequired > 0 -> "Super Attack · $kiRequired Ki"
+            else -> "Super Attack"
+        }
+}
+
 data class Kit(
     val cardId: String,
     val title: String,
@@ -30,7 +56,7 @@ data class Kit(
     val passiveName: String,
     /** (isHeader, text) rows of the itemized passive */
     val passiveRows: List<Pair<Boolean, String>>,
-    val supers: List<Pair<String, String>>,
+    val supers: List<SuperAttack>,
     val activeName: String,
     val activeDesc: String,
     val links: List<String>,
@@ -275,20 +301,71 @@ object DokkanInfo {
         )
     }
 
-    private fun parseSupers(data: JSONObject): List<Pair<String, String>> {
-        val supers = ArrayList<Pair<String, String>>()
+    private fun parseSupers(data: JSONObject): List<SuperAttack> {
+        val supers = ArrayList<SuperAttack>()
         val seen = HashSet<String>()
         data.optJSONArray("super_attacks")?.let { arr ->
             for (i in 0 until arr.length()) {
-                val attack = arr.getJSONObject(i).optJSONObject("attack") ?: continue
+                val entry = arr.getJSONObject(i)
+                val attack = entry.optJSONObject("attack") ?: continue
                 val name = attack.optString("name")
-                val desc = clean(attack.optString("description")).replace("\n", " ")
-                if (name.isNotEmpty() && seen.add("$name|$desc")) {
-                    supers.add(name to desc)
+                val desc = clean(attack.optString("description"))
+                    .replace("\n", " ").replace(Regex(" {2,}"), " ")
+                val ki = entry.optInt("eball_num_start")
+                if (name.isEmpty() || !seen.add("$name|$desc|$ki")) continue
+
+                val effects = ArrayList<String>()
+                entry.optJSONArray("specials")?.let { specials ->
+                    for (j in 0 until specials.length()) {
+                        renderEffect(specials.getJSONObject(j))?.let(effects::add)
+                    }
                 }
+                supers.add(
+                    SuperAttack(
+                        name = name,
+                        description = desc,
+                        kiRequired = ki,
+                        style = entry.optString("style"),
+                        condition = attack.optString("causality_description")
+                            .ifEmpty { null }?.replace("\n", " "),
+                        effects = effects,
+                    )
+                )
             }
         }
         return supers
+    }
+
+    /**
+     * A super attack's numeric effects, which the prose omits — "Raises ATK
+     * for 4 turns" never says by how much. Codes follow DokkanInfo's own
+     * rendering: efficacy_type picks the stat, calc_option picks the
+     * direction (2 = raise, 3 = lower), eff_value1/2 carry the percentages.
+     * Unknown codes are skipped rather than guessed at.
+     */
+    private fun renderEffect(special: JSONObject): String? {
+        val raise = special.optInt("calc_option") != 3
+        val v1 = special.optInt("eff_value1")
+        val v2 = special.optInt("eff_value2")
+        val turns = special.optInt("turn")
+        val chance = special.optInt("prob", 100)
+
+        fun stat(up: String, down: String, value: Int) =
+            "{passiveImg:${if (raise) up else down}}$value%"
+
+        val body = when (special.optInt("efficacy_type")) {
+            1 -> stat("atk_up", "atk_down", v1)
+            2 -> stat("def_up", "def_down", v1)
+            3 -> stat("atk_up", "atk_down", v1) + " " + stat("def_up", "def_down", v2)
+            9 -> "{passiveImg:stun}Stun"
+            48 -> "{passiveImg:astute}Seal"
+            else -> return null
+        }
+        return buildString {
+            append(body)
+            if (turns > 0) append(if (turns == 1) " for 1 turn" else " for $turns turns")
+            if (chance in 1..99) append(" ($chance% chance)")
+        }
     }
 
     private fun namesOf(data: JSONObject, field: String): List<String> {

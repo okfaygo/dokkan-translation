@@ -236,11 +236,30 @@ internal fun KitView(
     }
 
     if (kit.supers.isNotEmpty()) {
-        SectionHeader("Super Attack")
-        for ((name, desc) in kit.supers) {
-            Text(name, fontWeight = FontWeight.Bold)
-            Text(desc)
-            Spacer(Modifier.height(4.dp))
+        SectionHeader(if (kit.supers.size > 1) "Super Attacks" else "Super Attack")
+        for (sa in kit.supers) {
+            Text(
+                sa.label,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Text(sa.name, fontWeight = FontWeight.Bold)
+            if (sa.condition != null) {
+                Text(
+                    sa.condition!!,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.secondary,
+                )
+            }
+            Text(sa.description)
+            for (effect in sa.effects) {
+                Text(
+                    PassiveIcons.annotate(effect),
+                    inlineContent = passiveIcons,
+                    modifier = Modifier.padding(start = 8.dp),
+                )
+            }
+            Spacer(Modifier.height(10.dp))
         }
     }
 
