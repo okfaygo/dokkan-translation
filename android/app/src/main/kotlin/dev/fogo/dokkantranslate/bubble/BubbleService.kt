@@ -22,6 +22,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import dev.fogo.dokkantranslate.MainActivity
 import dev.fogo.dokkantranslate.R
+import dev.fogo.dokkantranslate.api.Kit
+import dev.fogo.dokkantranslate.ui.HistoryEntry
 import dev.fogo.dokkantranslate.identify.CardIdentifier
 import dev.fogo.dokkantranslate.identify.MatchDebug
 import dev.fogo.dokkantranslate.match.CardIndex
@@ -47,12 +49,15 @@ class BubbleService : Service() {
     private var bubble: ImageView? = null
     private var bubbleParams: WindowManager.LayoutParams? = null
     private var panelHost: OverlayComposeHost? = null
+    private var panelParams: WindowManager.LayoutParams? = null
     private var capture: ScreenCapture? = null
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private var work: Job? = null
 
     private var state by mutableStateOf<UiState>(UiState.Idle)
+    private var history by mutableStateOf<List<HistoryEntry>>(emptyList())
+    private var panelCollapsed by mutableStateOf(false)
     private var panelVisible = false
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -183,6 +188,8 @@ class BubbleService : Service() {
             setOverlaysVisible(true)
 
             state = UiState.Working("Reading the screen…")
+            // a tap means "show me this" — undo a collapse from last time
+            if (panelCollapsed) setPanelCollapsed(false)
             showPanel()
             state = if (frame == null) {
                 UiState.Failed("Couldn't read the screen. The projection may have been stopped — tap the notification to restart it.")
@@ -191,6 +198,7 @@ class BubbleService : Service() {
                     state = UiState.Working(step)
                 }.toUiState().also { frame.recycle() }
             }
+            (state as? UiState.Result)?.let { remember(it.kit) }
         }
     }
 
@@ -221,7 +229,10 @@ class BubbleService : Service() {
         host.setContent {
             BubblePanel(
                 state = state,
+                history = history,
+                collapsed = panelCollapsed,
                 onSelectCard = ::lookUp,
+                onToggleCollapse = { setPanelCollapsed(!panelCollapsed) },
                 onClose = { hidePanel() },
                 onResume = {
                     hidePanel()
@@ -231,7 +242,7 @@ class BubbleService : Service() {
         }
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
-            (resources.displayMetrics.heightPixels * 0.6f).toInt(),
+            panelHeight(panelCollapsed),
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
@@ -240,8 +251,26 @@ class BubbleService : Service() {
         windowManager.addView(host.view, params)
         host.onShown()
         panelHost = host
+        panelParams = params
         panelVisible = true
     }
+
+    /**
+     * Collapsing resizes the WINDOW, not just its contents: an overlay that
+     * still covered the lower screen would keep swallowing touches meant for
+     * the game even with nothing drawn in it.
+     */
+    private fun setPanelCollapsed(collapsed: Boolean) {
+        panelCollapsed = collapsed
+        val host = panelHost ?: return
+        val params = panelParams ?: return
+        params.height = panelHeight(collapsed)
+        runCatching { windowManager.updateViewLayout(host.view, params) }
+    }
+
+    private fun panelHeight(collapsed: Boolean): Int =
+        if (collapsed) (56 * resources.displayMetrics.density).toInt()
+        else (resources.displayMetrics.heightPixels * 0.6f).toInt()
 
     private fun hidePanel() {
         panelVisible = false
@@ -250,6 +279,15 @@ class BubbleService : Service() {
             host.onRemoved()
         }
         panelHost = null
+        panelParams = null
+    }
+
+    /** Newest first, de-duplicated, capped — cheap to revisit since kits
+     *  are cached on disk permanently. */
+    private fun remember(kit: Kit) {
+        val entry = HistoryEntry(kit.cardId, kit.name)
+        history = (listOf(entry) + history.filterNot { it.cardId == entry.cardId })
+            .take(MAX_HISTORY)
     }
 
     private fun lookUp(cardId: String) {
@@ -262,6 +300,7 @@ class BubbleService : Service() {
                 current?.alternatives ?: emptyList(),
                 current?.debug ?: MatchDebug(),
             ).toUiState()
+            (state as? UiState.Result)?.let { remember(it.kit) }
         }
     }
 
@@ -331,6 +370,7 @@ class BubbleService : Service() {
 
         private const val CHANNEL_ID = "screen_reading"
         private const val NOTIFICATION_ID = 1
+        private const val MAX_HISTORY = 8
         /** let one clean frame (without our overlays) reach the reader */
         private const val FRAME_SETTLE_MS = 150L
 
