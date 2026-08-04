@@ -363,10 +363,18 @@ identify -> fetch -> render works end to end.
      ETag revalidation returns 304.
    - Kotlin gotcha: do NOT name the constant `URL` — it shadows
      `java.net.URL` and `URL(URL)` then resolves to the String.
-   **Still unproven: whether Cloudflare lets GitHub Actions IPs scrape at
-   all.** The first scheduled (or manually dispatched) run is the test.
-   If blocked, fall back to the same `--sync` command on a local
-   scheduler, pushing from home.
+   **Cloudflare does NOT block GitHub Actions** — first dispatched run
+   succeeded (2026-08-04), whole job 15s, sync step 3s, reaching
+   NOTHING_NEW so the validate/commit steps correctly skipped.
+   Caveat on what that proved: with nothing new to fetch, the run made
+   only the ONE list-page request. Per-card page requests from an Actions
+   IP are still unexercised — same origin and same Cloudflare config, so
+   very likely fine, but the real confirmation comes the first time a
+   banner drops and it actually fetches card pages. Watch that run.
+   If it is ever blocked, fall back to the same `--sync` command on a
+   local scheduler, pushing from home — no code changes needed.
+   Action versions bumped to checkout@v5 / setup-python@v6 /
+   upload-artifact@v5 to clear the Node 20 deprecation warning.
 
    **v0.4 original plan (kept for reference):**
    Manually re-scraping for every new banner does not scale. Two halves,
