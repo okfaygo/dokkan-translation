@@ -223,6 +223,76 @@ identify -> fetch -> render works end to end.
    86 vs 88 with badges. The synthetic hostile arm slightly prefers the
    loose band because its targets are random within near-tied groups; the
    field failure it causes is real, so the tight band ships.
+   **v0.2 floating bubble scaffolded (2026-08-03, NOT device-tested):**
+   overlay bubble + MediaProjection, tap-to-identify without leaving the
+   game. Key API constraint that shaped the design: on Android 14+ a
+   MediaProjection token is SINGLE-USE (createVirtualDisplay twice on one
+   token throws; a consent Intent can be exchanged once), so a
+   capture-per-tap design would prompt for consent on every tap. Instead
+   one VirtualDisplay + ImageReader is created per bubble SESSION and each
+   tap pulls the newest frame. Required ordering: startForeground() before
+   getMediaProjection(), and a MediaProjection.Callback must be registered
+   or createVirtualDisplay() throws. Android 15 QPR1+ auto-stops the
+   projection on screen lock -> panel offers Resume, which re-requests
+   consent through an invisible activity (consent needs an Activity; the
+   bubble lives in a Service). Two non-obvious hazards handled: the
+   ImageReader must be DRAINED before each capture (only 2 buffers; a full
+   buffer blocks new frames, so a stale frame can be returned), and the
+   bubble hides itself before capturing or it lands in its own OCR input.
+   Compose in an overlay needs lifecycle/ViewModelStore/SavedStateRegistry
+   owners that a Service lacks — OverlayComposeHost supplies them so the
+   panel reuses the main screen's composables. The identify pipeline was
+   extracted to identify/CardIdentifier so bubble and share-sheet can't
+   drift. Not compiled here (no Android SDK on this machine).
+   **v0.2 CONFIRMED WORKING on device (2026-08-03).** User reports accuracy
+   "near 1-to-1 with both the card page AND the passive detail screen" —
+   card-page accuracy is now BETTER via the bubble than via the share
+   sheet, consistent with MediaProjection giving clean full-resolution
+   pixels where a shared screenshot can carry compression artifacts.
+   Remaining complaint: "sometimes takes a little while to fetch". First
+   response is instrumentation, not guessing — per-stage timings (index /
+   OCR / match / fetch) now show in the debug panel. Speculative fixes
+   applied alongside: index preloaded when the bubble starts (was a ~3.5MB
+   JSON parse on first tap), matching parallelised across cores
+   (Matcher.rankParallel — partitioning by record is exact since records
+   score independently, verified in Python: chunked merge == whole-index,
+   0 differences, so ordering and benchmark parity are preserved), and the
+   identified card is now named in the progress line while the network
+   fetch runs. Await real timings before optimising further.
+   **Super-attack detail + icon spacing (2026-08-03, untested on device):**
+   - Icon spacing: the gap after every status icon was NOT in the source
+     text (checked: only 2 of 6 tokens on a sample card are followed by a
+     real space). It was ContentScale.Fit letterboxing inside hardcoded
+     placeholder boxes whose aspect didn't match the PNGs. Placeholders are
+     now derived from each bitmap's own aspect ratio (height fixed at 15sp,
+     width = height x aspect), so there is nothing to letterbox.
+   - SA conditions: `eball_num_start` is the Ki gate (12 = Super Attack,
+     18 = Ultra Super Attack) and `style` is Normal/Hyper/Condition/Extra.
+     Cards with a second, higher-Ki SA now show both, each labelled.
+     `attack.causality_description` carries any extra gate (null on all
+     2,491 cached cards, but rendered when present).
+   - SA effect numbers: the prose omits them ("Raises ATK for 4 turns"
+     never says by how much) — the values live in `specials[]`.
+     Mapping recovered from dokkaninfo's app.js: efficacy_type 1=ATK,
+     2=DEF, 3=both (eff_value1/2), 9=stun, 48=seal; calc_option 2=raise,
+     3=lower; plus turn and prob. Rendered with the real game icons
+     (st_0001/st_0002 downloaded as atk_up/def_up alongside the existing
+     down/stun/seal set), e.g. "[ATK↑]30% [DEF↑]30% for 4 turns".
+     Coverage over 2,491 cached cards: 96% of effect entries rendered.
+     The main skipped code (84, 70 occurrences) has NO case in
+     dokkaninfo's own renderer either, so the app shows exactly what the
+     site shows; codes 90 and 111 (1 occurrence each) are also skipped.
+   **optString("null") bug (2026-08-03):** org.json's `optString` returns
+   the literal STRING "null" for a JSON null — not "" and not null — so
+   `.ifEmpty { null }` guards sail straight past it. Surfaced as "null"
+   printed under a super attack (causality_description is null on every
+   card), but the same trap had a second victim: 1,150 index records have
+   `passive_name: null`, so the string "null" was being added as a MATCH
+   KEY for each of them (practically harmless — the OCR filter drops
+   short non-Japanese lines — but junk). All optString calls in
+   DokkanInfo and CardIndex now go through util/Json.kt's
+   `stringOrNull` / `stringOr`, which check `isNull` first.
+   SA effect lines also now render as bullets.
    Roadmap after that:
    v0.2 floating bubble + MediaProjection (manual trigger), v0.3 auto-detect
    card screens from captured frames (marker text or image-retrieval on

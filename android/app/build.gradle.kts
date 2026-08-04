@@ -39,6 +39,9 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.activity:activity-compose:1.9.3")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
+    // hosting Compose inside a WindowManager overlay needs these owners
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
+    implementation("androidx.savedstate:savedstate-ktx:1.2.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     // On-device Japanese OCR; bundled model (~15MB) so it works offline
     implementation("com.google.mlkit:text-recognition-japanese:16.0.1")

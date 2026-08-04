@@ -1,6 +1,8 @@
 package dev.fogo.dokkantranslate.match
 
 import android.content.Context
+import dev.fogo.dokkantranslate.util.stringOr
+import dev.fogo.dokkantranslate.util.stringOrNull
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -72,32 +74,32 @@ object CardIndex {
             val records = ArrayList<CardRecord>(root.length())
             for (id in root.keys()) {
                 val rec = root.getJSONObject(id)
-                val title = rec.optString("title", "")
-                val name = rec.optString("name", "")
+                val title = rec.stringOr("title")
+                val name = rec.stringOr("name")
 
                 val keys = ArrayList<String>()
                 keys.addAll(strings(rec.optJSONArray("lines")))
                 keys.addAll(strings(rec.optJSONArray("active_lines")))
                 keys.addAll(strings(rec.optJSONArray("sa_names")))
-                keys.addAll(leaderLines(rec.optString("leader", "")))
+                keys.addAll(leaderLines(rec.stringOr("leader")))
                 if (title.isNotEmpty()) keys.add(title)
                 if (name.isNotEmpty()) keys.add(name)
-                rec.optString("passive_name", "").ifEmpty { null }?.let { keys.add(it) }
-                rec.optString("active_name", "").ifEmpty { null }?.let { keys.add(it) }
+                rec.stringOrNull("passive_name")?.let { keys.add(it) }
+                rec.stringOrNull("active_name")?.let { keys.add(it) }
 
                 val altKeys = ArrayList<String>()
                 altKeys.addAll(strings(rec.optJSONArray("pre_eza_lines")))
-                altKeys.addAll(leaderLines(rec.optString("pre_eza_leader", "")))
+                altKeys.addAll(leaderLines(rec.stringOr("pre_eza_leader")))
 
                 if (keys.isEmpty() && altKeys.isEmpty()) continue
                 records.add(
                     CardRecord(
                         id = id,
                         name = name,
-                        nameEn = rec.optString("name_en", "").ifEmpty { null },
+                        nameEn = rec.stringOrNull("name_en"),
                         title = title,
                         rarity = rec.optInt("rarity"),
-                        element = rec.optString("element").toIntOrNull() ?: -1,
+                        element = rec.stringOr("element").toIntOrNull() ?: -1,
                         ezaStep = rec.optInt("eza_step", 0),
                         keys = keys,
                         altKeys = altKeys,

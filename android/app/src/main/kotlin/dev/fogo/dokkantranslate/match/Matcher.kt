@@ -1,5 +1,10 @@
 package dev.fogo.dokkantranslate.match
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+
 /**
  * Port of prototype/match.py: every OCR line votes its best fuzzy score
  * (>= threshold) into each card it resembles; highest total wins.
@@ -87,14 +92,46 @@ object Matcher {
         ocrLines: List<String>,
         index: List<CardRecord>,
         threshold: Double = 70.0,
-    ): List<Candidate> {
-        val (elHint, rarHint) = extractHints(ocrLines)
+    ): List<Candidate> =
+        finish(scoreRecords(ocrLines, index, threshold), extractHints(ocrLines))
+
+    /**
+     * Same result as [rank], computed across all cores.
+     *
+     * Every record is scored independently, so partitioning by record and
+     * merging the partial maps is exact — each record lands in exactly one
+     * chunk, and the per-record sum is unchanged. Ordering is therefore
+     * identical to [rank], which keeps the Python benchmarks predictive.
+     */
+    suspend fun rankParallel(
+        ocrLines: List<String>,
+        index: List<CardRecord>,
+        threshold: Double = 70.0,
+    ): List<Candidate> = coroutineScope {
+        val cores = Runtime.getRuntime().availableProcessors().coerceIn(1, 8)
+        if (cores == 1 || index.size < 512) {
+            return@coroutineScope rank(ocrLines, index, threshold)
+        }
+        val chunkSize = (index.size + cores - 1) / cores
+        val partials = index.chunked(chunkSize).map { chunk ->
+            async(Dispatchers.Default) { scoreRecords(ocrLines, chunk, threshold) }
+        }.awaitAll()
+        val merged = HashMap<CardRecord, Double>()
+        for (partial in partials) merged.putAll(partial)
+        finish(merged, extractHints(ocrLines))
+    }
+
+    private fun scoreRecords(
+        ocrLines: List<String>,
+        records: List<CardRecord>,
+        threshold: Double,
+    ): HashMap<CardRecord, Double> {
         val scores = HashMap<CardRecord, Double>()
         for (raw in ocrLines) {
             val line = raw.trim()
             if (line.length < 4) continue
             val weight = minOf(line.length, 24) / 24.0
-            for (rec in index) {
+            for (rec in records) {
                 // both views pooled into one key set, matching match.py —
                 // scoring them separately made the app disagree with the
                 // benchmarks that are supposed to predict it
@@ -107,6 +144,14 @@ object Matcher {
                 }
             }
         }
+        return scores
+    }
+
+    private fun finish(
+        scores: Map<CardRecord, Double>,
+        hints: Pair<Int?, Int?>,
+    ): List<Candidate> {
+        val (elHint, rarHint) = hints
         val sorted = scores.map { (rec, raw) ->
             var score = raw
             if (elHint != null && rec.element >= 0 && rec.element % 10 == elHint) {

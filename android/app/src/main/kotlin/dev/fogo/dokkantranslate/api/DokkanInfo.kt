@@ -5,7 +5,57 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.net.HttpURLConnection
 import java.net.URL
+import dev.fogo.dokkantranslate.util.stringOr
+import dev.fogo.dokkantranslate.util.stringOrNull
 import org.json.JSONObject
+
+/**
+ * One super attack. Dokkan gates these on Ki and sometimes on extra
+ * conditions, and the numeric effect values live in a separate `specials`
+ * array rather than in the prose description — "Raises ATK for 4 turns"
+ * never says by how much.
+ */
+data class SuperAttack(
+    val name: String,
+    val description: String,
+    /** Ki needed to launch it: 12 = Super Attack, 18 = Ultra Super Attack */
+    val kiRequired: Int,
+    /** Normal / Hyper / Condition / Extra, as DokkanInfo labels them */
+    val style: String,
+    /** extra gate beyond Ki, when the card has one */
+    val condition: String?,
+    /** rendered effects with {passiveImg:...} icon tokens, e.g. ATK +30% */
+    val effects: List<String>,
+) {
+    val label: String
+        get() = when {
+            kiRequired >= 18 -> "Ultra Super Attack · $kiRequired Ki"
+            kiRequired > 0 -> "Super Attack · $kiRequired Ki"
+            else -> "Super Attack"
+        }
+}
+
+data class Kit(
+    val cardId: String,
+    val title: String,
+    val name: String,
+    val rarity: String,
+    val element: String,
+    val leader: String,
+    val passiveName: String,
+    /** (isHeader, text) rows of the itemized passive */
+    val passiveRows: List<Pair<Boolean, String>>,
+    val supers: List<SuperAttack>,
+    val activeName: String,
+    val activeDesc: String,
+    val links: List<String>,
+    val categories: List<String>,
+    /** other forms of this card: (card id, name) */
+    val transformations: List<Pair<String, String>>,
+)
+
+class CardNotOnGlobalException(cardId: String) :
+    Exception("This card isn't on the Global server yet (id $cardId), so no English kit exists for it.")
 
 /**
  * English kit source: the GLOBAL dokkaninfo.com card page, which embeds the
@@ -20,28 +70,6 @@ import org.json.JSONObject
  * displayed kit is the one on the player's screen. No pre/post-EZA
  * labeling exists on purpose — the views aren't consistently either.
  */
-data class Kit(
-    val cardId: String,
-    val title: String,
-    val name: String,
-    val rarity: String,
-    val element: String,
-    val leader: String,
-    val passiveName: String,
-    /** (isHeader, text) rows of the itemized passive */
-    val passiveRows: List<Pair<Boolean, String>>,
-    val supers: List<Pair<String, String>>,
-    val activeName: String,
-    val activeDesc: String,
-    val links: List<String>,
-    val categories: List<String>,
-    /** other forms of this card: (card id, name) */
-    val transformations: List<Pair<String, String>>,
-)
-
-class CardNotOnGlobalException(cardId: String) :
-    Exception("This card isn't on the Global server yet (id $cardId), so no English kit exists for it.")
-
 object DokkanInfo {
 
     private const val UA =
@@ -130,9 +158,8 @@ object DokkanInfo {
         val supers = parseSupers(api)
         val links = namesOf(api, "links")
         return kit.copy(
-            passiveName = passive?.optString("name")?.ifEmpty { null } ?: kit.passiveName,
-            passiveRows = passive?.optString("itemized_description")
-                ?.ifEmpty { null }
+            passiveName = passive?.stringOrNull("name") ?: kit.passiveName,
+            passiveRows = passive?.stringOrNull("itemized_description")
                 ?.let { parseItemized(it) } ?: kit.passiveRows,
             supers = supers.ifEmpty { kit.supers },
             links = links.ifEmpty { kit.links },
@@ -247,27 +274,27 @@ object DokkanInfo {
                 val form = arr.getJSONObject(i)
                 val id = form.optLong("id").toString()
                 if (id == cardId) continue
-                val name = form.optString("name").replace("\n", " ")
-                if (name.isNotEmpty()) transformations.add(id to name)
+                val name = form.stringOrNull("name")?.replace("\n", " ")
+                if (!name.isNullOrEmpty()) transformations.add(id to name)
             }
         }
 
         val activeDesc = listOfNotNull(
-            active?.optString("effect_description")?.ifEmpty { null },
-            active?.optString("condition_description")?.ifEmpty { null },
+            active?.stringOrNull("effect_description"),
+            active?.stringOrNull("condition_description"),
         ).joinToString(" — ") { clean(it).replace("\n", " ") }
 
         return Kit(
             cardId = cardId,
-            title = leader?.optString("name") ?: "",
-            name = card.optString("name").replace("\n", " "),
+            title = leader?.stringOr("name") ?: "",
+            name = card.stringOr("name").replace("\n", " "),
             rarity = RARITIES[card.optInt("rarity")] ?: card.optInt("rarity").toString(),
-            element = elementName(card.optString("element").toIntOrNull() ?: -1),
-            leader = clean(leader?.optString("description") ?: "-").replace("\n", " "),
-            passiveName = passive?.optString("name") ?: "",
-            passiveRows = parseItemized(passive?.optString("itemized_description") ?: ""),
+            element = elementName(card.stringOr("element").toIntOrNull() ?: -1),
+            leader = clean(leader?.stringOr("description", "-") ?: "-").replace("\n", " "),
+            passiveName = passive?.stringOr("name") ?: "",
+            passiveRows = parseItemized(passive?.stringOr("itemized_description") ?: ""),
             supers = supers,
-            activeName = active?.optString("name") ?: "",
+            activeName = active?.stringOr("name") ?: "",
             activeDesc = activeDesc,
             links = namesOf(data, "links"),
             categories = namesOf(data, "categories"),
@@ -275,24 +302,75 @@ object DokkanInfo {
         )
     }
 
-    private fun parseSupers(data: JSONObject): List<Pair<String, String>> {
-        val supers = ArrayList<Pair<String, String>>()
+    private fun parseSupers(data: JSONObject): List<SuperAttack> {
+        val supers = ArrayList<SuperAttack>()
         val seen = HashSet<String>()
         data.optJSONArray("super_attacks")?.let { arr ->
             for (i in 0 until arr.length()) {
-                val attack = arr.getJSONObject(i).optJSONObject("attack") ?: continue
-                val name = attack.optString("name")
-                val desc = clean(attack.optString("description")).replace("\n", " ")
-                if (name.isNotEmpty() && seen.add("$name|$desc")) {
-                    supers.add(name to desc)
+                val entry = arr.getJSONObject(i)
+                val attack = entry.optJSONObject("attack") ?: continue
+                val name = attack.stringOr("name")
+                val desc = clean(attack.stringOr("description"))
+                    .replace("\n", " ").replace(Regex(" {2,}"), " ")
+                val ki = entry.optInt("eball_num_start")
+                if (name.isEmpty() || !seen.add("$name|$desc|$ki")) continue
+
+                val effects = ArrayList<String>()
+                entry.optJSONArray("specials")?.let { specials ->
+                    for (j in 0 until specials.length()) {
+                        renderEffect(specials.getJSONObject(j))?.let(effects::add)
+                    }
                 }
+                supers.add(
+                    SuperAttack(
+                        name = name,
+                        description = desc,
+                        kiRequired = ki,
+                        style = entry.stringOr("style"),
+                        condition = attack.stringOrNull("causality_description")
+                            ?.replace("\n", " "),
+                        effects = effects,
+                    )
+                )
             }
         }
         return supers
     }
 
+    /**
+     * A super attack's numeric effects, which the prose omits — "Raises ATK
+     * for 4 turns" never says by how much. Codes follow DokkanInfo's own
+     * rendering: efficacy_type picks the stat, calc_option picks the
+     * direction (2 = raise, 3 = lower), eff_value1/2 carry the percentages.
+     * Unknown codes are skipped rather than guessed at.
+     */
+    private fun renderEffect(special: JSONObject): String? {
+        val raise = special.optInt("calc_option") != 3
+        val v1 = special.optInt("eff_value1")
+        val v2 = special.optInt("eff_value2")
+        val turns = special.optInt("turn")
+        val chance = special.optInt("prob", 100)
+
+        fun stat(up: String, down: String, value: Int) =
+            "{passiveImg:${if (raise) up else down}}$value%"
+
+        val body = when (special.optInt("efficacy_type")) {
+            1 -> stat("atk_up", "atk_down", v1)
+            2 -> stat("def_up", "def_down", v1)
+            3 -> stat("atk_up", "atk_down", v1) + " " + stat("def_up", "def_down", v2)
+            9 -> "{passiveImg:stun}Stun"
+            48 -> "{passiveImg:astute}Seal"
+            else -> return null
+        }
+        return buildString {
+            append(body)
+            if (turns > 0) append(if (turns == 1) " for 1 turn" else " for $turns turns")
+            if (chance in 1..99) append(" ($chance% chance)")
+        }
+    }
+
     private fun namesOf(data: JSONObject, field: String): List<String> {
         val arr = data.optJSONArray(field) ?: return emptyList()
-        return (0 until arr.length()).map { arr.getJSONObject(it).optString("name") }
+        return (0 until arr.length()).mapNotNull { arr.getJSONObject(it).stringOrNull("name") }
     }
 }
