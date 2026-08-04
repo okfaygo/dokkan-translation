@@ -294,11 +294,76 @@ identify -> fetch -> render works end to end.
    `stringOrNull` / `stringOr`, which check `isNull` first.
    SA effect lines also now render as bullets.
    Roadmap after that:
-   v0.2 floating bubble + MediaProjection (manual trigger), v0.3 auto-detect
-   card screens from captured frames (marker text or image-retrieval on
-   card art — retrieval index, NOT a trained classifier). Overlay draws
-   only; MediaProjection is what reads the screen (games have no
-   accessibility tree).
+   v0.2 floating bubble + MediaProjection (manual trigger) — DONE and
+   confirmed on device.
+
+   **v0.3 (current): control and ergonomics, NOT auto-detection.**
+   Auto-detecting card screens was the original v0.3 plan and was dropped
+   after the user reconsidered — agreed, for reasons worth keeping:
+   (a) Dokkan shows card art constantly (team building, summons, box,
+   battle), so an unrequested panel covers exactly what you're looking at;
+   (b) a tap expresses WHICH card you mean — auto has to guess, and team
+   screens show six; (c) it would pay the OCR cost every second or two
+   forever, on top of already-continuous screen mirroring; (d) the
+   original justification ("don't leave the game") is already satisfied
+   by v0.2, so the remaining gain is one tap. Planned instead:
+   - history strip: last N identified cards, tappable (kits are already
+     disk-cached, so re-showing is instant) — kills the repetition that
+     motivated auto-detect
+   - collapsible / resizable panel, so it stops covering the game
+   - auto-refresh WHILE THE PANEL IS OPEN — built, then **demoted to an
+     experimental opt-in, OFF by default, after user testing.** It works,
+     but the verdict was "not innovative, few use-cases, the flicker is
+     why I wouldn't use it": going card-to-card is rare, and every refresh
+     costs a visible ~150ms flicker because capturing requires hiding our
+     own overlays. That flicker is INHERENT to the hide -> capture -> show
+     design, not a polishable bug. Treat it as a curiosity, not a
+     headline feature, and do not re-enable it by default.
+     If it is ever worth reviving: the flicker could be avoided by
+     cropping the captured frame to the region the panel does not cover
+     instead of hiding the panel — only viable while COLLAPSED, since a
+     card page keeps its leader/SA text near the bottom, exactly where an
+     expanded panel sits.
+     Implementation, for reference: `ScreenCapture.sampleRegion()`
+     fingerprints a 16x16 luminance grid straight out of the frame buffer
+     (no Bitmap, no OCR) above the panel, so polling is cheap; a full
+     identify runs only once the picture CHANGED and then held still for
+     2 polls (avoids firing mid-animation). Two rules worth keeping if
+     touched: an automatic pass NEVER overwrites a good result on failure
+     (walking into a menu must not wipe the kit being read) and never
+     re-sets state for the same card (that would reset scroll position).
+     JVM gotcha hit here: a `panelCollapsed` property plus a
+     `setPanelCollapsed()` function are the SAME JVM signature — Kotlin
+     generates setPanelCollapsed(Z)V for the property (the `by` delegate
+     forces real accessors even though it is private). Renamed to
+     applyPanelCollapsed.
+   - possibly: drag the bubble onto a specific card to disambiguate
+
+   **v0.4 (pinned, after v0.3): automated index refresh.**
+   Manually re-scraping for every new banner does not scale. Two halves,
+   and BOTH are needed — either alone still leaves manual work:
+   1. CI (GitHub Actions, weekly cron) does an INCREMENTAL scrape: diff
+      the live card list against the committed index, fetch only the new
+      ids (typically 5-20 after a banner) via `--ids`, commit the result.
+      NEVER `--all` from CI — that is ~11k requests / 3.5h against someone
+      else's server on a timer. Refuse to commit if the record count
+      shrank or the scrape errored, so a bad night cannot ship a broken
+      index to the phone.
+   2. The app must FETCH the index at runtime. It is currently compiled
+      into the APK (`android/app/src/main/assets/index.json`), so a fresh
+      index in the repo does nothing until a rebuild+reinstall. Plan:
+      bundled asset stays the offline floor; on start, conditional-GET
+      (If-None-Match) a hosted copy — the raw GitHub URL of the committed
+      file needs no infrastructure — and prefer a newer download in
+      internal storage. ~700KB gzipped, and a cheap 304 most days.
+   Known risk: DokkanInfo is behind Cloudflare and datacenter IPs get
+   challenged far more than home connections, so the CI scrape may simply
+   be blocked. Fallback is the same script on a local schedule (Task
+   Scheduler) pushing from home. Try CI first; do not assume it works
+   until a run succeeds.
+   Not an option: fetching unknown cards on demand instead — matching
+   needs the JP text present locally, and the app cannot match what it
+   does not have.
 3. EZA/transformed states: same card id, different passive — API's
    `optimal_awakening_growths` / `transformations` cover this.
 

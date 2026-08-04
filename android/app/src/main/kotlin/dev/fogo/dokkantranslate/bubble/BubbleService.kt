@@ -22,8 +22,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import dev.fogo.dokkantranslate.MainActivity
 import dev.fogo.dokkantranslate.R
+import dev.fogo.dokkantranslate.api.Kit
+import dev.fogo.dokkantranslate.ui.HistoryEntry
 import dev.fogo.dokkantranslate.identify.CardIdentifier
 import dev.fogo.dokkantranslate.identify.MatchDebug
+import dev.fogo.dokkantranslate.identify.Outcome
 import dev.fogo.dokkantranslate.match.CardIndex
 import dev.fogo.dokkantranslate.ui.BubblePanel
 import dev.fogo.dokkantranslate.ui.UiState
@@ -47,13 +50,25 @@ class BubbleService : Service() {
     private var bubble: ImageView? = null
     private var bubbleParams: WindowManager.LayoutParams? = null
     private var panelHost: OverlayComposeHost? = null
+    private var panelParams: WindowManager.LayoutParams? = null
     private var capture: ScreenCapture? = null
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private var work: Job? = null
 
     private var state by mutableStateOf<UiState>(UiState.Idle)
+    private var history by mutableStateOf<List<HistoryEntry>>(emptyList())
+    private var panelCollapsed by mutableStateOf(false)
+    /**
+     * Experimental, and OFF by default. It works, but going card-to-card is
+     * rare in practice, and each refresh costs a visible flicker: capturing
+     * means hiding our own overlays first, which is inherent to the design
+     * rather than a bug that can be polished out. Not worth a poll loop and
+     * a flicker by default.
+     */
+    private var autoRefresh by mutableStateOf(false)
     private var panelVisible = false
+    private var watch: Job? = null
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -170,7 +185,17 @@ class BubbleService : Service() {
             hidePanel()
             return
         }
+        identifyScreen(auto = false)
+    }
+
+    /**
+     * @param auto true when the watcher noticed the game moved to another
+     *   card. Automatic passes are silent about failure: navigating to a
+     *   menu must not wipe out the kit the user was reading.
+     */
+    private fun identifyScreen(auto: Boolean) {
         if (work?.isActive == true) return
+        val previous = state
         work = scope.launch {
             // Our own bubble is ON the screen we are about to mirror, so hide
             // it first. Draining before the wait matters: buffered frames
@@ -182,16 +207,98 @@ class BubbleService : Service() {
             val frame = capture?.captureLatest()
             setOverlaysVisible(true)
 
-            state = UiState.Working("Reading the screen…")
-            showPanel()
-            state = if (frame == null) {
-                UiState.Failed("Couldn't read the screen. The projection may have been stopped — tap the notification to restart it.")
-            } else {
-                CardIdentifier.identify(this@BubbleService, frame) { step ->
-                    state = UiState.Working(step)
-                }.toUiState().also { frame.recycle() }
+            if (!auto) {
+                state = UiState.Working("Reading the screen…")
+                // a tap means "show me this" — undo a collapse from last time
+                if (panelCollapsed) applyPanelCollapsed(false)
+                showPanel()
+            }
+            if (frame == null) {
+                if (!auto) {
+                    state = UiState.Failed(
+                        "Couldn't read the screen. The projection may have been " +
+                            "stopped — tap the notification to restart it."
+                    )
+                }
+                return@launch
+            }
+
+            val outcome = CardIdentifier.identify(this@BubbleService, frame) { step ->
+                if (!auto) state = UiState.Working(step)
+            }
+            frame.recycle()
+
+            if (auto) {
+                val success = outcome as? Outcome.Success
+                val sameCard = success?.kit?.cardId ==
+                    (previous as? UiState.Result)?.kit?.cardId
+                // leave the panel alone unless we actually landed on a
+                // different card — re-setting state would reset the scroll
+                if (success == null || sameCard) {
+                    state = previous
+                    return@launch
+                }
+            }
+            state = outcome.toUiState()
+            (state as? UiState.Result)?.let { remember(it.kit) }
+        }
+    }
+
+    /**
+     * While the panel is open, notice when the game moves to another card
+     * and re-identify. Scoped to "panel open" on purpose: the user asked
+     * for this view, so refreshing it continues their request rather than
+     * interrupting them — which is why blanket auto-detection was dropped.
+     */
+    private fun startWatching() {
+        stopWatching()
+        if (!autoRefresh) return
+        watch = scope.launch {
+            var baseline: IntArray? = null
+            var changed = false
+            var stable = 0
+            while (isActive) {
+                delay(WATCH_POLL_MS)
+                if (!panelVisible || work?.isActive == true) {
+                    baseline = null
+                    continue
+                }
+                val sample = capture?.sampleRegion(panelParams?.height ?: 0)
+                    ?: continue
+                val base = baseline
+                baseline = sample
+                if (base == null) continue
+
+                if (differs(base, sample)) {
+                    // still moving (animation, scroll) — wait for it to land
+                    changed = true
+                    stable = 0
+                } else if (changed) {
+                    stable++
+                    if (stable >= WATCH_STABLE_POLLS) {
+                        changed = false
+                        stable = 0
+                        baseline = null
+                        identifyScreen(auto = true)
+                    }
+                }
             }
         }
+    }
+
+    private fun stopWatching() {
+        watch?.cancel()
+        watch = null
+    }
+
+    /** Fraction of grid samples that moved appreciably. */
+    private fun differs(a: IntArray, b: IntArray): Boolean {
+        if (a.size != b.size || a.isEmpty()) return false
+        var moved = 0
+        for (i in a.indices) {
+            if (kotlin.math.abs(a[i] - b[i]) > SAMPLE_TOLERANCE) moved++
+        }
+        return moved.toFloat() / a.size > CHANGED_FRACTION
     }
 
     private fun setOverlaysVisible(visible: Boolean) {
@@ -221,7 +328,15 @@ class BubbleService : Service() {
         host.setContent {
             BubblePanel(
                 state = state,
+                history = history,
+                collapsed = panelCollapsed,
+                autoRefresh = autoRefresh,
                 onSelectCard = ::lookUp,
+                onToggleCollapse = { applyPanelCollapsed(!panelCollapsed) },
+                onToggleAutoRefresh = {
+                    autoRefresh = !autoRefresh
+                    if (autoRefresh) startWatching() else stopWatching()
+                },
                 onClose = { hidePanel() },
                 onResume = {
                     hidePanel()
@@ -231,7 +346,7 @@ class BubbleService : Service() {
         }
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
-            (resources.displayMetrics.heightPixels * 0.6f).toInt(),
+            panelHeight(panelCollapsed),
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
@@ -240,16 +355,49 @@ class BubbleService : Service() {
         windowManager.addView(host.view, params)
         host.onShown()
         panelHost = host
+        panelParams = params
         panelVisible = true
+        startWatching()
     }
+
+    /**
+     * Collapsing resizes the WINDOW, not just its contents: an overlay that
+     * still covered the lower screen would keep swallowing touches meant for
+     * the game even with nothing drawn in it.
+     *
+     * Not named setPanelCollapsed — that is the JVM signature Kotlin already
+     * generates for the `panelCollapsed` property's setter, so the two would
+     * collide.
+     */
+    private fun applyPanelCollapsed(collapsed: Boolean) {
+        panelCollapsed = collapsed
+        val host = panelHost ?: return
+        val params = panelParams ?: return
+        params.height = panelHeight(collapsed)
+        runCatching { windowManager.updateViewLayout(host.view, params) }
+    }
+
+    private fun panelHeight(collapsed: Boolean): Int =
+        if (collapsed) (56 * resources.displayMetrics.density).toInt()
+        else (resources.displayMetrics.heightPixels * 0.6f).toInt()
 
     private fun hidePanel() {
         panelVisible = false
+        stopWatching()
         panelHost?.let { host ->
             runCatching { windowManager.removeView(host.view) }
             host.onRemoved()
         }
         panelHost = null
+        panelParams = null
+    }
+
+    /** Newest first, de-duplicated, capped — cheap to revisit since kits
+     *  are cached on disk permanently. */
+    private fun remember(kit: Kit) {
+        val entry = HistoryEntry(kit.cardId, kit.name)
+        history = (listOf(entry) + history.filterNot { it.cardId == entry.cardId })
+            .take(MAX_HISTORY)
     }
 
     private fun lookUp(cardId: String) {
@@ -262,6 +410,7 @@ class BubbleService : Service() {
                 current?.alternatives ?: emptyList(),
                 current?.debug ?: MatchDebug(),
             ).toUiState()
+            (state as? UiState.Result)?.let { remember(it.kit) }
         }
     }
 
@@ -307,6 +456,7 @@ class BubbleService : Service() {
 
     override fun onDestroy() {
         isRunning = false
+        stopWatching()
         work?.cancel()
         scope.cancel()
         hidePanel()
@@ -331,6 +481,13 @@ class BubbleService : Service() {
 
         private const val CHANNEL_ID = "screen_reading"
         private const val NOTIFICATION_ID = 1
+        private const val MAX_HISTORY = 8
+        /** how often the watcher fingerprints the screen (cheap, no OCR) */
+        private const val WATCH_POLL_MS = 700L
+        /** consecutive quiet polls before treating a change as settled */
+        private const val WATCH_STABLE_POLLS = 2
+        private const val SAMPLE_TOLERANCE = 18
+        private const val CHANGED_FRACTION = 0.12f
         /** let one clean frame (without our overlays) reach the reader */
         private const val FRAME_SETTLE_MS = 150L
 

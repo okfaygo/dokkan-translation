@@ -40,6 +40,21 @@ this supplies them so the panel reuses the same composables as the main
 screen), `bubble/ProjectionRequestActivity` (consent from a Service),
 `ui/BubblePanel` (the sheet).
 
+**Auto-follow (v0.3, experimental — off by default).** While the panel is
+open it can watch for the game moving to another card and re-identify.
+It works, but it earns its "experimental" label: flipping card-to-card is
+uncommon, and each refresh flickers for ~150ms because capturing requires
+hiding our own overlays first — inherent to the design, not a bug. Left in
+as an opt-in toggle. Don't turn it on by default.
+
+**Panel ergonomics (v0.3):** a *Recent* strip lists the cards identified
+this session — kits are cached on disk permanently, so revisiting one is
+instant and needs no capture. **Collapse** shrinks the overlay WINDOW
+rather than just its contents; a full-height window with nothing drawn in
+it would still swallow touches meant for the game. Collapsed, the header
+shows the current card's name so it stays useful, and the next bubble tap
+expands it again.
+
 `identify/CardIdentifier` holds the screenshot → kit pipeline shared by
 both the bubble and the share-sheet flow, so they cannot drift apart.
 
