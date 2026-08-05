@@ -5,3 +5,8 @@ __pycache__/
 
 # scratch id lists from targeted re-scrapes
 prototype/_*.txt
+
+# signing keystores must never reach a public repo
+*.jks
+*.keystore
+keystore.properties
