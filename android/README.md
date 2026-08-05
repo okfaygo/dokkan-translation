@@ -124,6 +124,38 @@ testing from the gallery.
    result and failure screens — raw ML Kit lines, whether the type/rarity
    badges were read, and the top 6 candidates with scores.
 
+## Installing on a phone without a computer
+
+`.github/workflows/release-apk.yml` builds a signed APK and attaches it to
+a GitHub Release, so the app can be downloaded and installed from the
+phone's browser. Runs on a `v*` tag or on demand.
+
+It needs four repository secrets (Settings → Secrets and variables →
+Actions), created once from a keystore you generate locally:
+
+```
+keytool -genkey -v -keystore dokkan-release.jks -keyalg RSA -keysize 2048 -validity 10000 -alias dokkan
+base64 -w0 dokkan-release.jks       # paste as KEYSTORE_BASE64
+```
+
+`KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`.
+
+**Why a real keystore rather than the debug key:** a fresh CI runner
+generates a new debug key every run, so consecutive CI builds would be
+signed differently and Android would refuse to install one over another —
+each update would mean uninstalling first and losing the cached kits. Keep
+the `.jks` backed up; losing it has the same consequence.
+
+Signing is env-gated (`KEYSTORE_FILE`), so local development is unchanged:
+without those variables the release config simply isn't created and debug
+builds keep using the local debug key. `versionCode` comes from the CI run
+number, because Android will not install an APK whose versionCode moved
+backwards.
+
+There is no committed Gradle wrapper — Android Studio builds with its own
+bundled Gradle — so CI pins Gradle 8.11.1 via `gradle/actions/setup-gradle`
+to match `gradle/wrapper/gradle-wrapper.properties`.
+
 ## Build & run
 
 Open this `android/` directory in Android Studio (Ladybug or newer), let it
