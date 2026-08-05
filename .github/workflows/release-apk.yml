@@ -1,0 +1,107 @@
+name: Build release APK
+
+# Builds a signed APK and attaches it to a GitHub Release, so the app can be
+# installed from the phone's browser instead of being sideloaded over USB.
+#
+# Signing uses a keystore held in repository secrets. That is not ceremony:
+# a debug key is regenerated on every fresh runner, so CI-built debug APKs
+# would each be signed differently and Android would refuse to install one
+# over another — every update would mean uninstalling first and losing the
+# cached kits. A stable release key makes updates install in place.
+#
+# Required secrets (Settings -> Secrets and variables -> Actions):
+#   KEYSTORE_BASE64     base64 of your .jks   (base64 -w0 dokkan-release.jks)
+#   KEYSTORE_PASSWORD   store password
+#   KEY_ALIAS           key alias, e.g. dokkan
+#   KEY_PASSWORD        key password
+#
+# Keep the .jks backed up somewhere safe. Losing it means future builds are
+# signed with a different key, and the only way to install them is to
+# uninstall the app first.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Check signing secrets are present
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::error::KEYSTORE_BASE64 is not set. See the comment at the" \
+                 "top of this workflow for the four secrets this needs."
+            exit 1
+          fi
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      # The project has no committed Gradle wrapper (Android Studio builds it
+      # with its own bundled Gradle), so pin the version here instead. It
+      # matches gradle/wrapper/gradle-wrapper.properties.
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: "8.11.1"
+
+      - name: Decode the keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+
+      - name: Build the release APK
+        working-directory: android
+        env:
+          KEYSTORE_FILE: ${{ runner.temp }}/release.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          VERSION_CODE: ${{ github.run_number }}
+          VERSION_NAME: 0.4.${{ github.run_number }}
+        run: gradle --no-daemon assembleRelease
+
+      - name: Confirm the APK is signed
+        run: |
+          APK=$(find android/app/build/outputs/apk/release -name "*.apk" | head -1)
+          echo "APK=$APK" >> "$GITHUB_ENV"
+          ls -lh "$APK"
+          # a release build that silently fell back to unsigned would install
+          # nowhere, so fail here rather than publishing a dud
+          "$ANDROID_HOME"/build-tools/*/apksigner verify "$APK" \
+            || { echo "::error::APK is not signed"; exit 1; }
+
+      - name: Publish the APK to a Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          if [ "${GITHUB_REF_TYPE}" != "tag" ]; then
+            TAG="build-${{ github.run_number }}"
+          fi
+          cp "$APK" "dokkan-translate-${TAG}.apk"
+          gh release create "$TAG" "dokkan-translate-${TAG}.apk" \
+            --title "Dokkan Translate $TAG" \
+            --notes "Install on the phone: open this page in the phone's browser, download the APK and tap it. Updates install over the top as long as the signing key is unchanged." \
+            || gh release upload "$TAG" "dokkan-translate-${TAG}.apk" --clobber
+
+      - name: Keep the build output when something went wrong
+        if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: build-logs
+          path: android/app/build/outputs
+          if-no-files-found: ignore
