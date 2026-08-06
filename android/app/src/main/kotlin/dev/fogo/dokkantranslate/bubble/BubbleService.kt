@@ -317,12 +317,20 @@ class BubbleService : Service() {
         panelHost?.view?.visibility = visibility
     }
 
+    /**
+     * Android allows only one screen-capture session at a time, so another
+     * app starting one — a screen recorder, a cast, a meeting app — silently
+     * takes ours. That is the most likely cause in practice, and naming it
+     * first saves the user hunting for a setting they never changed.
+     */
     private fun onProjectionStopped() {
         capture?.release()
         capture = null
         state = UiState.Failed(
-            "Screen capture stopped (the screen locked, or you revoked it). " +
-                "Tap Resume to grant it again."
+            "Screen capture stopped. Another app that records or shares the " +
+                "screen takes over when it starts, and Android only allows " +
+                "one at a time. The screen locking also ends it. " +
+                "Tap Resume to start capture again."
         )
         showPanel()
     }
