@@ -38,6 +38,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+// the CoroutineScope extension — NOT NonCancellable.isActive, which the IDE
+// offers first and which is hardcoded to true
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 /**
