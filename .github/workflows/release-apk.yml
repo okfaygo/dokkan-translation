@@ -79,9 +79,17 @@ jobs:
           APK=$(find android/app/build/outputs/apk/release -name "*.apk" | head -1)
           echo "APK=$APK" >> "$GITHUB_ENV"
           ls -lh "$APK"
-          # a release build that silently fell back to unsigned would install
-          # nowhere, so fail here rather than publishing a dud
-          "$ANDROID_HOME"/build-tools/*/apksigner verify "$APK" \
+          # A release build that silently fell back to unsigned would install
+          # nowhere, so fail here rather than publishing a dud.
+          #
+          # Resolve apksigner explicitly: the runner image carries several
+          # build-tools versions, so globbing the directory passed EVERY match
+          # to the shell — the first became the command and the second was
+          # read as a subcommand ("Unsupported command: .../apksigner").
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner -type f \
+            | sort -V | tail -1)
+          echo "using $APKSIGNER"
+          "$APKSIGNER" verify --print-certs "$APK" \
             || { echo "::error::APK is not signed"; exit 1; }
 
       - name: Publish the APK to a Release
