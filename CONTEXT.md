@@ -366,13 +366,18 @@ identify -> fetch -> render works end to end.
    **Cloudflare does NOT block GitHub Actions** — first dispatched run
    succeeded (2026-08-04), whole job 15s, sync step 3s, reaching
    NOTHING_NEW so the validate/commit steps correctly skipped.
-   Caveat on what that proved: with nothing new to fetch, the run made
-   only the ONE list-page request. Per-card page requests from an Actions
-   IP are still unexercised — same origin and same Cloudflare config, so
-   very likely fine, but the real confirmation comes the first time a
-   banner drops and it actually fetches card pages. Watch that run.
-   If it is ever blocked, fall back to the same `--sync` command on a
-   local scheduler, pushing from home — no code changes needed.
+   **Per-card fetching from CI confirmed too (2026-08-06):** a real banner
+   dropped, the run added 6 cards (5169 -> 5175: Panzy, Dr. Arinsu) and
+   committed them, so Actions IPs are not blocked on card pages either —
+   the whole pipeline is proven, not just the no-op path.
+   End-to-end verified the same day: CI commit -> raw.githubusercontent
+   serving the new index within minutes -> app picked it up on bubble
+   restart -> new cards identify correctly, with NO app reinstall.
+   Note the one restart requirement: `IndexUpdater` runs on app start and
+   bubble start, so a bubble left running from before a refresh keeps its
+   in-memory index until restarted.
+   If CI is ever blocked later, fall back to the same `--sync` command on
+   a local scheduler, pushing from home — no code changes needed.
    Action versions bumped to checkout@v5 / setup-python@v6 /
    upload-artifact@v5 to clear the Node 20 deprecation warning.
 
