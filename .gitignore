@@ -10,3 +10,8 @@ prototype/_*.txt
 *.jks
 *.keystore
 keystore.properties
+
+# IDE project files. android/.gitignore already covers android/.idea/, but
+# Android Studio also writes one at the repo root when opened from here.
+.idea/
+*.iml
