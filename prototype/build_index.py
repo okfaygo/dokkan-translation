@@ -77,7 +77,7 @@ def fetch_list(session, refresh=False):
     print("fetching card list (~12MB)...")
     text = _get(session, f"{BASE}/cards?sort=open_at")
     cards = _embedded_json(text, "cardsjson")
-    keep = ["id", "name", "rarity", "eza", "open_at", "element", "lv_max"]
+    keep = ["id", "name", "rarity", "eza", "open_at", "eza_open_at", "seza_open_at", "element", "lv_max"]
     cards = [{k: c.get(k) for k in keep} for c in cards]
     cache_file.write_text(json.dumps(cards, ensure_ascii=False),
                           encoding="utf-8")
@@ -203,6 +203,8 @@ def extract_record(data):
     if sa_names:
         rec["sa_names"] = sa_names
     rec["has_eza"] = bool(data.get("eza_medals"))
+    # NB: eza_at is NOT set here — the card page carries no EZA dates at all.
+    # main() stamps it from the card list, which is the only source.
     if data.get("max_eza_step"):
         rec["eza_step"] = data["max_eza_step"]
     return rec
@@ -243,24 +245,73 @@ def save_skips(ids):
     SKIP_LEDGER.write_text(json.dumps(sorted(ids)), encoding="utf-8")
 
 
-def missing_ids(cards, index, skips, min_rarity, limit):
-    """Cards on the site that the index doesn't have yet, oldest first.
+# Index cards shortly before release so the app works on day one. Far-future
+# open_at values (2029/2030) are placeholders for story bosses that may never
+# ship, and must stay excluded.
+FUTURE_GRACE = 30 * 24 * 60 * 60
 
-    Far-future open_at values are placeholders for unreleased story bosses
-    (2029/2030 dates appear in the live list), so anything not yet released
-    is left alone.
+
+def eza_timestamp(row):
+    """Newest EZA/SEZA opening on a card-list row, or 0.
+
+    The list uses False — not None — for a card with no Super EZA, so
+    `or 0` is doing real work here.
+    """
+    return max(int(row.get("eza_open_at") or 0),
+               int(row.get("seza_open_at") or 0))
+
+
+def ids_to_fetch(cards, index, skips, min_rarity, limit):
+    """Cards needing a fetch, oldest first.
+
+    Two reasons a card qualifies:
+      - the index has never seen it, or
+      - it is indexed but its EZA opened (or was upgraded to a Super EZA)
+        after we last scraped it, so the kit we stored is now stale.
+
+    The second case is the one an id-only diff cannot see: an EZA does not
+    mint a new card id, it adds a second kit to an id we already have.
     """
     now = time.time()
-    known = set(index.keys())
-    fresh = [
-        c for c in cards
-        if (c.get("rarity") or 0) >= min_rarity
-        and 0 < (c.get("open_at") or 0) <= now
-        and str(c["id"]) not in known
-        and c["id"] not in skips
-    ]
-    fresh.sort(key=lambda c: c.get("open_at") or 0)
-    return [c["id"] for c in fresh[:limit]]
+    wanted = []
+    for c in cards:
+        if (c.get("rarity") or 0) < min_rarity:
+            continue
+        open_at = c.get("open_at") or 0
+        if not (0 < open_at <= now + FUTURE_GRACE):
+            continue
+        rec = index.get(str(c["id"]))
+        if rec is None:
+            if c["id"] in skips:
+                continue          # known to carry no kit at all
+            wanted.append(c)
+        elif eza_timestamp(c) > (rec.get("eza_at") or 0):
+            # re-fetch even if ledgered: the ledger is about kit-less cards,
+            # and this one demonstrably has one
+            wanted.append(c)
+    wanted.sort(key=lambda c: c.get("open_at") or 0)
+    return [c["id"] for c in wanted[:limit]]
+
+
+def seed_eza_timestamps(index, by_id):
+    """Backfill eza_at on records written before the field existed.
+
+    Without this every EZA'd card looks stale on the first run after the
+    upgrade (~780 needless re-fetches). A record that already shows evidence
+    of having been scraped WITH an EZA — medals, a step, or a second kit —
+    gets the list's current timestamp, which is what a scrape today would
+    have recorded. Records with no such evidence keep 0, so the cards whose
+    EZA opened after we scraped them are correctly flagged stale.
+    """
+    seeded = 0
+    for cid, rec in index.items():
+        if "eza_at" in rec:
+            continue
+        row = by_id.get(int(cid))
+        had_eza = rec.get("has_eza") or rec.get("eza_step") or rec.get("pre_eza_lines")
+        rec["eza_at"] = eza_timestamp(row) if (row and had_eza) else 0
+        seeded += 1
+    return seeded
 
 
 def stratified_sample(cards, n, seed=7):
@@ -318,6 +369,11 @@ def main():
     started_with = len(index)
     skips = load_skips()
 
+    # Card-list rows by id. Empty for modes that never fetch the list
+    # (--rebuild, --ids); everything below must cope with that.
+    by_id = {}
+    stale = set()
+
     if args.rebuild:
         ids = [int(p.name.split(".")[0]) for p in CARD_CACHE.glob("*.json.gz")]
     elif args.ids:
@@ -328,14 +384,21 @@ def main():
                   "run --all once first", file=sys.stderr)
             return 1
         cards = fetch_list(session, refresh=True)
-        ids = missing_ids(cards, index, skips, args.min_rarity, args.max_new)
-        print(f"index has {started_with} cards; "
-              f"{len(ids)} new to fetch (skip ledger: {len(skips)})")
+        by_id = {c["id"]: c for c in cards}
+        seeded = seed_eza_timestamps(index, by_id)
+        if seeded:
+            print(f"backfilled eza_at on {seeded} existing records")
+        ids = ids_to_fetch(cards, index, skips, args.min_rarity, args.max_new)
+        stale = {i for i in ids if str(i) in index}
+        print(f"index has {started_with} cards; {len(ids)} to fetch "
+              f"({len(ids) - len(stale)} new, {len(stale)} with a newer EZA; "
+              f"skip ledger: {len(skips)})")
         if not ids:
             print("NOTHING_NEW")
             return 0
     else:
         cards = fetch_list(session)
+        by_id = {c["id"]: c for c in cards}
         if args.sample:
             ids = [c["id"] for c in stratified_sample(cards, args.sample)]
         elif args.all:
@@ -351,8 +414,12 @@ def main():
         if card_id in seen:
             continue
         seen.add(card_id)
+        # A card whose EZA just opened has a cached page from before it
+        # existed; reusing that would re-parse the old kit and conclude
+        # nothing changed.
+        force = card_id in stale or args.refresh_alt
         try:
-            data = fetch_card(session, card_id, delay=args.delay)
+            data = fetch_card(session, card_id, delay=args.delay, refresh=force)
             rec = extract_record(data)
             if rec["has_eza"]:
                 step = data.get("max_eza_step")
@@ -361,10 +428,10 @@ def main():
                     # transformation API, not its card page
                     alt = fetch_form_alt(session, card_id, step,
                                          delay=args.delay,
-                                         refresh=args.refresh_alt)
+                                         refresh=force)
                 else:
                     alt = fetch_card(session, card_id, delay=args.delay,
-                                     pre_eza=True, refresh=args.refresh_alt,
+                                     pre_eza=True, refresh=force,
                                      eza_step=step)
                 pre = extract_record(alt)
                 if pre["lines"] != rec["lines"]:
@@ -386,9 +453,25 @@ def main():
                 skips.add(card_id)
             continue
         if not rec["title"] and not rec["lines"]:
-            print(f"  {card_id} skipped (no kit — event/filler card)")
-            skips.add(card_id)   # deterministic: never worth re-fetching
+            # Only ledger RELEASED cards. An unreleased one legitimately has
+            # no kit yet, and ledgering it would mean never retrying it —
+            # permanently missing from the index after it launches.
+            row = by_id.get(card_id)
+            released = (row or {}).get("open_at") or 0
+            if released and released <= time.time():
+                print(f"  {card_id} skipped (no kit — event/filler card)")
+                skips.add(card_id)
+            else:
+                print(f"  {card_id} skipped (no kit yet — not released)")
             continue
+
+        # Stamp the EZA date from the list. When the list is unavailable
+        # (--rebuild, --ids) keep whatever was already stored: this record
+        # replaces the old one wholesale, so omitting it would silently
+        # erase the timestamp and make every EZA'd card look stale again.
+        previous = index.get(str(card_id), {})
+        row = by_id.get(card_id)
+        rec["eza_at"] = eza_timestamp(row) if row else (previous.get("eza_at") or 0)
         index[str(card_id)] = rec
         eza_tag = " +preEZA" if rec.get("pre_eza_lines") else ""
         print(f"  {card_id} [{rec['rarity']}] {rec['title']} / {rec['name']}"
