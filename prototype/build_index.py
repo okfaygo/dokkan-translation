@@ -32,12 +32,19 @@ from pathlib import Path
 
 import requests
 
+import kits as kitlib
+
 BASE = "https://jpnja.dokkaninfo.com"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36")
 HERE = Path(__file__).parent
 CACHE = HERE / "cache"
 CARD_CACHE = CACHE / "cards"
+GLOBAL_CACHE = CACHE / "global"
+
+# Bumped when the on-disk shape of index.json / kits.json.gz changes. The
+# app refuses a downloaded pair older than it understands.
+DATA_VERSION = 2
 
 JP_RE = re.compile(r"[぀-ヿ一-鿿]")
 
@@ -156,6 +163,100 @@ def fetch_form_alt(session, card_id, eza_step, delay=1.0, refresh=False):
     return data
 
 
+def fetch_global(session, card_id, alt_view, eza_step, delay=1.0, refresh=False):
+    """The GLOBAL card page, whose kit is what the app displays.
+
+    Mirrors what the app used to do at runtime: the alt (?eza=true) view
+    when the card has one, with &step= because plain ?eza=true serves the
+    wrong kit for some transformed EZA'd forms.
+
+    Returns None when the card has no global page — a JP-only card, which
+    the app can then say so about without a lookup.
+    """
+    GLOBAL_CACHE.mkdir(parents=True, exist_ok=True)
+    suffix = f".alt{eza_step}" if alt_view else ""
+    cache_file = GLOBAL_CACHE / f"{card_id}{suffix}.json.gz"
+    if cache_file.exists() and not refresh:
+        with gzip.open(cache_file, "rt", encoding="utf-8") as f:
+            return json.load(f)
+    url = f"{kitlib.GLOBAL}/cards/{card_id}"
+    if alt_view:
+        url += "?eza=true" + (f"&step={eza_step}" if eza_step else "")
+    try:
+        data = _embedded_json(_get(session, url), "datajson")
+    except requests.exceptions.HTTPError as e:
+        if getattr(e.response, "status_code", None) == 404:
+            return None          # not on the global server yet
+        raise
+    with gzip.open(cache_file, "wt", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False)
+    time.sleep(delay)
+    return data
+
+
+def fetch_global_transformation(session, card_id, eza_step, delay=1.0, refresh=False):
+    """A transformed form's own EZA kit, from the transformation API."""
+    GLOBAL_CACHE.mkdir(parents=True, exist_ok=True)
+    cache_file = GLOBAL_CACHE / f"{card_id}.tf{eza_step}.json.gz"
+    if cache_file.exists() and not refresh:
+        with gzip.open(cache_file, "rt", encoding="utf-8") as f:
+            return json.load(f)
+    url = (f"{kitlib.GLOBAL}/api/cards/{card_id}/transformation"
+           f"?eza=true&step={eza_step}")
+    data = json.loads(_get(session, url))
+    with gzip.open(cache_file, "wt", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False)
+    time.sleep(delay)
+    return data
+
+
+def build_kit(session, card_id, rec, delay=1.0, refresh=False):
+    """Extract one card's English kit, or None if it is JP-only."""
+    alt_view = bool(rec.get("pre_eza_lines"))
+    step = rec.get("eza_step") or 0
+    data = fetch_global(session, card_id, alt_view, step, delay, refresh)
+    if data is None:
+        return None
+    kit = kitlib.extract_kit(data, card_id)
+    if alt_view and step and card_id >= 4_000_000:
+        try:
+            api = fetch_global_transformation(session, card_id, step, delay, refresh)
+            kit = kitlib.overlay_form_kit(kit, api)
+        except Exception as e:
+            print(f"  {card_id}: transformation overlay skipped ({e})",
+                  file=sys.stderr)
+    return kit
+
+
+def real_cards(index):
+    """Card entries only — the index also carries a "__meta__" entry."""
+    return {k: v for k, v in index.items() if not k.startswith("__")}
+
+
+def load_packed_kits(index, kits_path):
+    """Read previously packed kits back out, so a run that only fetched a
+    handful of cards can still republish the whole file. CI has no scrape
+    cache, so this is what keeps incremental syncs possible."""
+    path = Path(kits_path)
+    if not path.exists():
+        return {}
+    with gzip.open(path, "rb") as f:
+        blob = f.read()
+    out = {}
+    for card_id, rec in real_cards(index).items():
+        span = rec.get("kit")
+        if not span:
+            continue
+        start, length = span
+        if start + length > len(blob):
+            continue
+        try:
+            out[card_id] = json.loads(blob[start:start + length].decode("utf-8"))
+        except Exception:
+            continue
+    return out
+
+
 def clean_lines(text):
     """Skill description -> the plain lines the game renders on screen."""
     if not text:
@@ -225,7 +326,7 @@ def save_index(index, override=None):
     path = index_path(override)
     path.write_text(json.dumps(index, ensure_ascii=False, indent=1),
                     encoding="utf-8")
-    print(f"{path.name}: {len(index)} cards")
+    print(f"{path.name}: {sum(1 for k in index if not k.startswith('__'))} cards")
 
 
 # Cards that exist in the card list but carry no kit at all (event/filler
@@ -304,7 +405,7 @@ def seed_eza_timestamps(index, by_id):
     EZA opened after we scraped them are correctly flagged stale.
     """
     seeded = 0
-    for cid, rec in index.items():
+    for cid, rec in real_cards(index).items():
         if "eza_at" in rec:
             continue
         row = by_id.get(int(cid))
@@ -312,6 +413,23 @@ def seed_eza_timestamps(index, by_id):
         rec["eza_at"] = eza_timestamp(row) if (row and had_eza) else 0
         seeded += 1
     return seeded
+
+
+def pack_and_save(index, kits, kits_path, index_override):
+    """Write kits.json.gz and index.json together.
+
+    Offsets in the index point into the kit blob, so the two files are only
+    valid as a pair — always write them in this order, never separately.
+    """
+    packed, raw = kitlib.pack(real_cards(index), kits, kits_path, DATA_VERSION)
+    # One meta entry rather than a field on all 5k records. Consumers must
+    # skip "__"-prefixed keys; the offsets are only valid against the
+    # kits.json.gz written in the same call.
+    index["__meta__"] = {"data_version": DATA_VERSION, "kits": packed}
+    save_index(index, index_override)
+    size = Path(kits_path).stat().st_size
+    print(f"{Path(kits_path).name}: {packed} kits, "
+          f"{raw/1024/1024:.1f}MB raw -> {size/1024/1024:.2f}MB gzipped")
 
 
 def stratified_sample(cards, n, seed=7):
@@ -362,12 +480,20 @@ def main():
                                     "defaults to prototype/index.json")
     ap.add_argument("--max-new", type=int, default=400,
                     help="safety cap on how many cards one --sync may fetch")
+    ap.add_argument("--kits", help="path to write the packed English kits; "
+                                   "defaults to alongside --index")
+    ap.add_argument("--backfill-kits", action="store_true",
+                    help="fetch the English kit for every indexed card that "
+                         "lacks one — the one-time global pass, run locally")
     args = ap.parse_args()
 
     session = _session()
     index = load_index(args.index)
-    started_with = len(index)
+    started_with = len(real_cards(index))
     skips = load_skips()
+    kits_path = Path(args.kits) if args.kits else         index_path(args.index).with_name("kits.json.gz")
+    kits = load_packed_kits(index, kits_path)
+    print(f"kits already packed: {len(kits)}")
 
     # Card-list rows by id. Empty for modes that never fetch the list
     # (--rebuild, --ids); everything below must cope with that.
@@ -403,8 +529,15 @@ def main():
             ids = [c["id"] for c in stratified_sample(cards, args.sample)]
         elif args.all:
             ids = [c["id"] for c in cards if c["rarity"] >= args.min_rarity]
+        elif args.backfill_kits:
+            # standalone: fetch nothing new, just fill in missing kits.
+            # Keeps kit progress checkpointed by the backfill pass rather
+            # than riding along with a full --rebuild.
+            ids = []
+            cards = []
         else:
-            ap.error("need --ids, --sample, --all, --sync, or --rebuild")
+            ap.error("need --ids, --sample, --all, --sync, --rebuild, "
+                     "or --backfill-kits")
 
     queue = list(ids)
     seen = set()
@@ -473,6 +606,20 @@ def main():
         row = by_id.get(card_id)
         rec["eza_at"] = eza_timestamp(row) if row else (previous.get("eza_at") or 0)
         index[str(card_id)] = rec
+
+        # The English kit ships with the index now, so it is collected here
+        # rather than fetched by every user at runtime.
+        try:
+            kit = build_kit(session, card_id, rec, delay=args.delay,
+                            refresh=force)
+            if kit is None:
+                rec["global"] = False    # JP-only: app says so, no lookup
+                kits.pop(str(card_id), None)
+            else:
+                rec.pop("global", None)
+                kits[str(card_id)] = kit
+        except Exception as e:
+            print(f"  {card_id}: kit FAILED {e}", file=sys.stderr)
         eza_tag = " +preEZA" if rec.get("pre_eza_lines") else ""
         print(f"  {card_id} [{rec['rarity']}] {rec['title']} / {rec['name']}"
               f" ({len(rec['lines'])} lines{eza_tag})")
@@ -486,28 +633,50 @@ def main():
     try:
         en = english_names(session)
         tagged = 0
-        for cid, rec in index.items():
+        for cid, rec in real_cards(index).items():
             name = en.get(int(cid))
             if name:
                 rec["name_en"] = name
                 tagged += 1
-        print(f"English names attached: {tagged}/{len(index)}")
+        print(f"English names attached: {tagged}/{len(real_cards(index))}")
     except Exception as e:
         print(f"English-name merge skipped: {e}", file=sys.stderr)
+
+    # One-time (and repair) pass: every indexed card that still has no
+    # English kit. Run locally — it is ~5k requests, not something to point
+    # a scheduled job at.
+    if args.backfill_kits:
+        todo = [c for c in real_cards(index)
+                if c not in kits and index[c].get("global") is not False]
+        print(f"backfilling kits for {len(todo)} cards...")
+        for n, cid in enumerate(todo, 1):
+            try:
+                kit = build_kit(session, int(cid), index[cid], delay=args.delay)
+            except Exception as e:
+                print(f"  {cid}: kit FAILED {e}", file=sys.stderr)
+                continue
+            if kit is None:
+                index[cid]["global"] = False
+            else:
+                kits[cid] = kit
+            if n % 100 == 0:
+                print(f"  {n}/{len(todo)}  ({len(kits)} kits)")
+                pack_and_save(index, kits, kits_path, args.index)
 
     # An automated run must never be able to shrink the index — a partial
     # scrape or a site-wide outage would otherwise ship a gutted index to
     # the app on the next release.
-    if len(index) < started_with:
-        print(f"REFUSING to write: index shrank {started_with} -> {len(index)}",
+    if len(real_cards(index)) < started_with:
+        print(f"REFUSING to write: index shrank {started_with} -> "
+              f"{len(real_cards(index))}",
               file=sys.stderr)
         return 1
 
-    save_index(index, args.index)
+    pack_and_save(index, kits, kits_path, args.index)
     save_skips(skips)
     if failed:
         print(f"failed ids: {failed}", file=sys.stderr)
-    added = len(index) - started_with
+    added = len(real_cards(index)) - started_with
     print(f"ADDED {added}")
     return 0
 

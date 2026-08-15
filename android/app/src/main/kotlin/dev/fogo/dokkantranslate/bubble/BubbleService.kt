@@ -22,12 +22,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import dev.fogo.dokkantranslate.MainActivity
 import dev.fogo.dokkantranslate.R
-import dev.fogo.dokkantranslate.api.Kit
+import dev.fogo.dokkantranslate.match.Kit
 import dev.fogo.dokkantranslate.ui.HistoryEntry
 import dev.fogo.dokkantranslate.identify.CardIdentifier
 import dev.fogo.dokkantranslate.identify.MatchDebug
 import dev.fogo.dokkantranslate.identify.Outcome
 import dev.fogo.dokkantranslate.match.CardIndex
+import dev.fogo.dokkantranslate.match.KitStore
 import dev.fogo.dokkantranslate.match.IndexUpdater
 import dev.fogo.dokkantranslate.ui.BubblePanel
 import dev.fogo.dokkantranslate.ui.UiState
@@ -115,7 +116,12 @@ class BubbleService : Service() {
                     if (IndexUpdater.refresh(this@BubbleService)) {
                         CardIndex.invalidate()
                     }
-                    CardIndex.load(this@BubbleService)
+                    val index = CardIndex.load(this@BubbleService)
+                    // inflate the kit blob now too — otherwise the first tap
+                    // pays for unpacking ~9.5MB
+                    index.firstOrNull { it.kitSpan != null }?.let {
+                        runCatching { KitStore.kit(this@BubbleService, it) }
+                    }
                 }
             }
         }

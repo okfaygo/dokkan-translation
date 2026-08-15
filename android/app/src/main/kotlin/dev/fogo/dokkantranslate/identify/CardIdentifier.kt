@@ -3,9 +3,9 @@ package dev.fogo.dokkantranslate.identify
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.SystemClock
-import dev.fogo.dokkantranslate.api.DokkanInfo
-import dev.fogo.dokkantranslate.api.Kit
 import dev.fogo.dokkantranslate.match.CardIndex
+import dev.fogo.dokkantranslate.match.Kit
+import dev.fogo.dokkantranslate.match.KitStore
 import dev.fogo.dokkantranslate.match.CardRecord
 import dev.fogo.dokkantranslate.match.Matcher
 import dev.fogo.dokkantranslate.ocr.OcrEngine
@@ -114,14 +114,16 @@ object CardIdentifier {
         progress: Progress = Progress {},
     ): Outcome {
         val record = CardIndex.load(context).firstOrNull { it.id == cardId }
-        return if (record != null) {
-            // the user picked this one, so it is no longer a guess
-            fetch(context, record, keepAlternatives, false, keepDebug, progress)
-        } else {
-            fetchById(context, cardId, 0, false, keepAlternatives, keepDebug, progress)
-        }
+            ?: return Outcome.Failure("Card $cardId isn't in the index.", keepDebug)
+        // the user picked this one, so it is no longer a guess
+        return fetch(context, record, keepAlternatives, false, keepDebug, progress)
     }
 
+    /**
+     * The kit is a seek-and-read out of the packed blob that ships with the
+     * index — no network. It used to be a ~211KB page fetch per card, per
+     * user, against DokkanInfo.
+     */
     private suspend fun fetch(
         context: Context,
         record: CardRecord,
@@ -129,32 +131,11 @@ object CardIdentifier {
         ambiguous: Boolean,
         debug: MatchDebug,
         progress: Progress,
-    ): Outcome = fetchById(
-        context, record.id, record.ezaStep, record.altKeys.isNotEmpty(),
-        alternatives, debug, progress, ambiguous, record.displayLabel,
-    )
-
-    private suspend fun fetchById(
-        context: Context,
-        cardId: String,
-        ezaStep: Int,
-        altView: Boolean,
-        alternatives: List<Matcher.Candidate>,
-        debug: MatchDebug,
-        progress: Progress,
-        ambiguous: Boolean = false,
-        label: String? = null,
     ): Outcome {
-        // naming the card while the network call runs makes the wait
-        // legible — the user can already tell whether we got it right
-        progress.onStep(
-            if (label != null) "Fetching kit for $label…" else "Fetching English kit…"
-        )
+        progress.onStep("Reading kit for ${record.displayLabel}…")
         val start = SystemClock.elapsedRealtime()
         return try {
-            val kit = withContext(Dispatchers.IO) {
-                DokkanInfo.fetch(context, cardId, altView, ezaStep)
-            }
+            val kit = withContext(Dispatchers.IO) { KitStore.kit(context, record) }
             val timed = debug.copy(fetchMs = SystemClock.elapsedRealtime() - start)
             Outcome.Success(kit, alternatives, ambiguous, timed)
         } catch (e: Exception) {

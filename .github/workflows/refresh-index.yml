@@ -44,6 +44,7 @@ jobs:
           python -X utf8 build_index.py \
             --sync \
             --index ../android/app/src/main/assets/index.json \
+            --kits ../android/app/src/main/assets/kits.json.gz \
             --max-new 400 \
             --delay 1.5 \
             2>&1 | tee sync.log
@@ -69,9 +70,21 @@ jobs:
           print(f"{len(old)} -> {len(new)} cards")
           if len(new) < len(old):
               sys.exit(f"index shrank ({len(old)} -> {len(new)}), refusing")
-          missing = [k for k in ("lines", "title") if not any(k in r for r in new.values())]
+          cards = {k: v for k, v in new.items() if not k.startswith("__")}
+          missing = [k for k in ("lines", "title") if not any(k in r for r in cards.values())]
           if missing:
               sys.exit(f"index looks malformed, missing {missing}")
+
+          # The offsets must address the blob shipping beside them, or the
+          # app reads garbage.
+          import gzip
+          blob = gzip.open("android/app/src/main/assets/kits.json.gz", "rb").read()
+          spans = [r["kit"] for r in cards.values() if r.get("kit")]
+          if not spans:
+              sys.exit("no kit offsets in the index")
+          if max(o + n for o, n in spans) > len(blob):
+              sys.exit("kit offsets overrun kits.json.gz — mismatched pair")
+          print(f"{len(spans)} kits, blob {len(blob)} bytes, offsets in range")
           PY
 
       - name: Commit the refreshed index
@@ -79,7 +92,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add android/app/src/main/assets/index.json prototype/skipped_ids.json
+          # index.json holds byte offsets into kits.json.gz, so the two are
+          # only valid together — never commit one without the other.
+          git add android/app/src/main/assets/index.json \
+                  android/app/src/main/assets/kits.json.gz \
+                  prototype/skipped_ids.json
           if git diff --cached --quiet; then
             echo "nothing to commit"
             exit 0

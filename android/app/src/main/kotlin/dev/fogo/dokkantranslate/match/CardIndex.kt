@@ -29,6 +29,10 @@ class CardRecord(
      *  Passed as &step= on the alt view — required for some transformed
      *  EZA'd LR forms, a no-op everywhere else. */
     val ezaStep: Int,
+    /** byte range of this card's kit inside the packed blob */
+    val kitSpan: Pair<Int, Int>?,
+    /** false when the card exists on the JP server only */
+    val onGlobal: Boolean,
     val keys: List<String>,
     val altKeys: List<String>,
 ) {
@@ -82,6 +86,8 @@ object CardIndex {
             val root = JSONObject(text)
             val records = ArrayList<CardRecord>(root.length())
             for (id in root.keys()) {
+                // the index also carries a "__meta__" entry
+                if (id.startsWith("__")) continue
                 val rec = root.getJSONObject(id)
                 val title = rec.stringOr("title")
                 val name = rec.stringOr("name")
@@ -110,6 +116,10 @@ object CardIndex {
                         rarity = rec.optInt("rarity"),
                         element = rec.stringOr("element").toIntOrNull() ?: -1,
                         ezaStep = rec.optInt("eza_step", 0),
+                        kitSpan = rec.optJSONArray("kit")?.let {
+                            it.getInt(0) to it.getInt(1)
+                        },
+                        onGlobal = rec.optBoolean("global", true),
                         keys = keys,
                         altKeys = altKeys,
                     )

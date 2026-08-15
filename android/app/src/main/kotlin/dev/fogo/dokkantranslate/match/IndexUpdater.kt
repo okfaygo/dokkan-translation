@@ -5,86 +5,117 @@ import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.zip.GZIPInputStream
+import org.json.JSONObject
 
 /**
- * Keeps the card index current without reinstalling the app.
+ * Keeps the card data current without reinstalling the app.
  *
- * The index bundled in assets is only the floor: it is whatever was true
- * when the APK was built, so a card released afterwards can never be
- * matched. CI refreshes the committed index weekly; this pulls that copy
- * down and stores it in internal storage, where [CardIndex] prefers it.
+ * What ships in the APK is only a floor — whatever was true when it was
+ * built — so a card released afterwards could never be matched. CI
+ * refreshes the committed data weekly; this pulls it down into internal
+ * storage, which [CardIndex] and [KitStore] prefer over the assets.
  *
- * Conditional on ETag, so the usual outcome is a 304 and no download at
- * all. Failure is always silent — a missed update just means the app keeps
- * using the index it already has, which is exactly the old behaviour.
+ * Two files, always moved together: the index holds byte offsets into the
+ * kit blob, so a mismatched pair would read garbage. They are downloaded
+ * to temporary names, checked, and only then swapped in.
  */
 object IndexUpdater {
 
-    // not named URL — that would shadow java.net.URL and make URL(...) below
-    // resolve to this String instead of the constructor
-    private const val INDEX_URL =
+    private const val RAW =
         "https://raw.githubusercontent.com/okfaygo/dokkan-translation/main/" +
-            "android/app/src/main/assets/index.json"
-    private const val FILE = "index.json"
-    private const val ETAG_FILE = "index.etag"
-    private const val MIN_BYTES = 512 * 1024
+            "android/app/src/main/assets/"
+    private const val INDEX = "index.json"
+    private const val KITS = "kits.json.gz"
+    private const val ETAG = "index.etag"
 
-    /** The downloaded index, or null when only the bundled one exists. */
+    /** Shape this build understands; a newer pair is rejected rather than
+     *  misread. Bumped alongside DATA_VERSION in build_index.py. */
+    private const val SUPPORTED_VERSION = 2
+    private const val MIN_INDEX_BYTES = 512 * 1024
+    private const val MIN_KITS_BYTES = 128 * 1024
+
     fun downloadedIndex(context: Context): File? =
-        File(context.filesDir, FILE).takeIf { it.length() >= MIN_BYTES }
+        File(context.filesDir, INDEX).takeIf { it.length() >= MIN_INDEX_BYTES }
 
-    /**
-     * @return true when a newer index was installed (callers may want to
-     *   drop [CardIndex]'s in-memory copy).
-     */
+    fun downloadedKits(context: Context): File? =
+        File(context.filesDir, KITS).takeIf { it.length() >= MIN_KITS_BYTES }
+
+    /** @return true when a newer pair was installed. */
     fun refresh(context: Context): Boolean {
-        val target = File(context.filesDir, FILE)
-        val etagFile = File(context.filesDir, ETAG_FILE)
-        val conn = (URL(INDEX_URL).openConnection() as HttpURLConnection).apply {
-            connectTimeout = 20_000
-            readTimeout = 60_000
-            setRequestProperty("Accept-Encoding", "gzip")
-            if (target.exists() && etagFile.exists()) {
-                setRequestProperty("If-None-Match", etagFile.readText().trim())
-            }
-        }
+        val etagFile = File(context.filesDir, ETAG)
+        val haveBoth = downloadedIndex(context) != null && downloadedKits(context) != null
+        val etag = if (haveBoth && etagFile.exists()) etagFile.readText().trim() else null
+
+        val indexTemp = File(context.filesDir, "$INDEX.part")
+        val kitsTemp = File(context.filesDir, "$KITS.part")
         try {
-            when (conn.responseCode) {
-                HttpURLConnection.HTTP_NOT_MODIFIED -> return false
-                HttpURLConnection.HTTP_OK -> Unit
-                else -> return false
-            }
-            val gzipped = conn.contentEncoding?.equals("gzip", true) == true
-            // Download to a temp file first: a half-written index is worse
-            // than a stale one, since it would break matching outright.
-            val temp = File(context.filesDir, "$FILE.part")
-            conn.inputStream.use { raw ->
-                val body = if (gzipped) GZIPInputStream(raw) else raw
-                temp.outputStream().use { out -> body.copyTo(out) }
-            }
-            if (temp.length() < MIN_BYTES || !looksLikeIndex(temp)) {
-                temp.delete()
-                return false
-            }
-            if (!temp.renameTo(target)) {
-                temp.copyTo(target, overwrite = true)
-                temp.delete()
-            }
-            conn.getHeaderField("ETag")?.let { etagFile.writeText(it) }
+            val (indexOk, newEtag) = download(RAW + INDEX, indexTemp, etag)
+                ?: return false                      // 304 or failure
+            if (!indexOk || indexTemp.length() < MIN_INDEX_BYTES) return false
+
+            // Reject a pair this build cannot read before touching anything.
+            val version = runCatching {
+                JSONObject(indexTemp.readText(Charsets.UTF_8))
+                    .optJSONObject("__meta__")?.optInt("data_version", 1) ?: 1
+            }.getOrDefault(0)
+            if (version != SUPPORTED_VERSION) return false
+
+            val (kitsOk, _) = download(RAW + KITS, kitsTemp, null) ?: return false
+            if (!kitsOk || kitsTemp.length() < MIN_KITS_BYTES) return false
+            if (!gzipReadable(kitsTemp)) return false
+
+            // Swap only once both are on disk and sane.
+            if (!replace(indexTemp, File(context.filesDir, INDEX))) return false
+            if (!replace(kitsTemp, File(context.filesDir, KITS))) return false
+            newEtag?.let { etagFile.writeText(it) }
+            KitStore.invalidate()
             return true
         } catch (e: Exception) {
             return false
+        } finally {
+            indexTemp.delete()
+            kitsTemp.delete()
+        }
+    }
+
+    /** @return null on 304 or error; else (ok, etag). */
+    private fun download(url: String, target: File, etag: String?): Pair<Boolean, String?>? {
+        val conn = (URL(url).openConnection() as HttpURLConnection).apply {
+            connectTimeout = 20_000
+            readTimeout = 120_000
+            setRequestProperty("Accept-Encoding", "gzip")
+            if (etag != null) setRequestProperty("If-None-Match", etag)
+        }
+        try {
+            when (conn.responseCode) {
+                HttpURLConnection.HTTP_NOT_MODIFIED -> return null
+                HttpURLConnection.HTTP_OK -> Unit
+                else -> return null
+            }
+            // NB: only the transfer encoding is unwrapped here. kits.json.gz
+            // is gzip *content* and must stay compressed on disk.
+            val transferGzip = conn.contentEncoding?.equals("gzip", true) == true
+            conn.inputStream.use { raw ->
+                val body = if (transferGzip) GZIPInputStream(raw) else raw
+                target.outputStream().use { out -> body.copyTo(out) }
+            }
+            return true to conn.getHeaderField("ETag")
+        } catch (e: Exception) {
+            return null
         } finally {
             conn.disconnect()
         }
     }
 
-    /** Cheap shape check — enough to reject an error page or a truncation. */
-    private fun looksLikeIndex(file: File): Boolean = runCatching {
-        file.bufferedReader(Charsets.UTF_8).use { reader ->
-            val head = CharArray(64)
-            val read = reader.read(head)
-            read > 0 && String(head, 0, read).trimStart().startsWith("{")
-        }
+    private fun gzipReadable(file: File): Boolean = runCatching {
+        GZIPInputStream(file.inputStream()).use { it.read() >= 0 }
     }.getOrDefault(false)
+
+    private fun replace(from: File, to: File): Boolean {
+        if (from.renameTo(to)) return true
+        return runCatching {
+            from.copyTo(to, overwrite = true)
+            true
+        }.getOrDefault(false)
+    }
 }
