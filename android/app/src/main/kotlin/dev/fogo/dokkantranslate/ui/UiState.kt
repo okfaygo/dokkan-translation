@@ -1,6 +1,6 @@
 package dev.fogo.dokkantranslate.ui
 
-import dev.fogo.dokkantranslate.api.Kit
+import dev.fogo.dokkantranslate.match.Kit
 import dev.fogo.dokkantranslate.identify.MatchDebug
 import dev.fogo.dokkantranslate.identify.Outcome
 import dev.fogo.dokkantranslate.match.Matcher

@@ -293,6 +293,35 @@ identify -> fetch -> render works end to end.
    DokkanInfo and CardIndex now go through util/Json.kt's
    `stringOrNull` / `stringOr`, which check `isNull` first.
    SA effect lines also now render as bullets.
+   **v0.5 bundle English kits (2026-08-14):** the app fetched a ~211KB
+   global card page per card, per user, to render ~1.9KB of kit. Fine for
+   one user; at community scale it is someone else's bandwidth bill, and
+   distribution was the stated goal. Extraction moved to build time.
+   - prototype/kits.py is the port of api/DokkanInfo.kt (parse_itemized,
+     parse_supers, render_effect incl. the calc_option raise/lower flag,
+     the transformation-API overlay). DokkanInfo.kt is DELETED, and with
+     it the runtime disk cache, the ?eza/&step URL policy and the app's
+     only runtime network dependency. Kit/SuperAttack moved to match/.
+   - Format: kits.json.gz is concatenated JSON objects; index.json carries
+     [offset,length] per card. Chosen over one big JSON because the app
+     needs ONE kit at a time — a full parse of the blob would cost seconds
+     and tens of MB of heap in a background service. Ships gzipped (~0.4MB
+     in the APK vs ~4MB) and is inflated once to filesDir on first use,
+     since a compressed asset cannot be seeked.
+   - THE TWO FILES ARE ONLY VALID TOGETHER. Offsets in one address bytes
+     in the other. Written, committed and swapped as a pair, gated on
+     DATA_VERSION (build_index.py) == SUPPORTED_VERSION (IndexUpdater).
+     CI validates that offsets do not overrun the blob before committing.
+   - index.json gained a "__meta__" entry; every consumer must skip
+     "__"-prefixed keys (real_cards() in Python, a startsWith check in
+     CardIndex).
+   - JP-only cards are marked at build time, so the app says so without a
+     failed request.
+   - Backfill lesson: the first run paired --backfill-kits with --rebuild,
+     which made the MAIN loop do the fetching — and its checkpoint saves
+     only the index, not the kits. A crash at ~900 cards lost all kit
+     progress though the page cache survived. --backfill-kits now runs
+     standalone and checkpoints kits every 100.
    Roadmap after that:
    v0.2 floating bubble + MediaProjection (manual trigger) — DONE and
    confirmed on device.

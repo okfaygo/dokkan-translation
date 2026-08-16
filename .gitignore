@@ -15,3 +15,6 @@ keystore.properties
 # Android Studio also writes one at the repo root when opened from here.
 .idea/
 *.iml
+
+# scrape run logs
+prototype/*.log

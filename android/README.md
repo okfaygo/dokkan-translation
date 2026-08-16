@@ -169,6 +169,41 @@ gradle assembleDebug
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
+## Where the English kits come from (v0.5)
+
+Kits ship **with** the index; the app makes no network request to render
+one. Previously it fetched a ~211KB card page per card, per user, and used
+about 1.9KB of it — fine for one person, rude at community scale.
+
+`prototype/kits.py` extracts what the app renders (the port of the old
+`api/DokkanInfo.kt`), and the scraper packs the results into
+`assets/kits.json.gz` as concatenated JSON objects. `index.json` records a
+`[offset, length]` per card, so `match/KitStore` seeks and parses ~2KB
+rather than loading the whole blob — a full parse would cost seconds and
+tens of MB of heap in a background service.
+
+**The two files are only valid as a pair.** Offsets in one address bytes in
+the other, so they are written together, committed together, and swapped
+together, gated on a `data_version` the app checks before trusting a
+download. Never regenerate one alone.
+
+The blob ships gzipped (the APK carries ~0.4MB instead of ~4MB) and is
+inflated once into internal storage on first use, because a compressed
+asset cannot be seeked.
+
+Cards that exist only on the JP server are marked at build time, so the app
+says so immediately instead of discovering it via a failed request.
+
+To rebuild kits from scratch (a ~5k-request pass — run it locally, never
+from CI):
+
+```
+python build_index.py --backfill-kits   --index ../android/app/src/main/assets/index.json   --kits  ../android/app/src/main/assets/kits.json.gz
+```
+
+It resumes safely: pages are cached on disk and progress is checkpointed
+every 100 cards.
+
 ## Keeping the index current (v0.4)
 
 New cards would otherwise be unmatchable until someone re-scraped by hand
