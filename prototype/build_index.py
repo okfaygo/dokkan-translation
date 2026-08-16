@@ -362,7 +362,33 @@ def eza_timestamp(row):
                int(row.get("seza_open_at") or 0))
 
 
-def ids_to_fetch(cards, index, skips, min_rarity, limit):
+def inherited_eza(cards, index):
+    """EZA dates for transformed forms, which the card list never dates.
+
+    The list puts eza_open_at on the base card only — all 8,453 form rows
+    carry a date of 0 — even though an EZA upgrades every form of the card.
+    A form therefore can never look stale by itself, so it goes on
+    re-parsing the page it cached before its base was EZA'd and serves the
+    pre-EZA kit forever. Lending the base's date to its forms closes that.
+    """
+    by_id = {c["id"]: c for c in cards}
+    dates = {}
+    for cid, rec in real_cards(index).items():
+        row = by_id.get(int(cid))
+        when = eza_timestamp(row) if row else 0
+        if not when:
+            continue
+        for tid in rec.get("transformations") or []:
+            dates[tid] = max(dates.get(tid, 0), when)
+    return dates
+
+
+def eza_stamp(card_id, row, inherited):
+    """When this card's kit last changed, per the list. See inherited_eza."""
+    return max(eza_timestamp(row) if row else 0, inherited.get(card_id, 0))
+
+
+def ids_to_fetch(cards, index, skips, min_rarity, limit, inherited=None):
     """Cards needing a fetch, oldest first.
 
     Two reasons a card qualifies:
@@ -373,6 +399,7 @@ def ids_to_fetch(cards, index, skips, min_rarity, limit):
     The second case is the one an id-only diff cannot see: an EZA does not
     mint a new card id, it adds a second kit to an id we already have.
     """
+    inherited = inherited or {}
     now = time.time()
     wanted = []
     for c in cards:
@@ -386,7 +413,7 @@ def ids_to_fetch(cards, index, skips, min_rarity, limit):
             if c["id"] in skips:
                 continue          # known to carry no kit at all
             wanted.append(c)
-        elif eza_timestamp(c) > (rec.get("eza_at") or 0):
+        elif eza_stamp(c["id"], c, inherited) > (rec.get("eza_at") or 0):
             # re-fetch even if ledgered: the ledger is about kit-less cards,
             # and this one demonstrably has one
             wanted.append(c)
@@ -499,6 +526,7 @@ def main():
     # (--rebuild, --ids); everything below must cope with that.
     by_id = {}
     stale = set()
+    inherited = {}
 
     if args.rebuild:
         ids = [int(p.name.split(".")[0]) for p in CARD_CACHE.glob("*.json.gz")]
@@ -514,7 +542,9 @@ def main():
         seeded = seed_eza_timestamps(index, by_id)
         if seeded:
             print(f"backfilled eza_at on {seeded} existing records")
-        ids = ids_to_fetch(cards, index, skips, args.min_rarity, args.max_new)
+        inherited = inherited_eza(cards, index)
+        ids = ids_to_fetch(cards, index, skips, args.min_rarity,
+                           args.max_new, inherited)
         stale = {i for i in ids if str(i) in index}
         print(f"index has {started_with} cards; {len(ids)} to fetch "
               f"({len(ids) - len(stale)} new, {len(stale)} with a newer EZA; "
@@ -604,7 +634,8 @@ def main():
         # erase the timestamp and make every EZA'd card look stale again.
         previous = index.get(str(card_id), {})
         row = by_id.get(card_id)
-        rec["eza_at"] = eza_timestamp(row) if row else (previous.get("eza_at") or 0)
+        stamp = eza_stamp(card_id, row, inherited)
+        rec["eza_at"] = stamp if (row or stamp) else (previous.get("eza_at") or 0)
         index[str(card_id)] = rec
 
         # The English kit ships with the index now, so it is collected here
@@ -627,6 +658,13 @@ def main():
             for tid in rec["transformations"]:
                 if tid not in seen:
                     queue.append(tid)
+                    if force:
+                        # An EZA upgrades every form, so a form's cached page
+                        # is exactly as stale as its base's. Nothing in the
+                        # card list says so (see inherited_eza), and reading
+                        # the old cache is how a form ends up serving its
+                        # pre-EZA kit.
+                        stale.add(tid)
         if len(seen) % 50 == 0:
             save_index(index, args.index)
 
