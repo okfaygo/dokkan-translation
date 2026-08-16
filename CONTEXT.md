@@ -322,6 +322,25 @@ identify -> fetch -> render works end to end.
      only the index, not the kits. A crash at ~900 cards lost all kit
      progress though the page cache survived. --backfill-kits now runs
      standalone and checkpoints kits every 100.
+   **v0.5.1 EZA'd transformed forms never went stale (2026-08-15):** a UR
+   whose EZA had just opened showed the correct new kit on its base card
+   and the PRE-EZA kit on its transformed form. Root cause is upstream:
+   the card list dates an EZA on the base card only (`eza_open_at` /
+   `seza_open_at`); all 8,453 `4xxxxxxx` form rows carry 0, even though an
+   EZA upgrades every form. Staleness was computed per list row, so a form
+   could never look stale -> never force-refreshed -> `fetch_card` replayed
+   the page it had cached from BEFORE the EZA existed -> `has_eza` False
+   -> no `pre_eza_lines` -> `build_kit` saw `alt_view=False` and fetched
+   the BARE global page. Verified on 4027661: cached page (2026-07-28)
+   has `eza_medals: []`, the live page has 7 medals and `max_eza_step: 7`.
+   Fix: forms inherit their base's EZA date (`inherited_eza`), so the
+   existing staleness machinery covers them with no special case, and the
+   next sync self-heals; plus a form enqueued from a force-refreshed base
+   inherits the force, covering the same-run case regardless of queue
+   order. One-time cost: 120 forms re-fetched (119 already correct).
+   Worth remembering the shape of this one — no check could have caught
+   it, because the stored data was internally consistent, just old. The
+   only signal was the game itself.
    Roadmap after that:
    v0.2 floating bubble + MediaProjection (manual trigger) — DONE and
    confirmed on device.
