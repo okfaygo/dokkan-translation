@@ -314,6 +314,27 @@
     text-align: center;
   }
 
+  figure.diagram {
+    margin: 30px 0 0;
+    overflow-x: auto;
+  }
+  figure.diagram svg {
+    display: block;
+    width: 100%;
+    min-width: 520px;
+    height: auto;
+    color: var(--ink);
+  }
+  figure.diagram figcaption {
+    margin: 14px auto 0;
+    max-width: 32rem;
+    font-family: var(--sans);
+    font-size: 0.83rem;
+    line-height: 1.55;
+    color: var(--muted);
+    text-align: center;
+  }
+
   @media (max-width: 640px) {
     body { font-size: 18px; }
     .page { padding: 48px 20px 80px; }
@@ -406,9 +427,121 @@
     <h2>Why recognising the card is the hard part</h2>
     <p>Reading text off a screen is never clean. Characters get dropped. Numbers sitting next to icons get mangled. And Dokkan makes it harder than most games, because there are well over a hundred cards called Super Saiyan Goku, and plenty of them share entire sentences of ability text with each other.</p>
     <p>So the app does not go looking for one perfect match. It holds a vote.</p>
-    <p>The index holds around 38,700 separate pieces of text: every passive line, every super attack name, every leader skill, across all 5,177 cards. Each line the recogniser manages to read is scored against them, and anything clearing a similarity threshold votes for that card, weighted by how long the line is. A full passive sentence therefore counts for far more than a category chip that appears on every screen in the game. The votes are summed per card and the highest total wins.</p>
+    <p>The index holds around 38,700 separate pieces of text: every passive line, every super attack name, every leader skill, across all 5,177 cards. Each line the recogniser manages to read is scored against them, and anything clearing a similarity threshold votes for that card, weighted by how long the line is.</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 640 390" role="img"
+           aria-label="Three lines of recognised text voting for three candidate cards. A long passive sentence contributes 96 to Majin Vegeta and 31 to Super Vegeta. A short category chip contributes 12 to all three, so it separates none of them. A garbled fragment falls below the threshold and contributes nothing. The totals are 108, 43 and 12, so Majin Vegeta wins.">
+        <defs>
+          <marker id="vh" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,1 L9,5 L0,9 z" fill="currentColor"/>
+          </marker>
+          <marker id="vha" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,1 L9,5 L0,9 z" fill="var(--accent, #21708f)"/>
+          </marker>
+        </defs>
+
+        <text x="8" y="20" font-size="13" font-weight="600" fill="currentColor">What the recogniser read</text>
+        <text x="360" y="20" font-size="13" font-weight="600" fill="currentColor">Running total per card</text>
+
+        <rect x="8" y="36" width="188" height="54" rx="7" fill="none" stroke="currentColor" stroke-opacity="0.35"/>
+        <text x="22" y="60" font-size="13" fill="currentColor">A full passive sentence</text>
+        <text x="22" y="78" font-size="11" fill="currentColor" fill-opacity="0.6">long, and distinctive</text>
+
+        <rect x="8" y="126" width="188" height="54" rx="7" fill="none" stroke="currentColor" stroke-opacity="0.35"/>
+        <text x="22" y="150" font-size="13" fill="currentColor">A category chip</text>
+        <text x="22" y="168" font-size="11" fill="currentColor" fill-opacity="0.6">short, on almost every card</text>
+
+        <rect x="8" y="216" width="188" height="54" rx="7" fill="none" stroke="currentColor" stroke-opacity="0.2"
+              stroke-dasharray="5 4"/>
+        <text x="22" y="240" font-size="13" fill="currentColor" fill-opacity="0.5">A garbled fragment</text>
+        <text x="22" y="258" font-size="11" fill="currentColor" fill-opacity="0.45">below the threshold</text>
+
+        <line x1="200" y1="54" x2="352" y2="52" stroke="var(--accent, #21708f)" stroke-width="2.6"
+              marker-end="url(#vha)"/>
+        <text x="266" y="40" font-size="12" font-weight="700" fill="var(--accent, #21708f)">+96</text>
+
+        <line x1="200" y1="74" x2="352" y2="140" stroke="currentColor" stroke-width="1.5"
+              stroke-opacity="0.55" marker-end="url(#vh)"/>
+        <text x="286" y="112" font-size="12" fill="currentColor" fill-opacity="0.7">+31</text>
+
+        <line x1="200" y1="144" x2="352" y2="66" stroke="currentColor" stroke-width="1"
+              stroke-opacity="0.3" stroke-dasharray="4 3" marker-end="url(#vh)"/>
+        <line x1="200" y1="152" x2="352" y2="150" stroke="currentColor" stroke-width="1"
+              stroke-opacity="0.3" stroke-dasharray="4 3" marker-end="url(#vh)"/>
+        <line x1="200" y1="160" x2="352" y2="234" stroke="currentColor" stroke-width="1"
+              stroke-opacity="0.3" stroke-dasharray="4 3" marker-end="url(#vh)"/>
+        <text x="216" y="202" font-size="12" fill="currentColor" fill-opacity="0.6">+12 to each</text>
+
+        <text x="216" y="250" font-size="12" fill="currentColor" fill-opacity="0.45">no vote</text>
+
+        <rect x="360" y="36" width="272" height="44" rx="7" fill="none" stroke="var(--accent, #21708f)" stroke-width="1.6"/>
+        <text x="376" y="63" font-size="13" font-weight="600" fill="currentColor">Majin Vegeta</text>
+        <text x="616" y="63" font-size="14" font-weight="700" text-anchor="end" fill="var(--accent, #21708f)">108</text>
+        <rect x="360" y="86" width="190" height="6" rx="3" fill="var(--accent, #21708f)"/>
+
+        <rect x="360" y="126" width="272" height="44" rx="7" fill="none" stroke="currentColor" stroke-opacity="0.35"/>
+        <text x="376" y="153" font-size="13" fill="currentColor">Super Vegeta</text>
+        <text x="616" y="153" font-size="14" text-anchor="end" fill="currentColor" fill-opacity="0.75">43</text>
+        <rect x="360" y="176" width="76" height="6" rx="3" fill="currentColor" fill-opacity="0.35"/>
+
+        <rect x="360" y="216" width="272" height="44" rx="7" fill="none" stroke="currentColor" stroke-opacity="0.35"/>
+        <text x="376" y="243" font-size="13" fill="currentColor">Vegeta (Angel)</text>
+        <text x="616" y="243" font-size="14" text-anchor="end" fill="currentColor" fill-opacity="0.75">12</text>
+        <rect x="360" y="266" width="21" height="6" rx="3" fill="currentColor" fill-opacity="0.35"/>
+
+        <text x="8" y="336" font-size="12" fill="currentColor" fill-opacity="0.65">The chip votes for everything, so it separates nothing. The long line decides it.</text>
+      </svg>
+      <figcaption>How one screenshot resolves to one card. The numbers are illustrative, but the shape is real: a short label appearing on almost every card contributes to all of them equally and therefore breaks no ties, while one long line does most of the work.</figcaption>
+    </figure>
     <p>The scoring is deliberately forgiving about the specific way OCR fails here. It measures the longest run of characters two strings share in order, rather than demanding they line up position by position, because the usual damage is dropped or swapped characters rather than scrambled ones. A digit misread next to an icon costs almost nothing.</p>
-    <p>One fix came out of a measurement rather than a hunch. The in-game card page truncates the leader skill to a single cut-off line, so comparing that fragment against the full index entry scored below the threshold and contributed nothing at all. The best evidence on the screen was invisible to the matcher on about 7% of cards. The answer was to also score how much of the read line appears, in order, inside the index entry, which makes the truncation stop mattering and costs nothing extra, because it falls out of the same comparison already being done.</p>
+    <p>One fix came out of a measurement rather than a hunch. The in-game card page truncates the leader skill to a single cut-off line, and comparing that fragment against the full index entry scored below the threshold, so the best evidence on the screen was contributing nothing at all. It was invisible to the matcher on about 7% of cards.</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 640 366" role="img"
+           aria-label="The index holds a leader skill of about eighty characters. The card page shows only the first twenty before cutting off. Compared whole against whole the score is 200 times 20 divided by 100, which is 40, below the threshold of 70, so it contributes nothing. Scored instead as how much of the read line appears inside the index entry, it is 100 times 20 divided by 20 times 0.95, which is 95, and it votes.">
+        <defs>
+          <marker id="tc" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,1 L9,5 L0,9 z" fill="currentColor"/>
+          </marker>
+        </defs>
+
+        <text x="8" y="20" font-size="12" fill="currentColor" fill-opacity="0.7">The leader skill, as the index has it</text>
+        <rect x="8" y="30" width="560" height="26" rx="5" fill="none" stroke="currentColor" stroke-opacity="0.35"/>
+        <rect x="8" y="30" width="140" height="26" rx="5" fill="var(--accent, #21708f)" fill-opacity="0.18"/>
+        <text x="576" y="48" font-size="12" fill="currentColor" fill-opacity="0.55">80</text>
+
+        <line x1="8" y1="58" x2="8" y2="86" stroke="currentColor" stroke-opacity="0.25" stroke-dasharray="3 3"/>
+        <line x1="148" y1="58" x2="148" y2="86" stroke="currentColor" stroke-opacity="0.25" stroke-dasharray="3 3"/>
+
+        <text x="8" y="80" font-size="12" fill="currentColor" fill-opacity="0.7">What the card page actually shows</text>
+        <rect x="8" y="90" width="140" height="26" rx="5" fill="var(--accent, #21708f)" fill-opacity="0.18"
+              stroke="var(--accent, #21708f)" stroke-opacity="0.7"/>
+        <text x="158" y="108" font-size="12" fill="currentColor" fill-opacity="0.55">20, then it is cut off</text>
+
+        <rect x="8" y="146" width="300" height="128" rx="7" fill="none" stroke="currentColor" stroke-opacity="0.3"/>
+        <text x="24" y="172" font-size="13" font-weight="600" fill="currentColor">Whole against whole</text>
+        <text x="24" y="198" font-size="12" fill="currentColor" fill-opacity="0.65">200 x 20 / (20 + 80)</text>
+        <text x="24" y="236" font-size="22" font-weight="700" fill="currentColor" fill-opacity="0.45">40</text>
+        <text x="24" y="260" font-size="12" fill="currentColor" fill-opacity="0.55">under 70, contributes nothing</text>
+
+        <rect x="332" y="146" width="300" height="128" rx="7" fill="none"
+              stroke="var(--accent, #21708f)" stroke-width="1.6"/>
+        <text x="348" y="172" font-size="13" font-weight="600" fill="currentColor">How much of it is inside</text>
+        <text x="348" y="198" font-size="12" fill="currentColor" fill-opacity="0.65">100 x 20 / 20 x 0.95</text>
+        <text x="348" y="236" font-size="22" font-weight="700" fill="var(--accent, #21708f)">95</text>
+        <text x="348" y="260" font-size="12" fill="var(--accent, #21708f)">clears 70, and votes</text>
+
+        <line x1="316" y1="210" x2="326" y2="210" stroke="currentColor" stroke-opacity="0.4"
+              marker-end="url(#tc)"/>
+
+        <text x="8" y="316" font-size="12" fill="currentColor" fill-opacity="0.65">Neither string changed. Only the question asked about them did.</text>
+      </svg>
+      <figcaption>Why a truncated line scored nothing. The threshold, the 0.95 discount and both formulas are the real ones; the two lengths are illustrative. The second measure costs nothing extra, because it reuses the character overlap the first one already computed.</figcaption>
+    </figure>
     <p>The textbook fix, meanwhile, failed. Down-weighting text that many cards share is the standard answer to a character name appearing on 105 different cards. It was implemented twice and made accuracy worse on every measurement, because damping the real signal leaves interface noise that happens to match something rare comparatively louder. It is written into the source as a dead end so that nobody, me included, tries it again.</p>
     <p>It works the way you recognise a song from a few half-remembered lyrics. No single line proves anything. Enough of them pointing the same direction does.</p>
   </section>
