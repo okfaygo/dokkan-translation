@@ -79,9 +79,16 @@ page = """<!doctype html>
 </html>
 """.format(title=title, desc=DESCRIPTION, url=SITE_URL, style=style, body=body)
 
-if os.path.isdir(OUT):
-    shutil.rmtree(OUT)
-os.makedirs(OUT)
+# Clear the contents rather than the directory itself: on Windows a
+# rmtree of _site fails with "access is denied" whenever anything still
+# holds the folder open, which leaves a half-deleted build behind.
+os.makedirs(OUT, exist_ok=True)
+for name in os.listdir(OUT):
+    stale = os.path.join(OUT, name)
+    if os.path.isdir(stale):
+        shutil.rmtree(stale, ignore_errors=True)
+    else:
+        os.remove(stale)
 open(os.path.join(OUT, "index.html"), "w", encoding="utf-8", newline="").write(page)
 
 missing = [a for a in ASSETS if not os.path.exists(os.path.join(HERE, a))]
