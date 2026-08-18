@@ -378,6 +378,8 @@
     <p>A small bubble floats on top of the game. When you hit a card you cannot read, you tap it. The bubble glances at the screen, works out which card that is, and slides up a panel with the English version: leader skill, passive, super attack, links and categories.</p>
     <p>Tap, read, close. That is the whole thing.</p>
     <p>Underneath it is an Android overlay window sitting above the game, MediaProjection mirroring the screen so a tap can grab the current frame, and ML Kit's Japanese text recognition running on the phone with the model bundled into the app. Nothing is sent anywhere.</p>
+    <p>That middle part is where the platform decided the design. On Android 14 and up a screen-capture grant is single use: the consent can be exchanged once, and creating a second capture from the same grant throws. So a capture-per-tap app would put a system permission dialog in front of you on every single tap. Instead the app takes the permission once when the bubble starts and leaves the screen mirrored for the session, and a tap just takes the newest frame. One dialog, unlimited reads, at the cost of mirroring while it runs.</p>
+    <p>Two consequences that were not obvious. The frame buffer holds two images, and while both are full the mirror cannot post anything new, so it has to be drained before every capture. Skip that and you are handed a frame from minutes ago, which is worse than an error, because it produces a confident answer about the wrong card. And the bubble has to hide itself before capturing, since it is sitting on the screen it is about to photograph. Grabbing the frame takes about 150 milliseconds; recognising and matching it takes under a second.</p>
 
     <figure class="demo">
       <video controls muted loop playsinline preload="metadata"
@@ -395,7 +397,9 @@
   <section>
     <h2>Where the 5,177 cards came from</h2>
     <p>Matching needs something to match against: the Japanese text of every card, keyed to an ID. There is no API for that. What there is, it turns out, is a community card database whose pages carry the entire card record as JSON embedded in the HTML, so a scraper can read it straight out rather than pretending to be a browser.</p>
+    <p>The notes I started from said that source was unscrapable, that the site rendered everything in the browser and served an empty shell. That note was two years old and wrong. A single HTTP request disproved it, and took with it the entire case for scraping a wiki instead, or pulling apart the game's own database. Checking it was the highest-value ten minutes in the project.</p>
     <p>Collecting it was not the hard part. Reconciling it was. An SSR that awakens to UR and then to LR is three separate cards with three different kits, so the index has to hold all three and the app has to match whichever one you are actually holding. An Extreme Z-Awakening does not mint a new card, it adds a second kit to an ID that already exists, so both versions have to sit in the index at once. And a transformed form does not serve its own abilities on its own page at all. That data only exists behind an undocumented endpoint, which turned up by reading the site's own JavaScript to see what its transformation arrows were calling.</p>
+    <p>That last one was not only a display problem. The index had been storing the base card's Japanese text for 117 transformed forms, so a screenshot of a transformed card could never match correctly. There was nothing correct in the index for it to match against. Fixing what the app showed also fixed what it was searching.</p>
   </section>
 
   <section>
@@ -404,13 +408,15 @@
     <p>So the app does not go looking for one perfect match. It holds a vote.</p>
     <p>The index holds around 38,700 separate pieces of text: every passive line, every super attack name, every leader skill, across all 5,177 cards. Each line the recogniser manages to read is scored against them, and anything clearing a similarity threshold votes for that card, weighted by how long the line is. A full passive sentence therefore counts for far more than a category chip that appears on every screen in the game. The votes are summed per card and the highest total wins.</p>
     <p>The scoring is deliberately forgiving about the specific way OCR fails here. It measures the longest run of characters two strings share in order, rather than demanding they line up position by position, because the usual damage is dropped or swapped characters rather than scrambled ones. A digit misread next to an icon costs almost nothing.</p>
+    <p>One fix came out of a measurement rather than a hunch. The in-game card page truncates the leader skill to a single cut-off line, so comparing that fragment against the full index entry scored below the threshold and contributed nothing at all. The best evidence on the screen was invisible to the matcher on about 7% of cards. The answer was to also score how much of the read line appears, in order, inside the index entry, which makes the truncation stop mattering and costs nothing extra, because it falls out of the same comparison already being done.</p>
+    <p>The textbook fix, meanwhile, failed. Down-weighting text that many cards share is the standard answer to a character name appearing on 105 different cards. It was implemented twice and made accuracy worse on every measurement, because damping the real signal leaves interface noise that happens to match something rare comparatively louder. It is written into the source as a dead end so that nobody, me included, tries it again.</p>
     <p>It works the way you recognise a song from a few half-remembered lyrics. No single line proves anything. Enough of them pointing the same direction does.</p>
   </section>
 
   <section>
     <h2>Knowing when it doesn’t know</h2>
     <p>Some screenshots genuinely cannot identify a card. If the only readable thing is the character's name, then a hundred cards match equally well, and no amount of cleverness recovers the right one, because the information needed simply is not on the screen.</p>
-    <p>The app checks for this. If too many cards end up tied at the top, it stops, tells you the screenshot was ambiguous, and hands you a short list to choose from instead of presenting a guess as though it were an answer.</p>
+    <p>The app checks for this by counting how many candidates sit within 2% of the top score. The separation is cleaner than I expected: a healthy card page usually has 2 candidates in that band, while a name-only screenshot has around 7. At three or more it stops, tells you the screenshot was ambiguous, widens the list of alternatives it offers, and points you at the screen that does work, instead of presenting a guess as though it were an answer.</p>
     <p>Being willing to say "I am not sure" turned out to be one of the more useful things it does.</p>
   </section>
 
