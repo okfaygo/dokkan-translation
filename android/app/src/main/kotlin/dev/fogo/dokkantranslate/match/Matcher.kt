@@ -12,9 +12,10 @@ import kotlinx.coroutines.coroutineScope
  * Votes are weighted by line length so a full passive sentence outvotes
  * short fragments (category chips, UI labels, OCR shrapnel).
  *
- * Each card's two site views (see CardIndex) are scored separately; the
- * winning candidate remembers which view matched, and the app fetches that
- * same view so the displayed kit is the one on the player's screen.
+ * Each card's two site views (see CardIndex) are scored separately so
+ * either can win. Only one kit is stored per card: the scraper chose the
+ * view at build time, so the displayed kit is the one on the screen without
+ * anything being selected at runtime.
  *
  * Ties: candidates within 2% of the top score are re-ranked to prefer base
  * summonable cards over transformed forms, then higher rarity, then higher

@@ -13,7 +13,8 @@ import org.json.JSONObject
  * and which one is the player's current kit varies (bare URL = base kit for
  * EZA'd URs but SEZA kit for LRs; ?eza=true is the other one). The matcher
  * scores both; whichever view matched the screenshot is the kit the player
- * is actually looking at, and the app fetches that same view for display.
+ * is actually looking at; the scraper packed that view's kit at build
+ * time, so display is a read and not a second choice made here.
  *
  *  - keys:    from the bare jpnja page ("lines" + active + leader)
  *  - altKeys: from the ?eza=true jpnja page ("pre_eza_lines" + its leader)
