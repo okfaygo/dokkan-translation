@@ -341,6 +341,46 @@ identify -> fetch -> render works end to end.
    Worth remembering the shape of this one — no check could have caught
    it, because the stored data was internally consistent, just old. The
    only signal was the game itself.
+   **v0.5.2 badge hints are inert; pixel colour investigated, declined
+   (2026-08-18):** field report was that OCR never reads the type/rarity
+   emblems off a real screenshot. Traced it: Matcher.extractHints wants a
+   bare two-character line starting with the Super or Extreme kanji, or a
+   bare "UR"/"LR"/"SSR" line. bench.py's badge_lines() SYNTHESISES exactly
+   those tokens into the benchmark input, which is where the 48% -> 82%
+   same-character figure came from. On a real screenshot the emblems are
+   stylised artwork rather than text, so ML Kit emits nothing for them and
+   the boost never fires. The feature is inert, not harmful.
+   Investigated recovering them by pixel colour. Pulled the JP icon assets
+   and measured the diamond fill, sampling the top and bottom tips because
+   the centre line runs straight through the kanji (two earlier attempts
+   measured the gold frame and produced nonsense; a swatch strip caught it):
+     AGL rgb(59,144,191) h=202    TEQ rgb(84,170,63)  h=108
+     INT rgb(181,105,162) h=315   STR rgb(224,86,60)  h=10
+     PHY rgb(181,116,10) h=37
+   Minimum hue gap 27.5 deg (STR vs PHY); every other pair is 55 to 94 deg
+   apart, so the palette is comfortably separable. Super and Extreme are
+   pixel-identical, which costs nothing since Matcher compares element % 10.
+   Declined anyway, for two reasons. (1) Rarity does not decode at all: UR
+   and LR are both rainbow-filled and differ only by the LR dragon ornament,
+   and UR vs LR is precisely the awakening-sibling case rarity was meant to
+   break. (2) Locating the badge is the real cost: OcrEngine keeps only
+   line.text and drops line.boundingBox, so there is no anchor to sample
+   against, and the passive-detail popup, the input the app recommends,
+   carries no badge at all. Ceiling is a bounded gain on one input type.
+   Governing asymmetry for any future attempt: a MISSING hint is free, a
+   WRONG hint boosts every card of the wrong type and can promote a wrong
+   answer outright. Abstain rather than guess. (An earlier note that
+   boost-only made this safe was wrong: it makes ABSENT hints safe, not
+   incorrect ones.)
+   Hints stay in the code: zero cost, and they would begin working if the
+   recognizer ever started reading the emblems. User decision: text-only
+   recognition is already good enough on the paths that matter.
+   Asset paths recovered from dokkaninfo's app.js, worth keeping:
+     JP type icon  /assets/japan/layout/image/character/cha_type_icon_<element>.png
+     JP rarity     .../character/cha_rare_sm_{ssr,ur,lr}.png
+     EN equivalent /assets/global/en/layout/en/image/character/
+     card thumb    /assets/<ver>/character/thumb/card_<icon_id>_thumb/card_<icon_id>_thumb.png
+     thumb frame   .../character/character_thumb_bg/cha_base_0<bg_element>_0<rarity>.png
    Roadmap after that:
    v0.2 floating bubble + MediaProjection (manual trigger) — DONE and
    confirmed on device.
