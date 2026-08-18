@@ -1,0 +1,66 @@
+name: Build check
+
+# Compiles the app on every pull request and on pushes to main.
+#
+# This exists because nothing else compiled the Kotlin until a release was
+# tagged. A watcher loop once shipped with `isActive` resolving to
+# NonCancellable.isActive (hardcoded true, so the loop condition was
+# decorative); it built locally only because the IDE had auto-imported it,
+# and the mistake was invisible until a release build ran days later.
+#
+# assembleDebug rather than compileDebugKotlin: it costs a little more and
+# also catches manifest, resource and packaging breakage. It needs no
+# secrets, because the debug key is generated on the runner.
+
+on:
+  pull_request:
+    paths:
+      - "android/**"
+      - ".github/workflows/build-check.yml"
+  push:
+    branches: [main]
+    paths:
+      - "android/**"
+      - ".github/workflows/build-check.yml"
+
+# A newer push supersedes whatever is still running for the same ref.
+concurrency:
+  group: build-check-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      # The project has no committed Gradle wrapper (Android Studio builds
+      # with its own bundled Gradle), so the version is pinned here. Keep it
+      # in step with release-apk.yml and gradle-wrapper.properties.
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: "8.11.1"
+
+      - name: Compile the app
+        working-directory: android
+        run: gradle --no-daemon assembleDebug
+
+      # Only useful when something broke; a passing build's output is just
+      # a debug APK signed with this runner's throwaway key.
+      - name: Keep the build output when something went wrong
+        if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: build-output
+          path: android/app/build/outputs
+          if-no-files-found: ignore
