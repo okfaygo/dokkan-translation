@@ -71,7 +71,7 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           VERSION_CODE: ${{ github.run_number }}
-          VERSION_NAME: 0.4.${{ github.run_number }}
+          VERSION_NAME: 0.5.${{ github.run_number }}
         run: gradle --no-daemon assembleRelease
 
       - name: Confirm the APK is signed
