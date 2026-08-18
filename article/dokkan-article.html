@@ -5,9 +5,11 @@
   file in a browser to preview it; the video sits beside it as
   demo_clip.mp4, so keep the two together.
 
-  demo_clip.mp4 is deliberately NOT in the repository, being 3.3MB of
-  video. A fresh clone will show an empty player until it is put back
-  alongside this file.
+  IMPORTANT: this file is deliberately NOT a whole HTML document. It has
+  no doctype, <html>, <head> or <body>, because it is published two ways:
+  as a Claude artifact, whose runtime supplies that wrapper, and as a
+  GitHub Pages site, where article/build_site.py supplies it. Adding those
+  tags by hand would break both. Everything else is fair game.
 
   House rules for this piece:
     * no em dashes or en dashes anywhere, use commas, colons or full stops

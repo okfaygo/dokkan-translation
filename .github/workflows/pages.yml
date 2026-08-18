@@ -1,0 +1,73 @@
+name: Publish the article
+
+# Serves article/ as a GitHub Pages site, so the write-up has a link that
+# sits next to the releases rather than living somewhere else.
+#
+# article/dokkan-article.html is deliberately not a whole HTML document:
+# it is also published as a Claude artifact, where the runtime supplies the
+# <head>. build_site.py adds one for Pages, which is what provides the
+# viewport meta (phones would otherwise render it at desktop width) and the
+# link-preview tags.
+#
+# One-time setup: Settings -> Pages -> Source: GitHub Actions.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "article/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never cancel a half-finished deploy; let it land, then run the next one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Build the site
+        run: python article/build_site.py
+
+      # A missing asset would publish a page with a dead video rather than
+      # failing, so check before anything is uploaded.
+      - name: Check the output
+        run: |
+          for f in index.html demo_clip.mp4 poster.jpg preview.jpg; do
+            test -s "_site/$f" || { echo "::error::_site/$f missing or empty"; exit 1; }
+          done
+          grep -q 'width=device-width' _site/index.html \
+            || { echo "::error::viewport meta missing"; exit 1; }
+          grep -q 'og:image' _site/index.html \
+            || { echo "::error::preview tags missing"; exit 1; }
+          ls -lh _site
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
