@@ -497,7 +497,51 @@
       <figcaption>How one screenshot resolves to one card. The numbers are illustrative, but the shape is real: a short label appearing on almost every card contributes to all of them equally and therefore breaks no ties, while one long line does most of the work.</figcaption>
     </figure>
     <p>The scoring is deliberately forgiving about the specific way OCR fails here. It measures the longest run of characters two strings share in order, rather than demanding they line up position by position, because the usual damage is dropped or swapped characters rather than scrambled ones. A digit misread next to an icon costs almost nothing.</p>
-    <p>One fix came out of a measurement rather than a hunch. The in-game card page truncates the leader skill to a single cut-off line, so comparing that fragment against the full index entry scored below the threshold and contributed nothing at all. The best evidence on the screen was invisible to the matcher on about 7% of cards. The answer was to also score how much of the read line appears, in order, inside the index entry, which makes the truncation stop mattering and costs nothing extra, because it falls out of the same comparison already being done.</p>
+    <p>One fix came out of a measurement rather than a hunch. The in-game card page truncates the leader skill to a single cut-off line, and comparing that fragment against the full index entry scored below the threshold, so the best evidence on the screen was contributing nothing at all. It was invisible to the matcher on about 7% of cards.</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 640 366" role="img"
+           aria-label="The index holds a leader skill of about eighty characters. The card page shows only the first twenty before cutting off. Compared whole against whole the score is 200 times 20 divided by 100, which is 40, below the threshold of 70, so it contributes nothing. Scored instead as how much of the read line appears inside the index entry, it is 100 times 20 divided by 20 times 0.95, which is 95, and it votes.">
+        <defs>
+          <marker id="tc" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,1 L9,5 L0,9 z" fill="currentColor"/>
+          </marker>
+        </defs>
+
+        <text x="8" y="20" font-size="12" fill="currentColor" fill-opacity="0.7">The leader skill, as the index has it</text>
+        <rect x="8" y="30" width="560" height="26" rx="5" fill="none" stroke="currentColor" stroke-opacity="0.35"/>
+        <rect x="8" y="30" width="140" height="26" rx="5" fill="var(--accent, #21708f)" fill-opacity="0.18"/>
+        <text x="576" y="48" font-size="12" fill="currentColor" fill-opacity="0.55">80</text>
+
+        <line x1="8" y1="58" x2="8" y2="86" stroke="currentColor" stroke-opacity="0.25" stroke-dasharray="3 3"/>
+        <line x1="148" y1="58" x2="148" y2="86" stroke="currentColor" stroke-opacity="0.25" stroke-dasharray="3 3"/>
+
+        <text x="8" y="80" font-size="12" fill="currentColor" fill-opacity="0.7">What the card page actually shows</text>
+        <rect x="8" y="90" width="140" height="26" rx="5" fill="var(--accent, #21708f)" fill-opacity="0.18"
+              stroke="var(--accent, #21708f)" stroke-opacity="0.7"/>
+        <text x="158" y="108" font-size="12" fill="currentColor" fill-opacity="0.55">20, then it is cut off</text>
+
+        <rect x="8" y="146" width="300" height="128" rx="7" fill="none" stroke="currentColor" stroke-opacity="0.3"/>
+        <text x="24" y="172" font-size="13" font-weight="600" fill="currentColor">Whole against whole</text>
+        <text x="24" y="198" font-size="12" fill="currentColor" fill-opacity="0.65">200 x 20 / (20 + 80)</text>
+        <text x="24" y="236" font-size="22" font-weight="700" fill="currentColor" fill-opacity="0.45">40</text>
+        <text x="24" y="260" font-size="12" fill="currentColor" fill-opacity="0.55">under 70, contributes nothing</text>
+
+        <rect x="332" y="146" width="300" height="128" rx="7" fill="none"
+              stroke="var(--accent, #21708f)" stroke-width="1.6"/>
+        <text x="348" y="172" font-size="13" font-weight="600" fill="currentColor">How much of it is inside</text>
+        <text x="348" y="198" font-size="12" fill="currentColor" fill-opacity="0.65">100 x 20 / 20 x 0.95</text>
+        <text x="348" y="236" font-size="22" font-weight="700" fill="var(--accent, #21708f)">95</text>
+        <text x="348" y="260" font-size="12" fill="var(--accent, #21708f)">clears 70, and votes</text>
+
+        <line x1="316" y1="210" x2="326" y2="210" stroke="currentColor" stroke-opacity="0.4"
+              marker-end="url(#tc)"/>
+
+        <text x="8" y="316" font-size="12" fill="currentColor" fill-opacity="0.65">Neither string changed. Only the question asked about them did.</text>
+      </svg>
+      <figcaption>Why a truncated line scored nothing. The threshold, the 0.95 discount and both formulas are the real ones; the two lengths are illustrative. The second measure costs nothing extra, because it reuses the character overlap the first one already computed.</figcaption>
+    </figure>
     <p>The textbook fix, meanwhile, failed. Down-weighting text that many cards share is the standard answer to a character name appearing on 105 different cards. It was implemented twice and made accuracy worse on every measurement, because damping the real signal leaves interface noise that happens to match something rare comparatively louder. It is written into the source as a dead end so that nobody, me included, tries it again.</p>
     <p>It works the way you recognise a song from a few half-remembered lyrics. No single line proves anything. Enough of them pointing the same direction does.</p>
   </section>
