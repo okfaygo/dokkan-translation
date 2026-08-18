@@ -377,6 +377,7 @@
     <h2>What using it looks like</h2>
     <p>A small bubble floats on top of the game. When you hit a card you cannot read, you tap it. The bubble glances at the screen, works out which card that is, and slides up a panel with the English version: leader skill, passive, super attack, links and categories.</p>
     <p>Tap, read, close. That is the whole thing.</p>
+    <p>Underneath it is an Android overlay window sitting above the game, MediaProjection mirroring the screen so a tap can grab the current frame, and ML Kit's Japanese text recognition running on the phone with the model bundled into the app. Nothing is sent anywhere.</p>
 
     <figure class="demo">
       <video controls muted loop playsinline preload="metadata"
@@ -392,10 +393,17 @@
   <div class="spectrum"><span></span><span></span><span></span><span></span><span></span></div>
 
   <section>
+    <h2>Where the 5,177 cards came from</h2>
+    <p>Matching needs something to match against: the Japanese text of every card, keyed to an ID. There is no API for that. What there is, it turns out, is a community card database whose pages carry the entire card record as JSON embedded in the HTML, so a scraper can read it straight out rather than pretending to be a browser.</p>
+    <p>Collecting it was not the hard part. Reconciling it was. An SSR that awakens to UR and then to LR is three separate cards with three different kits, so the index has to hold all three and the app has to match whichever one you are actually holding. An Extreme Z-Awakening does not mint a new card, it adds a second kit to an ID that already exists, so both versions have to sit in the index at once. And a transformed form does not serve its own abilities on its own page at all. That data only exists behind an undocumented endpoint, which turned up by reading the site's own JavaScript to see what its transformation arrows were calling.</p>
+  </section>
+
+  <section>
     <h2>Why recognising the card is the hard part</h2>
     <p>Reading text off a screen is never clean. Characters get dropped. Numbers sitting next to icons get mangled. And Dokkan makes it harder than most games, because there are well over a hundred cards called Super Saiyan Goku, and plenty of them share entire sentences of ability text with each other.</p>
     <p>So the app does not go looking for one perfect match. It holds a vote.</p>
-    <p>Every line of text it manages to read votes for the cards it resembles, and for how closely it resembles them. A long, distinctive sentence gets a much bigger say than a short label that shows up on every screen in the game. Then the votes are added up, and the card with the most agreement wins.</p>
+    <p>The index holds around 38,700 separate pieces of text: every passive line, every super attack name, every leader skill, across all 5,177 cards. Each line the recogniser manages to read is scored against them, and anything clearing a similarity threshold votes for that card, weighted by how long the line is. A full passive sentence therefore counts for far more than a category chip that appears on every screen in the game. The votes are summed per card and the highest total wins.</p>
+    <p>The scoring is deliberately forgiving about the specific way OCR fails here. It measures the longest run of characters two strings share in order, rather than demanding they line up position by position, because the usual damage is dropped or swapped characters rather than scrambled ones. A digit misread next to an icon costs almost nothing.</p>
     <p>It works the way you recognise a song from a few half-remembered lyrics. No single line proves anything. Enough of them pointing the same direction does.</p>
   </section>
 
@@ -410,9 +418,20 @@
 
   <section>
     <h2>It works with no internet</h2>
-    <p>Everything the app needs is already inside it. All 5,177 cards, and all the English kits, are packed into the app itself. It does not need a connection to answer a question.</p>
-    <p>That was partly a courtesy. An earlier version looked each card up from a fan-run Dokkan site as you used it, downloading a full web page every time to show you a few lines of text. That is fine when one person does it and rude when a whole community does. Now everything is gathered once, ahead of time, and the site gets left alone.</p>
+    <p>Everything the app needs is already inside it. All 5,177 cards and all 5,159 English kits are packed into the app itself, about half a megabyte compressed. It does not need a connection to answer a question.</p>
+    <p>The kits are stored as one long run of JSON objects with a byte offset recorded per card, rather than as a single document. The app only ever wants one kit at a time, and parsing the whole thing would cost seconds and a good deal of memory inside a background service, so instead it seeks to the offset and reads about two kilobytes.</p>
+    <p>That was partly a courtesy. An earlier version looked each card up from a fan-run Dokkan site as you used it, pulling a 211KB page every time to show you those same two kilobytes. That is fine when one person does it and rude when a whole community does. Now it is gathered once, ahead of time, and the site gets left alone.</p>
   </section>
+
+  <section>
+    <h2>A card released next week</h2>
+    <p>Which is the obvious problem with packing everything into the app: a card that comes out next week is not in a build I made last month.</p>
+    <p>That is handled by a pipeline rather than by me remembering. A scheduled job runs every week, pulls the live card list and compares it against the index already committed to the repository. It fetches only what is genuinely missing, which after a banner is usually five to twenty cards rather than the eleven thousand a full re-scrape would hit. It checks the result, refuses to commit an index smaller than the one already there, and pushes the update back. The app looks for a newer index when it starts and pulls it down.</p>
+    <p>New banner, no app update, no work from me.</p>
+    <p>Releases work the same way. Tagging a version builds and signs the APK and attaches it to a release, which is why it installs from a phone's browser with no computer involved. The signing part matters more than it sounds: a fresh build machine invents a new key every run, and Android will not install a build over one signed with a different key, so without a stored key every update would mean uninstalling first.</p>
+  </section>
+
+  <div class="spectrum"><span></span><span></span><span></span><span></span><span></span></div>
 
   <section>
     <h2>One bug worth telling you about</h2>
@@ -432,7 +451,7 @@
   </div>
 
   <footer>
-    <p>It installs straight from your phone's browser. No computer and no cable needed. The code and the card data are public, and the card index refreshes itself every week so new banners work without an update.</p>
+    <p>It installs straight from your phone's browser. No computer and no cable needed. The code, the card index and the extracted kits are all public.</p>
     <a class="repo-card" href="https://github.com/okfaygo/dokkan-translation/releases">
       <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
       <span class="rc-body">
