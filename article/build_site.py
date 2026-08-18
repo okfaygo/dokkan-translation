@@ -24,7 +24,9 @@ DESCRIPTION = (
     "An Android app that reads JP Dokkan Battle cards off your screen and "
     "shows what they do in English, without translating a single word."
 )
-ASSETS = ["demo_clip.mp4", "poster.jpg", "preview.jpg"]
+ASSETS = ["demo_clip.mp4", "poster.jpg", "preview.jpg",
+          "example-vegeta-card.jpg", "example-vegeta-kit.jpg",
+          "example-goku-card.jpg", "example-goku-kit.jpg"]
 
 src = open(os.path.join(HERE, "dokkan-article.html"), encoding="utf-8").read()
 
