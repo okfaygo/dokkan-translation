@@ -416,8 +416,8 @@ class BubbleService : Service() {
         panelParams = null
     }
 
-    /** Newest first, de-duplicated, capped — cheap to revisit since kits
-     *  are cached on disk permanently. */
+    /** Newest first, de-duplicated, capped — cheap to revisit since
+     *  every kit ships inside the app. */
     private fun remember(kit: Kit) {
         val entry = HistoryEntry(kit.cardId, kit.name)
         history = (listOf(entry) + history.filterNot { it.cardId == entry.cardId })
@@ -427,13 +427,15 @@ class BubbleService : Service() {
     private fun lookUp(cardId: String) {
         val current = state as? UiState.Result
         work = scope.launch {
-            state = UiState.Working("Fetching English kit…")
+            // Nothing is fetched here: the kit is a seek into the packed
+            // blob. Report what CardIdentifier reports instead of keeping a
+            // second copy of the wording, which is how this one went stale.
             state = CardIdentifier.lookUp(
                 this@BubbleService,
                 cardId,
                 current?.alternatives ?: emptyList(),
                 current?.debug ?: MatchDebug(),
-            ).toUiState()
+            ) { step -> state = UiState.Working(step) }.toUiState()
             (state as? UiState.Result)?.let { remember(it.kit) }
         }
     }

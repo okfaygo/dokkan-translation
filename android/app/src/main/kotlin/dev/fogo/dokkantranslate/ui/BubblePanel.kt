@@ -143,8 +143,8 @@ fun BubblePanel(
 }
 
 /**
- * Cards identified earlier this session, newest first. Kits are cached on
- * disk permanently, so revisiting one is instant and costs no capture —
+ * Cards identified earlier this session, newest first. Every kit ships
+ * inside the app, so revisiting one is instant and costs no capture —
  * this is what removes the repetition that made auto-detection tempting.
  */
 @Composable
