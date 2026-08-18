@@ -289,6 +289,31 @@
     .repo-card { transition: none; }
   }
 
+  figure.examples { margin: 30px 0 0; }
+  figure.examples + figure.examples { margin-top: 26px; }
+  .ex-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .ex-pair img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 9px;
+    border: 1px solid var(--rule);
+    background: #000;
+  }
+  figure.examples figcaption {
+    margin: 13px auto 0;
+    max-width: 30rem;
+    font-family: var(--sans);
+    font-size: 0.83rem;
+    line-height: 1.55;
+    color: var(--muted);
+    text-align: center;
+  }
+
   @media (max-width: 640px) {
     body { font-size: 18px; }
     .page { padding: 48px 20px 80px; }
@@ -308,6 +333,22 @@
   <section>
     <p>A new card lands on JP. You pull it, you open the details, and you are looking at a wall of Japanese. Somewhere in there it says how much ATK it actually gets, whether that lasts one turn or the whole fight, and whether the part that sounds incredible only works when the enemy is above 50% HP.</p>
     <p>You can guess. Guessing is how people end up building a rotation around a card that does not do what they thought it did.</p>
+
+    <figure class="examples">
+      <div class="ex-pair">
+        <img src="example-vegeta-card.jpg" alt="A Dokkan Battle card page shown entirely in Japanese, for Majin Vegeta.">
+        <img src="example-vegeta-kit.jpg" alt="The passive skill detail screen for the same card, a full page of dense Japanese text.">
+      </div>
+      <figcaption>Majin Vegeta. The card on the left, his passive skill on the right. Almost everything that decides whether he is worth building around is on that second screen.</figcaption>
+    </figure>
+
+    <figure class="examples">
+      <div class="ex-pair">
+        <img src="example-goku-card.jpg" alt="A Dokkan Battle card page shown entirely in Japanese, for Super Saiyan 4 Goku (Mini) from DAIMA.">
+        <img src="example-goku-kit.jpg" alt="The passive skill detail screen for the same card, another full page of dense Japanese text.">
+      </div>
+      <figcaption>Super Saiyan 4 Goku (Mini) from DAIMA, and the same problem again. Ten separate effects hanging off five different conditions, and the conditions are the part that matters.</figcaption>
+    </figure>
   </section>
 
   <section>
