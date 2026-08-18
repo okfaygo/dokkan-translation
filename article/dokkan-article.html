@@ -1,0 +1,350 @@
+<!--
+  The plain-English article, in an editable form.
+
+  Edit the text between the tags and nothing else is required. Open this
+  file in a browser to preview it; the video sits beside it as
+  demo_clip.mp4, so keep the two together.
+
+  demo_clip.mp4 is deliberately NOT in the repository, being 3.3MB of
+  video. A fresh clone will show an empty player until it is put back
+  alongside this file.
+
+  House rules for this piece:
+    * no em dashes or en dashes anywhere, use commas, colons or full stops
+    * plain language, assume the reader plays Dokkan and writes no code
+    * the numbers in it are real: 5,177 cards indexed, 5,159 with an
+      English kit, 18 without one
+
+  When you are happy with it, say so and it gets re-embedded and
+  republished to the same artifact URL.
+-->
+<title>The App That Doesn’t Translate</title>
+
+<style>
+  /* Palette is taken from the game's own type emblems, sampled from the
+     icon assets: AGL blue, TEQ green, INT purple, STR red, PHY gold.
+     The accent is the AGL blue, deepened for contrast on a light ground. */
+  :root {
+    --ground: #f1f4f7;
+    --surface: #ffffff;
+    --ink: #131720;
+    --muted: #525c6c;
+    --faint: #838d9d;
+    --rule: #dde2e9;
+    --accent: #21708f;
+    --accent-soft: rgba(33, 112, 143, 0.10);
+
+    --agl: #3b90bf;
+    --teq: #54aa3f;
+    --int: #b569a2;
+    --str: #e0563c;
+    --phy: #b5740a;
+
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "Times New Roman", serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0d1117;
+      --surface: #171d26;
+      --ink: #e7eaf0;
+      --muted: #98a2b2;
+      --faint: #727d8e;
+      --rule: #242c38;
+      --accent: #63b6e2;
+      --accent-soft: rgba(99, 182, 226, 0.13);
+
+      --agl: #5aa8d2;
+      --teq: #6cc154;
+      --int: #c884b6;
+      --str: #ef6f56;
+      --phy: #d99423;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0d1117;
+    --surface: #171d26;
+    --ink: #e7eaf0;
+    --muted: #98a2b2;
+    --faint: #727d8e;
+    --rule: #242c38;
+    --accent: #63b6e2;
+    --accent-soft: rgba(99, 182, 226, 0.13);
+
+    --agl: #5aa8d2;
+    --teq: #6cc154;
+    --int: #c884b6;
+    --str: #ef6f56;
+    --phy: #d99423;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 19px;
+    line-height: 1.72;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 72px 24px 110px;
+  }
+
+  h1, h2, .eyebrow, .stat .v, .limits h2, footer { font-family: var(--sans); }
+
+  h1 {
+    font-size: clamp(2.1rem, 6.5vw, 3rem);
+    font-weight: 750;
+    letter-spacing: -0.032em;
+    line-height: 1.08;
+    text-wrap: balance;
+    margin: 0 0 20px;
+  }
+
+  h2 {
+    font-size: clamp(1.25rem, 3.4vw, 1.5rem);
+    font-weight: 700;
+    letter-spacing: -0.018em;
+    line-height: 1.25;
+    text-wrap: balance;
+    margin: 0 0 14px;
+  }
+
+  .eyebrow {
+    font-size: 0.74rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+    margin: 0 0 14px;
+  }
+
+  .lede {
+    font-size: 1.16rem;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  p { margin: 0 0 20px; }
+  p:last-child { margin-bottom: 0; }
+
+  section { margin-top: 46px; }
+
+  /* The five type colours, used as the section divider. It is the one
+     decorative device on the page, and it is borrowed from the subject. */
+  .spectrum {
+    display: flex;
+    gap: 3px;
+    margin: 44px 0 0;
+  }
+  .spectrum span { height: 4px; flex: 1; border-radius: 2px; }
+  .spectrum span:nth-child(1) { background: var(--agl); }
+  .spectrum span:nth-child(2) { background: var(--teq); }
+  .spectrum span:nth-child(3) { background: var(--int); }
+  .spectrum span:nth-child(4) { background: var(--str); }
+  .spectrum span:nth-child(5) { background: var(--phy); }
+
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 26px 28px;
+    margin: 30px 0;
+    text-align: center;
+  }
+  .stat .v {
+    display: block;
+    font-size: clamp(2.2rem, 8vw, 3rem);
+    font-weight: 750;
+    letter-spacing: -0.035em;
+    line-height: 1;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .stat .l {
+    display: block;
+    margin-top: 10px;
+    font-size: 0.98rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  blockquote {
+    margin: 30px 0;
+    padding: 4px 0 4px 22px;
+    border-left: 3px solid var(--accent);
+    font-size: 1.13rem;
+    color: var(--ink);
+  }
+  blockquote p { margin: 0; }
+
+  .limits {
+    background: var(--accent-soft);
+    border-radius: 8px;
+    padding: 26px 28px;
+    margin-top: 30px;
+  }
+  .limits h2 { font-size: 1.06rem; margin-bottom: 12px; }
+  .limits ul { margin: 0; padding-left: 1.2em; }
+  .limits li { margin-bottom: 12px; font-size: 0.99rem; line-height: 1.6; }
+  .limits li:last-child { margin-bottom: 0; }
+  .limits li::marker { color: var(--accent); }
+
+  a { color: var(--accent); text-underline-offset: 3px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+  footer {
+    margin-top: 50px;
+    padding-top: 26px;
+    border-top: 1px solid var(--rule);
+    font-size: 0.92rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  figure.demo { margin: 32px 0 0; }
+  figure.demo video {
+    display: block;
+    width: 100%;
+    max-width: 296px;
+    margin: 0 auto;
+    border-radius: 16px;
+    border: 1px solid var(--rule);
+    background: #000;
+  }
+  figure.demo figcaption {
+    margin: 16px auto 0;
+    max-width: 30rem;
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  @media (max-width: 640px) {
+    body { font-size: 18px; }
+    .page { padding: 48px 20px 80px; }
+  }
+</style>
+
+<div class="page">
+
+  <header>
+    <p class="eyebrow">Dokkan Battle</p>
+    <h1>The app that doesn’t translate</h1>
+    <p class="lede">I built something that reads JP Dokkan cards and shows you what they do in English. The interesting part is that it never translates a single word.</p>
+  </header>
+
+  <div class="spectrum"><span></span><span></span><span></span><span></span><span></span></div>
+
+  <section>
+    <p>A new card lands on JP. You pull it, you open the details, and you are looking at a wall of Japanese. Somewhere in there it says how much ATK it actually gets, whether that lasts one turn or the whole fight, and whether the part that sounds incredible only works when the enemy is above 50% HP.</p>
+    <p>You can guess. Guessing is how people end up building a rotation around a card that does not do what they thought it did.</p>
+  </section>
+
+  <section>
+    <h2>The obvious fix, and why it fails</h2>
+    <p>The obvious fix is a translator. Point something at the text, get English back.</p>
+    <p>In practice that goes badly. Dokkan's wording is formal, repetitive and extremely specific, and the numbers matter far more than the sentence wrapped around them. A translator that turns "raises ATK by 150% for 3 turns" into "greatly increases attack for a while" has technically done its job and practically ruined it.</p>
+    <p>The bigger problem is that machine translation is confidently wrong. It does not flag the parts it guessed at. For a game where a single number decides whether a card is worth building around, a translation you cannot trust is worse than no translation.</p>
+  </section>
+
+  <div class="spectrum"><span></span><span></span><span></span><span></span><span></span></div>
+
+  <section>
+    <h2>So it doesn’t translate. Not one word.</h2>
+    <p>Here is what makes that possible.</p>
+    <p>The community already translated every card. By hand, carefully, over years. When a card reaches the Global version it gets an official English kit, and because JP and Global now release the same cards on the same schedule, that English version almost always already exists by the time you are looking at the card.</p>
+    <div class="stat">
+      <span class="v">18</span>
+      <span class="l">of the 5,177 cards the app knows about have no English version yet. The other 5,159 were already written by someone.</span>
+    </div>
+    <p>The translation problem was solved a long time ago, by players. What was never solved is a much smaller question:</p>
+    <blockquote><p>Which one of five thousand cards am I looking at right now?</p></blockquote>
+    <p>Answer that, and the English is just a lookup.</p>
+  </section>
+
+  <section>
+    <h2>What using it looks like</h2>
+    <p>A small bubble floats on top of the game. When you hit a card you cannot read, you tap it. The bubble glances at the screen, works out which card that is, and slides up a panel with the English version: leader skill, passive, super attack, links and categories.</p>
+    <p>Tap, read, close. That is the whole thing.</p>
+
+    <figure class="demo">
+      <video controls muted loop playsinline preload="metadata"
+             aria-label="The app identifying Dokkan cards and showing their English kits">
+        <source src="demo_clip.mp4" type="video/mp4">
+      </video>
+      <figcaption>Japanese on the screen, the English kit underneath. The panel
+      keeping up as the cards change is an optional setting. By default you tap
+      the bubble whenever you want a card read.</figcaption>
+    </figure>
+  </section>
+
+  <div class="spectrum"><span></span><span></span><span></span><span></span><span></span></div>
+
+  <section>
+    <h2>Why recognising the card is the hard part</h2>
+    <p>Reading text off a screen is never clean. Characters get dropped. Numbers sitting next to icons get mangled. And Dokkan makes it harder than most games, because there are well over a hundred cards called Super Saiyan Goku, and plenty of them share entire sentences of ability text with each other.</p>
+    <p>So the app does not go looking for one perfect match. It holds a vote.</p>
+    <p>Every line of text it manages to read votes for the cards it resembles, and for how closely it resembles them. A long, distinctive sentence gets a much bigger say than a short label that shows up on every screen in the game. Then the votes are added up, and the card with the most agreement wins.</p>
+    <p>It works the way you recognise a song from a few half-remembered lyrics. No single line proves anything. Enough of them pointing the same direction does.</p>
+  </section>
+
+  <section>
+    <h2>Knowing when it doesn’t know</h2>
+    <p>Some screenshots genuinely cannot identify a card. If the only readable thing is the character's name, then a hundred cards match equally well, and no amount of cleverness recovers the right one, because the information needed simply is not on the screen.</p>
+    <p>The app checks for this. If too many cards end up tied at the top, it stops, tells you the screenshot was ambiguous, and hands you a short list to choose from instead of presenting a guess as though it were an answer.</p>
+    <p>Being willing to say "I am not sure" turned out to be one of the more useful things it does.</p>
+  </section>
+
+  <div class="spectrum"><span></span><span></span><span></span><span></span><span></span></div>
+
+  <section>
+    <h2>It works with no internet</h2>
+    <p>Everything the app needs is already inside it. All 5,177 cards, and all the English kits, are packed into the app itself. It does not need a connection to answer a question.</p>
+    <p>That was partly a courtesy. An earlier version looked each card up from a fan-run Dokkan site as you used it, downloading a full web page every time to show you a few lines of text. That is fine when one person does it and rude when a whole community does. Now everything is gathered once, ahead of time, and the site gets left alone.</p>
+  </section>
+
+  <section>
+    <h2>One bug worth telling you about</h2>
+    <p>A card had just been Extreme Z-Awakened. On its base form, the app showed the new kit correctly. On its transformed form, it kept showing the old one.</p>
+    <p>The cause was not really in the app. The card list it builds from records an awakening date on the base card only. Every transformed form is listed with no date at all, even though the awakening upgrades every form of the card. So the app looked at the transformed form, saw that nothing had changed, and carried on using the copy it had saved from before the awakening happened.</p>
+    <p>Nothing inside the app could have caught it. The saved information was complete and perfectly consistent with itself. It was just describing a card that no longer existed. The only thing that knew it was wrong was the game, and a player who noticed.</p>
+  </section>
+
+  <div class="limits">
+    <h2>What it can’t do</h2>
+    <ul>
+      <li>Cards that share both a name and an entire kit with an awakening sibling are genuinely impossible to tell apart from text alone. The app shows you both instead of quietly picking one.</li>
+      <li>A card that is on JP but has not reached Global yet gets identified correctly, and then honestly tells you there is no English version to show. Now that the two versions release together, this is rare.</li>
+      <li>It reads best from a card's ability detail popup. A card list, where the game cuts text off after one line, is harder for it.</li>
+      <li>While the bubble is running, the app is watching the screen, which costs some battery. That is the trade for not making you grant permission again on every single tap.</li>
+    </ul>
+  </div>
+
+  <footer>
+    <p>It installs straight from your phone's browser. No computer and no cable needed. The code and the card data are public, and the card index refreshes itself every week so new banners work without an update.</p>
+    <p style="margin-top:14px"><a href="https://github.com/okfaygo/dokkan-translation/releases">github.com/okfaygo/dokkan-translation/releases</a></p>
+  </footer>
+
+</div>
+
+<script>
+  (function () {
+    var v = document.querySelector('figure.demo video');
+    if (!v) return;
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      v.setAttribute('autoplay', '');
+      var go = v.play();
+      if (go && go.catch) go.catch(function () {});
+    }
+  })();
+</script>

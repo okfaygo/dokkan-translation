@@ -18,3 +18,7 @@ keystore.properties
 
 # scrape run logs
 prototype/*.log
+
+# The article's demo clip: 3.3MB of video that belongs in the
+# published artifact, not in git history.
+article/demo_clip.mp4
