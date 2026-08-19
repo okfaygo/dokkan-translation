@@ -400,7 +400,6 @@
     <p>Tap, read, close. That is the whole thing.</p>
     <p>Underneath it is an Android overlay window sitting above the game, MediaProjection mirroring the screen so a tap can grab the current frame, and ML Kit's Japanese text recognition running on the phone with the model bundled into the app. Nothing is sent anywhere.</p>
     <p>That middle part is where the platform decided the design. On Android 14 and up a screen-capture grant is single use: the consent can be exchanged once, and creating a second capture from the same grant throws. So a capture-per-tap app would put a system permission dialog in front of you on every single tap. Instead the app takes the permission once when the bubble starts and leaves the screen mirrored for the session, and a tap just takes the newest frame. One dialog, unlimited reads, at the cost of mirroring while it runs.</p>
-    <p>Two consequences that were not obvious. The frame buffer holds two images, and while both are full the mirror cannot post anything new, so it has to be drained before every capture. Skip that and you are handed a frame from minutes ago, which is worse than an error, because it produces a confident answer about the wrong card. And the bubble has to hide itself before capturing, since it is sitting on the screen it is about to photograph. Grabbing the frame takes about 150 milliseconds; recognising and matching it takes under a second.</p>
 
     <figure class="demo">
       <video controls muted loop playsinline preload="metadata"
@@ -495,6 +494,7 @@
         <text x="8" y="336" font-size="12" fill="currentColor" fill-opacity="0.65">The chip votes for everything, so it separates nothing. The long line decides it.</text>
       </svg>
       <figcaption>How one screenshot resolves to one card. The numbers are illustrative, but the shape is real: a short label appearing on almost every card contributes to all of them equally and therefore breaks no ties, while one long line does most of the work.</figcaption>
+      <br>
     </figure>
     <p>The scoring is deliberately forgiving about the specific way OCR fails here. It measures the longest run of characters two strings share in order, rather than demanding they line up position by position, because the usual damage is dropped or swapped characters rather than scrambled ones. A digit misread next to an icon costs almost nothing.</p>
     <p>One fix came out of a measurement rather than a hunch. The in-game card page truncates the leader skill to a single cut-off line, and comparing that fragment against the full index entry scored below the threshold, so the best evidence on the screen was contributing nothing at all. It was invisible to the matcher on about 7% of cards.</p>
@@ -541,6 +541,7 @@
         <text x="8" y="316" font-size="12" fill="currentColor" fill-opacity="0.65">Neither string changed. Only the question asked about them did.</text>
       </svg>
       <figcaption>Why a truncated line scored nothing. The threshold, the 0.95 discount and both formulas are the real ones; the two lengths are illustrative. The second measure costs nothing extra, because it reuses the character overlap the first one already computed.</figcaption>
+      <br>
     </figure>
     <p>The textbook fix, meanwhile, failed. Down-weighting text that many cards share is the standard answer to a character name appearing on 105 different cards. It was implemented twice and made accuracy worse on every measurement, because damping the real signal leaves interface noise that happens to match something rare comparatively louder. It is written into the source as a dead end so that nobody, me included, tries it again.</p>
     <p>It works the way you recognise a song from a few half-remembered lyrics. No single line proves anything. Enough of them pointing the same direction does.</p>
