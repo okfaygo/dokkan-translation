@@ -16,7 +16,13 @@ object OcrEngine {
      *  type/rarity hints, so they survive the Japanese-text filter. */
     private val rarityMarkers = setOf("UR", "LR", "SSR")
 
-    /** All recognized lines containing Japanese text, in reading order. */
+    /**
+     * All recognized lines containing Japanese text, in reading order.
+     *
+     * Repeats are KEPT: a mission list shows the same line once per entry
+     * ("極限Z覚醒を7段階行おう" under three characters), and each one is
+     * a different mission. The card matcher de-duplicates for itself.
+     */
     suspend fun recognizeJapaneseLines(bitmap: Bitmap): List<String> {
         val recognizer =
             TextRecognition.getClient(JapaneseTextRecognizerOptions.Builder().build())
@@ -36,6 +42,6 @@ object OcrEngine {
                 ) lines.add(s)
             }
         }
-        return lines.distinct()
+        return lines
     }
 }

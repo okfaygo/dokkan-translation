@@ -54,6 +54,7 @@ fun AppScreen(
                     is UiState.Working -> Working(state.step)
                     is UiState.Failed -> Failed(state.message, state.debug, onPickImage)
                     is UiState.Result -> KitView(state, onSelectCard, onPickImage)
+                    is UiState.Missions -> MissionsView(state, onPickImage)
                 }
             }
         }
@@ -99,7 +100,8 @@ private fun Idle(onPickImage: () -> Unit) {
     Text(
         "Screenshot a card in JP Dokkan (the passive-detail popup works " +
             "best, the card page also works), then Share it to this app " +
-            "to see the English kit.\n\n" +
+            "to see the English kit. Mission screens work the same " +
+            "way: every mission on screen is shown in English.\n\n" +
             "You can also pick a screenshot from your gallery:"
     )
     Spacer(Modifier.height(16.dp))
@@ -141,6 +143,12 @@ internal fun DebugPanel(debug: MatchDebug) {
     if (!open) return
 
     Text(debug.timings, style = MaterialTheme.typography.labelMedium)
+    Spacer(Modifier.height(6.dp))
+    Text(
+        "best card %.1f  ·  missions %.1f (the higher one is shown)"
+            .format(debug.cardScore, debug.missionScore),
+        style = MaterialTheme.typography.labelMedium,
+    )
     Spacer(Modifier.height(6.dp))
     Text(
         "OCR read ${debug.ocrLines.size} line(s)" +
@@ -300,6 +308,55 @@ internal fun KitView(
                     Text(alt.record.displayLabel)
                 }
             }
+        }
+    }
+
+    Spacer(Modifier.height(24.dp))
+    OutlinedButton(onClick = onPickImage) { Text(bottomActionLabel) }
+    DebugPanel(result.debug)
+}
+
+/**
+ * Every mission recognized on screen, in screen order, with Global's
+ * official English. Descriptions carry the real conditions (names are often
+ * generic: "clear the specified Extreme Z-Battle under special
+ * conditions"), so they are shown whenever the match is certain.
+ */
+@Composable
+internal fun MissionsView(
+    result: UiState.Missions,
+    onPickImage: () -> Unit,
+    bottomActionLabel: String = "Identify another screenshot",
+) {
+    Text(
+        if (result.hits.size == 1) "Mission" else "Missions (${result.hits.size})",
+        style = MaterialTheme.typography.headlineSmall,
+    )
+    for (hit in result.hits) {
+        val mission = hit.mission
+        Spacer(Modifier.height(12.dp))
+        val nameEn = mission.nameEn
+        val descEn = mission.descEn
+        if (nameEn != null) {
+            Text(nameEn, fontWeight = FontWeight.Bold)
+            when {
+                !hit.confident -> Text(
+                    "Several events have a mission with this name; open it " +
+                        "in game to see its exact conditions.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                descEn != null && descEn != nameEn ->
+                    Text(descEn, style = MaterialTheme.typography.bodyMedium)
+            }
+        } else {
+            Text(mission.nameJa.replace("\n", ""), fontWeight = FontWeight.Bold)
+            Text(
+                "Not on the Global server yet, so there is no official " +
+                    "English text for this mission.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.secondary,
+            )
         }
     }
 
