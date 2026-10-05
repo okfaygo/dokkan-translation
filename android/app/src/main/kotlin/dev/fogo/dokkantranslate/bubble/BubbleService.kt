@@ -30,6 +30,7 @@ import dev.fogo.dokkantranslate.identify.Outcome
 import dev.fogo.dokkantranslate.match.CardIndex
 import dev.fogo.dokkantranslate.match.KitStore
 import dev.fogo.dokkantranslate.match.IndexUpdater
+import dev.fogo.dokkantranslate.match.MissionIndex
 import dev.fogo.dokkantranslate.ui.BubblePanel
 import dev.fogo.dokkantranslate.ui.UiState
 import dev.fogo.dokkantranslate.ui.toUiState
@@ -122,6 +123,11 @@ class BubbleService : Service() {
                     index.firstOrNull { it.kitSpan != null }?.let {
                         runCatching { KitStore.kit(this@BubbleService, it) }
                     }
+                    // and the mission table, which every tap also reads
+                    if (IndexUpdater.refreshMissions(this@BubbleService)) {
+                        MissionIndex.invalidate()
+                    }
+                    MissionIndex.load(this@BubbleService)
                 }
             }
         }
@@ -463,7 +469,7 @@ class BubbleService : Service() {
         )
         val notification: Notification = Notification.Builder(this, CHANNEL_ID)
             .setContentTitle("Dokkan Translate is reading the screen")
-            .setContentText("Tap the bubble over a card to identify it.")
+            .setContentText("Tap the bubble over a card or a mission list.")
             .setSmallIcon(R.drawable.ic_launcher)
             .setContentIntent(open)
             .addAction(Notification.Action.Builder(null, "Stop", stop).build())
