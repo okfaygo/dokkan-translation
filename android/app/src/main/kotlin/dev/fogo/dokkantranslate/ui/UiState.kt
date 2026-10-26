@@ -4,6 +4,7 @@ import dev.fogo.dokkantranslate.match.Kit
 import dev.fogo.dokkantranslate.identify.MatchDebug
 import dev.fogo.dokkantranslate.identify.Outcome
 import dev.fogo.dokkantranslate.match.Matcher
+import dev.fogo.dokkantranslate.match.MissionMatcher
 
 /** Shared by the full-screen activity and the floating bubble's panel. */
 sealed interface UiState {
@@ -17,9 +18,14 @@ sealed interface UiState {
         val ambiguous: Boolean = false,
         val debug: MatchDebug = MatchDebug(),
     ) : UiState
+    data class Missions(
+        val hits: List<MissionMatcher.Hit>,
+        val debug: MatchDebug = MatchDebug(),
+    ) : UiState
 }
 
 fun Outcome.toUiState(): UiState = when (this) {
     is Outcome.Success -> UiState.Result(kit, alternatives, ambiguous, debug)
+    is Outcome.Missions -> UiState.Missions(hits, debug)
     is Outcome.Failure -> UiState.Failed(message, debug)
 }

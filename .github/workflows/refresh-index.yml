@@ -1,4 +1,4 @@
-name: Refresh card index
+name: Refresh card index and missions
 
 # New Dokkan cards land roughly weekly. This fetches only the ones the
 # index is missing and commits the result, so the app's index keeps up
@@ -105,10 +105,67 @@ jobs:
           git commit -m "Refresh card index ($COUNT cards)"
           git push
 
+      # Missions live in their own file with no offsets into anything, so
+      # they are refreshed and committed independently of the card pair.
+      # --sync stops paging at the first page with nothing new (~12
+      # requests), never the ~100-page full scrape.
+      - name: Sync missions
+        id: missions
+        working-directory: prototype
+        run: |
+          set -o pipefail
+          python -X utf8 build_missions.py \
+            --sync \
+            --out ../android/app/src/main/assets/missions.json \
+            --delay 1.5 \
+            2>&1 | tee missions.log
+          if grep -q "NOTHING_NEW" missions.log; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate the mission table before committing
+        if: steps.missions.outputs.changed == 'true'
+        run: |
+          python - <<'PY'
+          import json, subprocess, sys
+          path = "android/app/src/main/assets/missions.json"
+          new = json.load(open(path, encoding="utf-8"))
+          old_raw = subprocess.run(
+              ["git", "show", f"HEAD:{path}"], capture_output=True, text=True,
+          ).stdout
+          old = json.loads(old_raw) if old_raw.strip() else {}
+          count = lambda t: sum(1 for k in t if not k.startswith("__"))
+          print(f"{count(old)} -> {count(new)} missions")
+          if count(new) < count(old):
+              sys.exit("mission table shrank, refusing")
+          if new.get("__meta__", {}).get("data_version") != 1:
+              sys.exit("unexpected data_version — bump the app's SUPPORTED_MISSIONS_VERSION too")
+          if not new.get("__cats__"):
+              sys.exit("mission table has no event names")
+          PY
+
+      - name: Commit the refreshed missions
+        if: steps.missions.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add android/app/src/main/assets/missions.json
+          if git diff --cached --quiet; then
+            echo "nothing to commit"
+            exit 0
+          fi
+          COUNT=$(python -c "import json;print(json.load(open('android/app/src/main/assets/missions.json',encoding='utf-8'))['__meta__']['missions'])")
+          git commit -m "Refresh missions ($COUNT missions)"
+          git push
+
       - name: Keep the log when something went wrong
         if: failure()
         uses: actions/upload-artifact@v5
         with:
           name: sync-log
-          path: prototype/sync.log
+          path: |
+            prototype/sync.log
+            prototype/missions.log
           if-no-files-found: ignore

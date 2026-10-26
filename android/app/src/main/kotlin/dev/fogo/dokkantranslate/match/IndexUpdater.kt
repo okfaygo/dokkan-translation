@@ -27,18 +27,55 @@ object IndexUpdater {
     private const val INDEX = "index.json"
     private const val KITS = "kits.json.gz"
     private const val ETAG = "index.etag"
+    private const val MISSIONS = "missions.json"
+    private const val MISSIONS_ETAG = "missions.etag"
 
     /** Shape this build understands; a newer pair is rejected rather than
      *  misread. Bumped alongside DATA_VERSION in build_index.py. */
     private const val SUPPORTED_VERSION = 2
     private const val MIN_INDEX_BYTES = 512 * 1024
     private const val MIN_KITS_BYTES = 128 * 1024
+    /** missions.json has its own DATA_VERSION (build_missions.py) */
+    private const val SUPPORTED_MISSIONS_VERSION = 1
+    private const val MIN_MISSIONS_BYTES = 512 * 1024
 
     fun downloadedIndex(context: Context): File? =
         File(context.filesDir, INDEX).takeIf { it.length() >= MIN_INDEX_BYTES }
 
     fun downloadedKits(context: Context): File? =
         File(context.filesDir, KITS).takeIf { it.length() >= MIN_KITS_BYTES }
+
+    fun downloadedMissions(context: Context): File? =
+        File(context.filesDir, MISSIONS).takeIf { it.length() >= MIN_MISSIONS_BYTES }
+
+    /**
+     * The mission table on its own: unlike the card pair it holds no
+     * offsets into anything, so it is fetched and swapped independently.
+     * @return true when a newer table was installed.
+     */
+    fun refreshMissions(context: Context): Boolean {
+        val etagFile = File(context.filesDir, MISSIONS_ETAG)
+        val etag = if (downloadedMissions(context) != null && etagFile.exists()) {
+            etagFile.readText().trim()
+        } else null
+        val temp = File(context.filesDir, "$MISSIONS.part")
+        try {
+            val (ok, newEtag) = download(RAW + MISSIONS, temp, etag) ?: return false
+            if (!ok || temp.length() < MIN_MISSIONS_BYTES) return false
+            val version = runCatching {
+                JSONObject(temp.readText(Charsets.UTF_8))
+                    .optJSONObject("__meta__")?.optInt("data_version", 0) ?: 0
+            }.getOrDefault(0)
+            if (version != SUPPORTED_MISSIONS_VERSION) return false
+            if (!replace(temp, File(context.filesDir, MISSIONS))) return false
+            newEtag?.let { etagFile.writeText(it) }
+            return true
+        } catch (e: Exception) {
+            return false
+        } finally {
+            temp.delete()
+        }
+    }
 
     /** @return true when a newer pair was installed. */
     fun refresh(context: Context): Boolean {

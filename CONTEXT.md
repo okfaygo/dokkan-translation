@@ -494,6 +494,53 @@ identify -> fetch -> render works end to end.
    Not an option: fetching unknown cards on demand instead — matching
    needs the JP text present locally, and the app cannot match what it
    does not have.
+   **Mission translation (2026-10-01, NOT device-tested; JVM-verified):**
+   same identify-and-lookup idea, applied to mission screens. No machine
+   translation: DokkanInfo's `/missions?type=N&page=P` pages embed
+   `missioncategoriesset` JSON, and mission ids are SHARED between the JP
+   and Global sites, so Global's official text is joined on id.
+   - Data: `prototype/build_missions.py` -> `assets/missions.json`
+     (7,198 missions, 7,154 with English, 476 event names in `__cats__`;
+     3.4MB, ~300KB gzipped). Types 1 daily / 2 normal / 4 Supreme Kai
+     trials are single pages; 3 events and 5 panels are paginated
+     newest-first. `--sync` (what CI runs, weekly, in refresh-index.yml)
+     stops at the first page with nothing new: ~10 requests. Own
+     DATA_VERSION (1), own download + ETag in IndexUpdater — no offsets
+     into anything, so not coupled to the card pair.
+   - DATA FINDING that shaped the matcher: names are often generic — 402
+     missions are literally "clear the specified Extreme Z-Battle under
+     special conditions"; the specifics live in the description, and the
+     only thing separating the twins is the EVENT. Hence event names are
+     match keys and vote for a category.
+   - Matcher: `prototype/match_missions.py` (reference) ==
+     `match/MissionMatcher.kt`. Several missions per screen, so the result
+     is a list: segments = lines + adjacent pairs (names wrap at the JP
+     \n); pairs compared ONLY with multi-line keys (else "挑戦する" +
+     a name line scores ~83 against the one-line name); digits must agree
+     (templated "ステージ1/2を1回クリア" differ only by number); greedy
+     cover where a mission claims ONE contiguous block of lines (else it
+     steals one entry's first line and another's second). Twins with
+     identical JP and no event evidence -> most common English, flagged
+     not-confident (UI hides the description, which may be a twin's).
+     Ties go to the newest event/mission (reruns repeat text verbatim).
+   - Card vs mission screen is decided per screenshot, no mode switch:
+     missions win only if their score (same scale as the card matcher)
+     beats the best card. Needed because mission descriptions quote card
+     names and categories, so card pages DO hit mission text.
+   - OcrEngine no longer de-duplicates lines (a mission list repeats
+     "極限Z覚醒を7段階行おう" once per entry); the card path calls
+     distinct() itself, so card matching is unchanged.
+   - Verified: synthetic bench (`bench_missions.py`; no real screenshots
+     yet): lists 100% / 96% / 86% recall at 0 / 5 / 10% char noise,
+     popups 97-98%, 0/60 card screens misread as missions. Kotlin vs
+     Python parity 175/175 identical, run on a JVM in Docker with an
+     Android stub; ~7ms per screen on desktop, index load ~0.5s
+     (preloaded by the bubble). Not compiled against the Android SDK
+     here: build-check.yml covers that on push.
+   - Unknowns to check on device: the bench ASSUMES list entries show the
+     name wrapped exactly at the JP \n, and detail popups show the
+     description lines. The debug panel now prints both scores ("best
+     card X · missions Y") for the first real failures.
 3. EZA/transformed states: same card id, different passive — API's
    `optimal_awakening_growths` / `transformations` cover this.
 

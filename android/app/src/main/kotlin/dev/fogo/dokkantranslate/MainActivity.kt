@@ -22,6 +22,7 @@ import dev.fogo.dokkantranslate.identify.CardIdentifier
 import dev.fogo.dokkantranslate.identify.MatchDebug
 import dev.fogo.dokkantranslate.match.CardIndex
 import dev.fogo.dokkantranslate.match.IndexUpdater
+import dev.fogo.dokkantranslate.match.MissionIndex
 import dev.fogo.dokkantranslate.ui.AppScreen
 import dev.fogo.dokkantranslate.ui.UiState
 import dev.fogo.dokkantranslate.ui.toUiState
@@ -75,6 +76,7 @@ class MainActivity : ComponentActivity() {
         // usually a 304; keeps the share-sheet flow current too
         lifecycleScope.launch(Dispatchers.IO) {
             if (IndexUpdater.refresh(this@MainActivity)) CardIndex.invalidate()
+            if (IndexUpdater.refreshMissions(this@MainActivity)) MissionIndex.invalidate()
         }
     }
 

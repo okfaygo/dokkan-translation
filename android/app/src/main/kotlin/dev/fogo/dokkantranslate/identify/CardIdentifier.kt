@@ -8,8 +8,12 @@ import dev.fogo.dokkantranslate.match.Kit
 import dev.fogo.dokkantranslate.match.KitStore
 import dev.fogo.dokkantranslate.match.CardRecord
 import dev.fogo.dokkantranslate.match.Matcher
+import dev.fogo.dokkantranslate.match.MissionIndex
+import dev.fogo.dokkantranslate.match.MissionMatcher
 import dev.fogo.dokkantranslate.ocr.OcrEngine
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 
 /** What the matcher saw, kept for the debug panel. */
@@ -19,6 +23,9 @@ data class MatchDebug(
     val tiedCount: Int = 0,
     val typeHint: String? = null,
     val rarityHint: String? = null,
+    /** both readings of the screen, on one scale: the higher one is shown */
+    val cardScore: Double = 0.0,
+    val missionScore: Double = 0.0,
     /** per-stage timings, so slowness can be attributed instead of guessed */
     val indexMs: Long = 0,
     val ocrMs: Long = 0,
@@ -37,12 +44,23 @@ sealed interface Outcome {
         val debug: MatchDebug,
     ) : Outcome
 
+    /** The screen showed missions, not a card. */
+    data class Missions(
+        val hits: List<MissionMatcher.Hit>,
+        val debug: MatchDebug,
+    ) : Outcome
+
     data class Failure(val message: String, val debug: MatchDebug = MatchDebug()) : Outcome
 }
 
 /**
- * Screenshot -> English kit. Shared by the share-sheet flow (MainActivity)
- * and the floating bubble (BubbleService) so both behave identically.
+ * Screenshot -> English kit, or English missions. Shared by the share-sheet
+ * flow (MainActivity) and the floating bubble (BubbleService) so both
+ * behave identically.
+ *
+ * Both readings run on every screenshot and the one explaining more of the
+ * screen wins (see MissionMatcher.isMissionScreen) — no mode switch for the
+ * user to forget about.
  */
 object CardIdentifier {
 
@@ -65,24 +83,38 @@ object CardIdentifier {
         if (lines.isEmpty()) {
             return Outcome.Failure(
                 "No Japanese text found. Open a card's page or its " +
-                    "passive-detail popup — the popup is the most reliable."
+                    "passive-detail popup (the most reliable), or a mission list."
             )
         }
 
-        progress.onStep("Matching against the card index…")
-        // usually already warm (BubbleService preloads it), but the first
-        // run in a process pays a ~3.5MB JSON parse
+        progress.onStep("Matching against cards and missions…")
+        // usually already warm (BubbleService preloads them), but the first
+        // run in a process pays a ~3.5MB JSON parse for each
         val indexStart = SystemClock.elapsedRealtime()
-        val index = withContext(Dispatchers.Default) { CardIndex.load(context) }
+        val (index, missionIndex) = coroutineScope {
+            val cardJob = async(Dispatchers.Default) { CardIndex.load(context) }
+            val missionJob = async(Dispatchers.Default) { MissionIndex.load(context) }
+            cardJob.await() to missionJob.await()
+        }
         val indexMs = SystemClock.elapsedRealtime() - indexStart
 
         val matchStart = SystemClock.elapsedRealtime()
-        val ranked = Matcher.rankParallel(lines, index)
+        // repeats only matter to missions; the card votes are as before
+        val cardLines = lines.distinct()
+        val (ranked, missions) = coroutineScope {
+            val missionJob = async(Dispatchers.Default) {
+                MissionMatcher.match(lines, missionIndex)
+            }
+            Matcher.rankParallel(cardLines, index) to missionJob.await()
+        }
         val matchMs = SystemClock.elapsedRealtime() - matchStart
+        val cardScore = ranked.maxOfOrNull { it.score } ?: 0.0
 
-        val (elHint, rarHint) = Matcher.extractHints(lines)
+        val (elHint, rarHint) = Matcher.extractHints(cardLines)
         val debug = MatchDebug(
             ocrLines = lines,
+            cardScore = cardScore,
+            missionScore = missions.score,
             topCandidates = ranked.take(6).map { it.record.displayLabel to it.score },
             tiedCount = Matcher.tiedCount(ranked),
             typeHint = elHint?.let { CardRecord.elementName(it) },
@@ -91,6 +123,9 @@ object CardIdentifier {
             ocrMs = ocrMs,
             matchMs = matchMs,
         )
+        if (MissionMatcher.isMissionScreen(missions, cardScore)) {
+            return Outcome.Missions(missions.hits, debug)
+        }
         if (ranked.isEmpty()) {
             return Outcome.Failure(
                 "Couldn't match any card from ${lines.size} recognized lines.",

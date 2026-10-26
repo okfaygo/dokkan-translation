@@ -48,7 +48,10 @@ fun BubblePanel(
     onClose: () -> Unit,
     onResume: () -> Unit,
 ) {
-    val current = (state as? UiState.Result)?.kit
+    // collapsed, the header is all that's visible — so name what is
+    // shown rather than the app
+    val collapsedTitle = (state as? UiState.Result)?.kit?.name
+        ?: (state as? UiState.Missions)?.let { "${it.hits.size} mission(s)" }
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -63,10 +66,8 @@ fun BubblePanel(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    // collapsed, the header is all that's visible — so show
-                    // the card name rather than the app name
                     Text(
-                        current?.name?.takeIf { collapsed } ?: "Dokkan Translate",
+                        collapsedTitle?.takeIf { collapsed } ?: "Dokkan Translate",
                         style = MaterialTheme.typography.labelLarge,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -118,7 +119,7 @@ fun BubblePanel(
                         .verticalScroll(rememberScrollState()),
                 ) {
                     when (state) {
-                        is UiState.Idle -> Text("Tap the bubble over a card.")
+                        is UiState.Idle -> Text("Tap the bubble over a card or a mission list.")
                         is UiState.Working -> Working(state.step)
                         is UiState.Failed -> {
                             Text(state.message, color = MaterialTheme.colorScheme.error)
@@ -131,6 +132,11 @@ fun BubblePanel(
                         is UiState.Result -> KitView(
                             result = state,
                             onSelectCard = onSelectCard,
+                            onPickImage = onClose,
+                            bottomActionLabel = "Close",
+                        )
+                        is UiState.Missions -> MissionsView(
+                            result = state,
                             onPickImage = onClose,
                             bottomActionLabel = "Close",
                         )
